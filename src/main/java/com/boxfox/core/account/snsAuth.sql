@@ -1,1 +1,0 @@
-INSERT INTO user (email, nickname) values(?, ?) ON DUPLICATE KEY UPDATE
