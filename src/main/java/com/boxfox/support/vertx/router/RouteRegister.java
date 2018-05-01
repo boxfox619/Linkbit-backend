@@ -19,6 +19,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 
 /* boxfox 2017.02.13*/
 
@@ -39,36 +42,38 @@ public class RouteRegister {
         router.route().handler(handler);
     }
 
-    public void route(String... pacakge) {
-        Reflections routerAnnotations = new Reflections(pacakge);
-        Set<Class<?>> annotatedClass = routerAnnotations.getTypesAnnotatedWith(RouteRegistration.class);
-        Set<Method> annotatedMethod = routerAnnotations.getMethodsAnnotatedWith(RouteRegistration.class);
+    public void route(String... packages) {
+        Arrays.stream(packages).forEach(packageName -> {
+            Reflections routerAnnotations = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
+            Set<Class<?>> annotatedClass = routerAnnotations.getTypesAnnotatedWith(RouteRegistration.class);
+            Set<Method> annotatedMethod = routerAnnotations.getMethodsAnnotatedWith(RouteRegistration.class);
 
-        annotatedClass.forEach(c -> {
-            RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
-            try {
-                Object routingInstance = c.newInstance();
-                Handler handler = (Handler<RoutingContext>) routingInstance;
-                for (HttpMethod method : annotation.method())
-                    router.route(method, annotation.uri()).handler(handler);
-                routerList.add(new RouterContext(annotation, routingInstance));
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
+            annotatedClass.forEach(c -> {
+                RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
+                try {
+                    Object routingInstance = c.newInstance();
+                    Handler handler = (Handler<RoutingContext>) routingInstance;
+                    for (HttpMethod method : annotation.method())
+                        router.route(method, annotation.uri()).handler(handler);
+                    routerList.add(new RouterContext(annotation, routingInstance));
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
 
-        annotatedMethod.forEach(m -> {
-            RouteRegistration annotation = m.getAnnotation(RouteRegistration.class);
-            try {
-                Object instance = searchCreatedInstance(m.getDeclaringClass());
-                if (instance == null)
-                    instance = m.getDeclaringClass().newInstance();
-                Handler handler = createMethodHandler(instance, m);
-                for (HttpMethod method : annotation.method())
-                    router.route(method, annotation.uri()).handler(handler);
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            annotatedMethod.forEach(m -> {
+                RouteRegistration annotation = m.getAnnotation(RouteRegistration.class);
+                try {
+                    Object instance = searchCreatedInstance(m.getDeclaringClass());
+                    if (instance == null)
+                        instance = m.getDeclaringClass().newInstance();
+                    Handler handler = createMethodHandler(instance, m);
+                    for (HttpMethod method : annotation.method())
+                        router.route(method, annotation.uri()).handler(handler);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 
