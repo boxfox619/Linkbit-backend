@@ -11,8 +11,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class WalletRouter {
 
-
-    @RouteRegistration(uri = "/wallet:name//balance", method = HttpMethod.GET)
+    @RouteRegistration(uri = "/wallet:name/balance", method = HttpMethod.GET)
     public void getBalance(RoutingContext ctx, @Param String address) {
         String name = ctx.pathParam("name");
         WalletService service = WalletServiceManager.getService(name);

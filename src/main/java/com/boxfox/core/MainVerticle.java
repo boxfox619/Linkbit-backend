@@ -2,6 +2,7 @@ package com.boxfox.core;
 
 import com.boxfox.service.wallet.WalletServiceManager;
 import com.boxfox.service.wallet.EthereumService;
+import com.boxfox.support.vertx.middleware.CORSHandler;
 import com.boxfox.support.vertx.router.RouteRegister;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -15,8 +16,9 @@ public class MainVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) {
         RouteRegister routeRegister = RouteRegister.routing(vertx);
-        routeRegister.route(this.getClass().getPackage().getName());
         Router router = routeRegister.getRouter();
+        router.route("/*").handler(CORSHandler.create());
+        routeRegister.route(this.getClass().getPackage().getName());
         server = vertx.createHttpServer().requestHandler(router::accept).listen(8999);
         future.complete();
         registerServices();

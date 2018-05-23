@@ -1,0 +1,59 @@
+package com.boxfox.core.router;
+
+import com.boxfox.service.AuthService;
+import com.boxfox.support.vertx.router.Param;
+import com.boxfox.support.vertx.router.RouteRegistration;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTOptions;
+import io.vertx.ext.web.Cookie;
+import io.vertx.ext.web.RoutingContext;
+
+public class AuthRouter {
+    private AuthService authService;
+
+    public AuthRouter(){
+        authService = new AuthService();
+    }
+
+    @RouteRegistration(uri = "/signin", method = HttpMethod.POST)
+    public void signin(RoutingContext ctx, @Param String id, @Param String password) {
+        if (authService.signin(id, password)) {
+            String token = AuthService.createToken(ctx.vertx(), id);
+            ctx.addCookie(Cookie.cookie("token", token));
+            ctx.response().end(token);
+        } else {
+            ctx.fail(401);
+        }
+    }
+
+    @RouteRegistration(uri = "/signin/fb", method = HttpMethod.POST)
+    public void signin(RoutingContext ctx, @Param String accessToken) {
+    JsonObject result = authService.signinWithFacebook(accessToken);
+        if (result.getBoolean("result")) {
+            String token = AuthService.createToken(ctx.vertx(), result.getString("email"));
+            ctx.addCookie(Cookie.cookie("token", token));
+            ctx.response().end(token);
+        } else {
+            ctx.fail(401);
+        }
+    }
+
+    @RouteRegistration(uri = "/logout", method = HttpMethod.POST)
+    public void logout(RoutingContext ctx) {
+        String token = ctx.getCookie("token").getValue();
+        AuthService.createJWTAuth(ctx.vertx()).authenticate(new JsonObject()
+                .put("jwt", token)
+                .put("options", new JsonObject()
+                        .put("ignoreExpiration", true)), res -> {
+            if (res.succeeded()) {
+                ctx.removeCookie("token");
+                ctx.response().setStatusCode(200).end();
+            } else {
+                ctx.fail(401);
+            }
+        });
+    }
+}
