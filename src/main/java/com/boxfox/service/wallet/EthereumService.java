@@ -1,4 +1,4 @@
-package com.boxfox.service;
+package com.boxfox.service.wallet;
 
 import com.boxfox.support.data.Config;
 import com.google.common.io.Files;
@@ -24,7 +24,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
-public class EthereumService implements CryptoCurrencyService {
+public class EthereumService implements WalletService {
 
   static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
   static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);

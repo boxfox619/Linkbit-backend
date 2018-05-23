@@ -1,7 +1,7 @@
 package com.boxfox.core;
 
-import com.boxfox.service.CryptoCurrencyManager;
-import com.boxfox.service.EthereumService;
+import com.boxfox.service.wallet.WalletServiceManager;
+import com.boxfox.service.wallet.EthereumService;
 import com.boxfox.support.vertx.router.RouteRegister;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -29,6 +29,6 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void registerServices(){
-        CryptoCurrencyManager.register("eth", new EthereumService());
+        WalletServiceManager.register("eth", new EthereumService());
     }
 }

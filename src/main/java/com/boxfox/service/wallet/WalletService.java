@@ -1,8 +1,8 @@
-package com.boxfox.service;
+package com.boxfox.service.wallet;
 
 import io.vertx.core.json.JsonObject;
 
-public interface CryptoCurrencyService {
+public interface WalletService {
 
   String getBalance(String address);
   JsonObject createWallet(String password);

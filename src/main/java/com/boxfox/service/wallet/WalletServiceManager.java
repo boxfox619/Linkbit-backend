@@ -1,24 +1,24 @@
-package com.boxfox.service;
+package com.boxfox.service.wallet;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CryptoCurrencyManager {
-  private Map<String, CryptoCurrencyService> serviceMap;
+public class WalletServiceManager {
+  private Map<String, WalletService> serviceMap;
 
-  private CryptoCurrencyManager(){
+  private WalletServiceManager(){
     serviceMap = new HashMap<>();
   }
 
   public static class CryptoCurrencyRegisteryInstance{
-    private static CryptoCurrencyManager instance = new CryptoCurrencyManager();
+    private static WalletServiceManager instance = new WalletServiceManager();
   }
 
-  public static CryptoCurrencyManager getInstance(){
+  public static WalletServiceManager getInstance(){
     return CryptoCurrencyRegisteryInstance.instance;
   }
 
-  public static void register(String name, CryptoCurrencyService service){
+  public static void register(String name, WalletService service){
     getInstance().serviceMap.put(name, service);
   }
 
@@ -30,7 +30,7 @@ public class CryptoCurrencyManager {
     return getInstance().serviceMap.containsKey(name);
   }
 
-  public static CryptoCurrencyService getService(String name){
+  public static WalletService getService(String name){
     return getInstance().serviceMap.get(name);
   }
 }
