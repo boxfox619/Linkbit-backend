@@ -26,6 +26,7 @@ public class AuthService {
         Profile profile = FacebookAuth.validation(accessToken);
         if(profile!=null) {
             result.put("result", true);
+            result.put("email", profile.getEmail());
             if (data.fetchByEmail(profile.getEmail()).size() == 0) {
                 String address = createRandomAddress(data);
                 createContext().insertInto(ACCOUNT, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(profile.getEmail(), profile.getName(), address);
