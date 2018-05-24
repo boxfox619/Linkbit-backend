@@ -47,6 +47,13 @@ public class Config {
         }
         return str;
     }
+    public int getInt(String propName, int defaultInt) {
+        String str = preference.getProperty(propName);
+        if(str==null){
+            return defaultInt;
+        }
+        return Integer.valueOf(str);
+    }
 
 
     public int getInt(String propName) {
