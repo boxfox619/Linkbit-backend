@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import com.boxfox.support.vertx.middleware.JWTAuthHandler;
 import com.google.common.net.HttpHeaders;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -52,8 +53,12 @@ public class RouteRegister {
                 try {
                     Object routingInstance = c.newInstance();
                     Handler handler = (Handler<RoutingContext>) routingInstance;
-                    for (HttpMethod method : annotation.method())
+                    for (HttpMethod method : annotation.method()){
+                        if(annotation.auth()){
+                            router.route(method, annotation.uri()).handler(JWTAuthHandler.create());
+                        }
                         router.route(method, annotation.uri()).handler(handler);
+                    }
                     routerList.add(new RouterContext(annotation, routingInstance));
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
@@ -67,8 +72,12 @@ public class RouteRegister {
                     if (instance == null)
                         instance = m.getDeclaringClass().newInstance();
                     Handler handler = createMethodHandler(instance, m);
-                    for (HttpMethod method : annotation.method())
+                    for (HttpMethod method : annotation.method()){
+                        if(annotation.auth()){
+                            router.route(method, annotation.uri()).handler(JWTAuthHandler.create());
+                        }
                         router.route(method, annotation.uri()).handler(handler);
+                    }
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }

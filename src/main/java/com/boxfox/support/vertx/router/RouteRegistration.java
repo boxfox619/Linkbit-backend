@@ -19,4 +19,6 @@ public @interface RouteRegistration {
 
     String paramDefaultType() default "";
 
+    boolean auth() default false;
+
 }
