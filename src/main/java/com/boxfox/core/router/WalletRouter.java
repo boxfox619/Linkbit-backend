@@ -11,7 +11,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class WalletRouter {
 
-    @RouteRegistration(uri = "/wallet:name/balance", method = HttpMethod.GET)
+    @RouteRegistration(uri = "/wallet:name/balance", method = HttpMethod.GET, auth = true)
     public void getBalance(RoutingContext ctx, @Param String address) {
         String name = ctx.pathParam("name");
         WalletService service = WalletServiceManager.getService(name);
@@ -26,7 +26,7 @@ public class WalletRouter {
         ctx.response().end();
     }
 
-    @RouteRegistration(uri = "/wallet/:name/create", method = HttpMethod.POST)
+    @RouteRegistration(uri = "/wallet/:name/create", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String password) {
         String name = ctx.pathParam("name");
         WalletService service = WalletServiceManager.getService(name);
@@ -36,7 +36,7 @@ public class WalletRouter {
         ctx.response().end();
     }
 
-    @RouteRegistration(uri = "/wallet:name//send", method = HttpMethod.POST)
+    @RouteRegistration(uri = "/wallet:name/send", method = HttpMethod.POST, auth = true)
     public void send(RoutingContext ctx,
                      @Param String walletFileName,
                      @Param String walletJsonFile,

@@ -41,19 +41,9 @@ public class AuthRouter {
         }
     }
 
-    @RouteRegistration(uri = "/logout", method = HttpMethod.POST)
+    @RouteRegistration(uri = "/logout", method = HttpMethod.POST, auth = true)
     public void logout(RoutingContext ctx) {
-        String token = ctx.getCookie("token").getValue();
-        AuthService.createJWTAuth(ctx.vertx()).authenticate(new JsonObject()
-                .put("jwt", token)
-                .put("options", new JsonObject()
-                        .put("ignoreExpiration", true)), res -> {
-            if (res.succeeded()) {
-                ctx.removeCookie("token");
-                ctx.response().setStatusCode(200).end();
-            } else {
-                ctx.fail(401);
-            }
-        });
+        ctx.removeCookie("token");
+        ctx.response().setStatusCode(200).end();
     }
 }
