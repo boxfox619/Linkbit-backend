@@ -20,8 +20,8 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/*").handler(CORSHandler.create());
         routeRegister.route(this.getClass().getPackage().getName());
         server = vertx.createHttpServer().requestHandler(router::accept).listen(8999);
-        future.complete();
         registerServices();
+        future.complete();
     }
 
     @Override
