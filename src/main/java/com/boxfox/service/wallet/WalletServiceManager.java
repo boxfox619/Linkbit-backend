@@ -21,6 +21,11 @@ public class WalletServiceManager {
   public static void register(String name, WalletService service){
     getInstance().serviceMap.put(name, service);
   }
+  public static void register(String[] symbols, WalletService service) {
+    for(String symbol : symbols){
+      getInstance().serviceMap.put(symbol, service);
+    }
+  }
 
   public static void unRegister(String name){
     getInstance().serviceMap.remove(name);
