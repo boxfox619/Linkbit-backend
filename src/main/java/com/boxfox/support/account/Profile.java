@@ -1,7 +1,7 @@
 package com.boxfox.support.account;
 
 public class Profile {
-    private String email, name, profile;
+    private String email, name, profile, uid;
 
     public String getProfile() {
         return profile;
@@ -25,5 +25,13 @@ public class Profile {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

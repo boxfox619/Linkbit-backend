@@ -29,7 +29,7 @@ public class AuthService {
             result.put("email", profile.getEmail());
             if (data.fetchByEmail(profile.getEmail()).size() == 0) {
                 String address = createRandomAddress(data);
-                createContext().insertInto(ACCOUNT, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(profile.getEmail(), profile.getName(), address);
+                createContext().insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(profile.getUid() , profile.getEmail(), profile.getName(), address);
             }
         }
         return result;

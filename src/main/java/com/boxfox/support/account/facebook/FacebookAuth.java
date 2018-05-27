@@ -28,6 +28,7 @@ public class FacebookAuth {
             in.close();
             profile = new Profile();
             JsonObject responseObj = new JsonObject(response.toString());
+            profile.setUid(responseObj.getString("id"));
             profile.setName(responseObj.getString("name"));
             profile.setEmail(responseObj.getString("email"));
             JsonObject picture_reponse = responseObj.getJsonObject("picture");
