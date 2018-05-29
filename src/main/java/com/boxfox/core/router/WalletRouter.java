@@ -1,9 +1,12 @@
 package com.boxfox.core.router;
 
+import com.boxfox.service.wallet.model.TransactionResult;
 import com.boxfox.service.wallet.WalletServiceManager;
 import com.boxfox.service.wallet.WalletService;
 import com.boxfox.support.vertx.router.RouteRegistration;
 import com.boxfox.support.vertx.router.Param;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -15,6 +18,11 @@ import static io.one.sys.db.Tables.COIN;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
 public class WalletRouter {
+    private Gson gson;
+    private WalletRouter(){
+        GsonBuilder builder = new GsonBuilder();
+        gson = builder.create();
+    }
 
     @RouteRegistration(uri = "/support/wallet/", method = HttpMethod.GET, auth = true)
     public void getSupportWalletList(RoutingContext ctx){
@@ -77,9 +85,14 @@ public class WalletRouter {
                      @Param String amount) {
         String name = ctx.pathParam("name");
         WalletService service = WalletServiceManager.getService(name);
-        JsonObject result = service.send(walletFileName, walletJsonFile, password, targetAddress, amount);
+        TransactionResult result = service.send(walletFileName, walletJsonFile, password, targetAddress, amount);
         ctx.response().putHeader("content-type", "application/json");
-        ctx.response().write(result.encodePrettily());
+        ctx.response().write(gson.toJson(result));
         ctx.response().end();
+    }
+
+    @RouteRegistration(uri= "/status/:address", method = HttpMethod.GET, auth= true)
+    public void status(RoutingContext ctx, @Param String address){
+
     }
 }
