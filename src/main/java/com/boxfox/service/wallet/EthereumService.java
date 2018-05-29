@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.web3j.crypto.CipherException;
@@ -133,10 +134,16 @@ public class EthereumService extends WalletService {
 
   @Override
   public List<TransactionStatus> getTransactionList(String address) {
-
-    //@TODO search transaction by address
-
-    return null;
+    List<TransactionStatus> txStatusList = new ArrayList<>();
+    createContext().selectFrom(TRANSACTION).where(TRANSACTION.FROM.eq(address).or(TRANSACTION.TO.eq(address))).fetch().forEach(r->{
+      TransactionStatus txStatus = new TransactionStatus();
+      txStatus.setAmount(r.getValue(TRANSACTION.AMOUNT));
+      txStatus.setSourceAddress(r.getValue(TRANSACTION.FROM));
+      txStatus.setTargetAddress(r.getValue(TRANSACTION.TO));
+      txStatus.setTransactionHash(r.getValue(TRANSACTION.HASH));
+      txStatusList.add(txStatus);
+    });
+    return txStatusList;
   }
 
   @Override
