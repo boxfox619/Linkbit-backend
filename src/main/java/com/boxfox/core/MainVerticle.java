@@ -1,6 +1,7 @@
 package com.boxfox.core;
 
 import com.boxfox.cross.service.wallet.WalletServiceManager;
+import com.boxfox.cross.service.wallet.indexing.TransactionIndexingVerticle;
 import com.boxfox.cross.wallet.eth.EthereumService;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.cross.common.vertx.router.RouteRegister;
@@ -24,8 +25,11 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/*").handler(CORSHandler.create());
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
-        server = vertx.createHttpServer().requestHandler(router::accept).listen(8999);
-        registerServices();
+        server = vertx.createHttpServer().requestHandler(router::accept).listen(8999, rs -> {
+            System.out.println("asdasd");
+            vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
+            WalletServiceManager.register("eth", new EthereumService());
+        });
         future.complete();
     }
 
@@ -33,10 +37,5 @@ public class MainVerticle extends AbstractVerticle {
     public void stop(Future<Void> stopFuture) {
         server.close();
         stopFuture.complete();
-    }
-
-    private void registerServices(){
-        vertx.deployVerticle("com.boxfox.service.wallet.indexing.TransactionIndexingVerticle", new DeploymentOptions().setWorker(true));
-        WalletServiceManager.register("eth", new EthereumService());
     }
 }

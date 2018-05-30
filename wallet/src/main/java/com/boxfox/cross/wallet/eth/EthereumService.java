@@ -13,6 +13,7 @@ import com.google.common.io.Files;
 import io.vertx.core.json.JsonObject;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
@@ -65,7 +66,9 @@ public class EthereumService extends WalletService {
   @Override
   public String getBalance(String address) {
     try {
-      return web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance().toString();
+      String wei = web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance().toString();
+      BigDecimal bigDecimal = Convert.fromWei(wei, Convert.Unit.ETHER);
+      return bigDecimal.toPlainString();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -138,11 +141,11 @@ public class EthereumService extends WalletService {
   @Override
   public List<TransactionStatus> getTransactionList(String address) {
     List<TransactionStatus> txStatusList = new ArrayList<>();
-    createContext().selectFrom(TRANSACTION).where(TRANSACTION.FROM.eq(address).or(TRANSACTION.TO.eq(address))).fetch().forEach(r->{
+    createContext().selectFrom(TRANSACTION).where(TRANSACTION.SOURCEADDRESS.eq(address).or(TRANSACTION.TARGETADDRESS.eq(address))).fetch().forEach(r->{
       TransactionStatus txStatus = new TransactionStatus();
-      txStatus.setAmount(r.getValue(TRANSACTION.AMOUNT));
-      txStatus.setSourceAddress(r.getValue(TRANSACTION.FROM));
-      txStatus.setTargetAddress(r.getValue(TRANSACTION.TO));
+      txStatus.setAmount(r.getAmount());
+      txStatus.setSourceAddress(r.getValue(TRANSACTION.SOURCEADDRESS));
+      txStatus.setTargetAddress(r.getValue(TRANSACTION.TARGETADDRESS));
       txStatus.setTransactionHash(r.getValue(TRANSACTION.HASH));
       txStatusList.add(txStatus);
     });
@@ -161,7 +164,7 @@ public class EthereumService extends WalletService {
       status.setSourceAddress(receipt.getFrom());
       status.setTargetAddress(receipt.getTo());
       status.setTransactionHash(receipt.getBlockHash());
-      status.setAmount(tx.getValue());
+      status.setAmount(Double.valueOf(Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER).toPlainString()));
       status.setStatus(receipt.getStatus().equals("0x1"));
       return status;
     } catch (IOException e) {

@@ -38,7 +38,9 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.+'
 }
 
-
+compileJava {
+    options.compilerArgs << '-parameters'
+}
 
 shadowJar {
     mustRunAfter jar

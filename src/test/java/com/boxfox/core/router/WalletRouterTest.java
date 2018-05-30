@@ -1,5 +1,7 @@
 package com.boxfox.core.router;
 
+import com.boxfox.cross.service.wallet.WalletServiceManager;
+import com.boxfox.cross.wallet.eth.EthereumService;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import io.vertx.core.http.HttpServerResponse;
@@ -25,17 +27,18 @@ public class WalletRouterTest {
     public WalletRouterTest() {
         this.router = new WalletRouter();
         this.ctx = mock(RoutingContext.class);
+        WalletServiceManager.register("eth", new EthereumService());
     }
 
     @Test
     public void getBalance() {
         HttpServerResponse response = createResponse(200);
         when(response.write(anyString())).then(invocation -> {
-            int balance = Integer.valueOf((String) invocation.getArguments()[0]);
+            double balance = Double.valueOf((String) invocation.getArguments()[0]);
             Assert.assertTrue(balance > 0);
             return response;
         });
-        this.router.getBalance(ctx, "0xa5B5bE1ecB74696eC27E3CA89E5d940c9dbcCc56");
+        this.router.getBalance(ctx, "eth", "0xa5B5bE1ecB74696eC27E3CA89E5d940c9dbcCc56");
     }
 
     @Test

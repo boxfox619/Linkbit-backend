@@ -89,22 +89,18 @@ public class RouteRegister {
         return ctx -> {
             List<Object> argments = new ArrayList<>();
             Arrays.stream(m.getParameters()).forEach(param -> {
-                String paramType = getParamType(param, m);
-                String paramName = param.getName();
                 Class<?> paramClass = param.getType();
-                if (paramClass.equals(Handler.class)) {
+                if (paramClass.equals(RoutingContext.class)) {
                     argments.add(ctx);
                 } else {
+                    String paramName = param.getName();
                     Object paramData = null;
-                    switch (paramType) {
-                        case Param.TYPE_BODY:
-                            paramData = getParameterFromBody(ctx, paramName, paramClass);
-                            break;
-                        case Param.TYPE_PATH:
-                            paramData = castingParameter(ctx.pathParam(paramName), paramType);
-                            break;
-                        default:
-                            paramData = castingParameter(ctx.queryParam(paramName).get(0), paramType);
+                    if (param.getAnnotation(Param.class) != null) {
+                        paramData = getParameterFromBody(ctx, paramName, paramClass);
+                        if (paramData == null)
+                            paramData = castingParameter(ctx.pathParam(paramName), paramClass);
+                        if (paramData == null && ctx.queryParam(paramName).size() > 0)
+                            paramData = castingParameter(ctx.queryParam(paramName).get(0), paramClass);
                     }
                     argments.add(paramData);
                 }
@@ -114,26 +110,12 @@ public class RouteRegister {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                e.getTargetException().printStackTrace();
             }
         };
     }
 
-    private String getParamType(Parameter param, Method m) {
-        String defaultParamType = m.getAnnotation(RouteRegistration.class).paramDefaultType();
-        String paramType = param.getAnnotation(Param.class).type();
-        if (param.equals(Param.TYPE_AUTO)) {
-            if (defaultParamType.length() == 0) {
-                HttpMethod method = m.getAnnotation(RouteRegistration.class).method()[0];
-                paramType = (method == HttpMethod.GET) ? Param.TYPE_QUERY : Param.TYPE_BODY;
-            } else {
-                paramType = defaultParamType;
-            }
-        }
-        return paramType;
-    }
-
-    private Object castingParameter(String str, String paramType) {
+    private Object castingParameter(String str, Class<?> paramType) {
         Object paramData = str;
         if (paramType.equals(Integer.class)) {
             paramData = Integer.valueOf(str);
@@ -143,9 +125,9 @@ public class RouteRegister {
             paramData = Double.valueOf(str);
         } else if (paramType.equals(Float.class)) {
             paramData = Float.valueOf(str);
-        } else if (paramData.equals(JsonObject.class)) {
+        } else if (paramType.equals(JsonObject.class)) {
             paramData = new JsonObject(str);
-        } else if (paramData.equals(JsonArray.class)) {
+        } else if (paramType.equals(JsonArray.class)) {
             paramData = new JsonArray(str);
         }
         return paramData;
@@ -153,24 +135,25 @@ public class RouteRegister {
 
     private Object getParameterFromBody(RoutingContext ctx, String paramName, Class<?> paramType) {
         Object paramData = null;
-        boolean json = ctx.request().getHeader(HttpHeaders.CONTENT_TYPE).toLowerCase().contains("json");
-        JsonObject bodyData = ctx.getBodyAsJson();
-        if (paramType.equals(String.class)) {
-            paramData = bodyData.getString(paramName);
-        } else if (paramType.equals(Integer.class)) {
-            paramData = bodyData.getInteger(paramName);
-        } else if (paramType.equals(Boolean.class)) {
-            paramData = bodyData.getBoolean(paramName);
-        } else if (paramType.equals(Double.class)) {
-            paramData = bodyData.getDouble(paramName);
-        } else if (paramType.equals(Float.class)) {
-            paramData = bodyData.getFloat(paramName);
-        } else if (paramData.equals(JsonObject.class)) {
-            paramData = bodyData.getJsonObject(paramName);
-        } else if (paramData.equals(JsonArray.class)) {
-            paramData = bodyData.getJsonArray(paramName);
-        } else if (paramData.equals(byte[].class)) {
-            paramData = bodyData.getBinary(paramName);
+        if(ctx.request().method() == HttpMethod.POST) {
+            JsonObject bodyData = ctx.getBodyAsJson();
+            if (paramType.equals(String.class)) {
+                paramData = bodyData.getString(paramName);
+            } else if (paramType.equals(Integer.class)) {
+                paramData = bodyData.getInteger(paramName);
+            } else if (paramType.equals(Boolean.class)) {
+                paramData = bodyData.getBoolean(paramName);
+            } else if (paramType.equals(Double.class)) {
+                paramData = bodyData.getDouble(paramName);
+            } else if (paramType.equals(Float.class)) {
+                paramData = bodyData.getFloat(paramName);
+            } else if (paramData.equals(JsonObject.class)) {
+                paramData = bodyData.getJsonObject(paramName);
+            } else if (paramData.equals(JsonArray.class)) {
+                paramData = bodyData.getJsonArray(paramName);
+            } else if (paramData.equals(byte[].class)) {
+                paramData = bodyData.getBinary(paramName);
+            }
         }
         return paramData;
     }

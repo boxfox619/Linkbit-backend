@@ -7,7 +7,7 @@ public class TransactionStatus {
   private String sourceAddress;
   private String targetAddress;
   private boolean status;
-  private BigInteger amount;
+  private double amount;
   private BigInteger blockNumber;
   private BigInteger confirmation;
 
@@ -35,11 +35,11 @@ public class TransactionStatus {
     this.targetAddress = targetAddress;
   }
 
-  public BigInteger getAmount() {
+  public double getAmount() {
     return amount;
   }
 
-  public void setAmount(BigInteger amount) {
+  public void setAmount(double amount) {
     this.amount = amount;
   }
 

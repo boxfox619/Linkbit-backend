@@ -19,15 +19,16 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 
 public class WalletRouter {
     private Gson gson;
-    private WalletRouter(){
+
+    public WalletRouter() {
         GsonBuilder builder = new GsonBuilder();
         gson = builder.create();
     }
 
     @RouteRegistration(uri = "/support/wallet/", method = HttpMethod.GET, auth = true)
-    public void getSupportWalletList(RoutingContext ctx){
+    public void getSupportWalletList(RoutingContext ctx) {
         JsonArray coins = new JsonArray();
-        createContext().selectFrom(COIN).fetch().forEach(r-> coins.add(new JsonObject(r.formatJSON())));
+        createContext().selectFrom(COIN).fetch().forEach(r -> coins.add(new JsonObject(r.formatJSON())));
         ctx.response().end(coins.encode());
     }
 
@@ -40,7 +41,7 @@ public class WalletRouter {
                 .from(WALLET.join(COIN).on(WALLET.SYMBOL.eq(COIN.SYMBOL)))
                 .where(WALLET.UID.equal(ownUid))
                 .fetch()
-                .forEach(r->{
+                .forEach(r -> {
                     String symbol = (String) r.getValue("symbol");
                     String address = (String) r.getValue("address");
                     String balance = WalletServiceManager.getService(symbol).getBalance(address);
@@ -52,18 +53,18 @@ public class WalletRouter {
     }
 
     @RouteRegistration(uri = "/wallet/:name/balance", method = HttpMethod.GET, auth = true)
-    public void getBalance(RoutingContext ctx, @Param String address) {
-        String name = ctx.pathParam("name");
+    public void getBalance(RoutingContext ctx, @Param String name, @Param String address) {
         WalletService service = WalletServiceManager.getService(name);
-        String balance = service.getBalance(address);
-        if(balance==null){
-            ctx.response().write(balance);
-            ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
-        }else{
-            ctx.response().write(balance);
-            ctx.response().setStatusCode(200);
+        if (service != null) {
+            String balance = service.getBalance(address);
+            if (balance == null) {
+                ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
+            } else {
+                ctx.response().setStatusCode(200).end(balance);
+            }
+        } else {
+            ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
         }
-        ctx.response().end();
     }
 
     @RouteRegistration(uri = "/wallet/:name/create", method = HttpMethod.POST, auth = true)
@@ -91,8 +92,8 @@ public class WalletRouter {
         ctx.response().end();
     }
 
-    @RouteRegistration(uri= "/status/:address", method = HttpMethod.GET, auth= true)
-    public void status(RoutingContext ctx, @Param String address){
+    @RouteRegistration(uri = "/status/:address", method = HttpMethod.GET, auth = true)
+    public void status(RoutingContext ctx, @Param String address) {
 
     }
 }
