@@ -25,14 +25,14 @@ public class WalletRouter {
         gson = builder.create();
     }
 
-    @RouteRegistration(uri = "/support/wallet/", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/support/wallet/list", method = HttpMethod.GET, auth = true)
     public void getSupportWalletList(RoutingContext ctx) {
         JsonArray coins = new JsonArray();
         createContext().selectFrom(COIN).fetch().forEach(r -> coins.add(new JsonObject(r.formatJSON())));
         ctx.response().end(coins.encode());
     }
 
-    @RouteRegistration(uri = "/wallet/", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/list", method = HttpMethod.GET, auth = true)
     public void getWallets(RoutingContext ctx) {
         String ownUid = (String) ctx.data().get("uid");
         JsonArray wallets = new JsonArray();
@@ -69,11 +69,15 @@ public class WalletRouter {
 
     @RouteRegistration(uri = "/wallet/:name/create", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String password) {
-        String name = ctx.pathParam("name");
-        WalletService service = WalletServiceManager.getService(name);
-        JsonObject result = service.createWallet(password);
-        ctx.response().putHeader("content-type", "application/json");
-        ctx.response().write(result.encodePrettily());
+        if (password != null) {
+            String name = ctx.pathParam("name");
+            WalletService service = WalletServiceManager.getService(name);
+            JsonObject result = service.createWallet(password);
+            ctx.response().putHeader("content-type", "application/json");
+            ctx.response().write(result.encodePrettily());
+        } else {
+            ctx.response().setStatusMessage("Illegal Argument").setStatusCode(HttpResponseStatus.BAD_REQUEST.code());
+        }
         ctx.response().end();
     }
 

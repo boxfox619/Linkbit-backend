@@ -135,24 +135,24 @@ public class RouteRegister {
 
     private Object getParameterFromBody(RoutingContext ctx, String paramName, Class<?> paramType) {
         Object paramData = null;
-        if(ctx.request().method() == HttpMethod.POST) {
-            JsonObject bodyData = ctx.getBodyAsJson();
+        String data = ctx.request().getFormAttribute(paramName);
+        if(ctx.request().method() == HttpMethod.POST&& data!=null) {
             if (paramType.equals(String.class)) {
-                paramData = bodyData.getString(paramName);
+                paramData = data;
             } else if (paramType.equals(Integer.class)) {
-                paramData = bodyData.getInteger(paramName);
+                paramData = Integer.valueOf(data);
             } else if (paramType.equals(Boolean.class)) {
-                paramData = bodyData.getBoolean(paramName);
+                paramData = Boolean.valueOf(data);
             } else if (paramType.equals(Double.class)) {
-                paramData = bodyData.getDouble(paramName);
+                paramData = Double.valueOf(data);
             } else if (paramType.equals(Float.class)) {
-                paramData = bodyData.getFloat(paramName);
+                paramData = Float.valueOf(data);
             } else if (paramData.equals(JsonObject.class)) {
-                paramData = bodyData.getJsonObject(paramName);
+                paramData = new JsonObject(data);
             } else if (paramData.equals(JsonArray.class)) {
-                paramData = bodyData.getJsonArray(paramName);
+                paramData = new JsonArray(data);
             } else if (paramData.equals(byte[].class)) {
-                paramData = bodyData.getBinary(paramName);
+                paramData = Byte.valueOf(data);
             }
         }
         return paramData;

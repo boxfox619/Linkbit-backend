@@ -10,6 +10,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 
@@ -22,6 +23,7 @@ public class MainVerticle extends AbstractVerticle {
         RouteRegister routeRegister = RouteRegister.routing(vertx);
         Router router = routeRegister.getRouter();
         router.route().handler(CookieHandler.create());
+        router.route().handler(BodyHandler.create());
         router.route("/*").handler(CORSHandler.create());
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
