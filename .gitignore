@@ -42,7 +42,7 @@ Thumbs.db
 
 # JOOQ builded files #
 ######################
-src/main/java/io
+**/src/main/java/io
 
 # Build output directies
 /target

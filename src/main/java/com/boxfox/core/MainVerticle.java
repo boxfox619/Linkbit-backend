@@ -1,10 +1,11 @@
 package com.boxfox.core;
 
-import com.boxfox.service.wallet.WalletServiceManager;
-import com.boxfox.service.wallet.EthereumService;
-import com.boxfox.support.vertx.middleware.CORSHandler;
-import com.boxfox.support.vertx.router.RouteRegister;
+import com.boxfox.cross.service.wallet.WalletServiceManager;
+import com.boxfox.cross.wallet.eth.EthereumService;
+import com.boxfox.cross.common.vertx.middleware.CORSHandler;
+import com.boxfox.cross.common.vertx.router.RouteRegister;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
@@ -35,6 +36,7 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void registerServices(){
+        vertx.deployVerticle("com.boxfox.service.wallet.indexing.TransactionIndexingVerticle", new DeploymentOptions().setWorker(true));
         WalletServiceManager.register("eth", new EthereumService());
     }
 }

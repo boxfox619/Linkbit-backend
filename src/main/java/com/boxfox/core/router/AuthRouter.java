@@ -1,13 +1,10 @@
 package com.boxfox.core.router;
 
-import com.boxfox.service.AuthService;
-import com.boxfox.support.vertx.router.Param;
-import com.boxfox.support.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.vertx.router.Param;
+import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.service.auth.AuthService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.User;
-import io.vertx.ext.auth.jwt.JWTAuth;
-import io.vertx.ext.auth.jwt.JWTOptions;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 

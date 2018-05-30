@@ -1,0 +1,87 @@
+import groovy.xml.MarkupBuilder
+import org.jooq.util.GenerationTool
+
+import javax.xml.bind.JAXB
+
+group 'com.boxfox.cross'
+version '1.0.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+buildscript {
+    ext {
+        vertx_jooq_version = '3.1.0'
+        postgresql_version = '42.1.4'
+    }
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.github.jklingsporn:vertx-jooq-generate:$vertx_jooq_version"
+        classpath "org.postgresql:postgresql:$postgresql_version"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group:'io.vertx', name:'vertx-core', version:'3.5.0'
+    compile group:'io.vertx', name:'vertx-web', version:'3.5.0'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    compile "io.github.jklingsporn:vertx-jooq-classic:$vertx_jooq_version"
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task jooqGenerate {
+    doLast() {
+        def writer = new StringWriter()
+        new MarkupBuilder(writer).configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.10.0.xsd') {
+            jdbc {
+                driver('org.postgresql.Driver')
+                url('jdbc:postgresql://localhost:5432/crossdb')
+                user('postgres')
+                password('dbpw1234')
+            }
+            generator {
+                name('io.github.jklingsporn.vertx.jooq.generate.VertxGenerator')
+                database {
+                    name('org.jooq.util.postgres.PostgresDatabase')
+                    include('.*')
+                    excludes('schema_version')
+                    inputSchema('public')
+                    includeTables(true)
+                    includeRoutines(true)
+                    includePackages(false)
+                    includeUDTs(true)
+                    includeSequences(true)
+                }
+                generate([:]) {
+                    deprecated(false)
+                    records(false)
+                    interfaces(true)
+                    fluentSetters(true)
+                    pojos(true)
+                    daos(true)
+                }
+                target() {
+                    packageName('io.one.sys.db')
+                    directory("$projectDir/src/main/java")
+                }
+                strategy {
+                    name('io.github.jklingsporn.vertx.jooq.generate.classic.JDBCClassicVertxGeneratorStrategy')
+                }
+            }
+        }
+        GenerationTool.generate(
+                JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
+        )
+    }
+}

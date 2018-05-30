@@ -1,10 +1,10 @@
 package com.boxfox.core.router;
 
-import com.boxfox.service.wallet.model.TransactionResult;
-import com.boxfox.service.wallet.WalletServiceManager;
-import com.boxfox.service.wallet.WalletService;
-import com.boxfox.support.vertx.router.RouteRegistration;
-import com.boxfox.support.vertx.router.Param;
+import com.boxfox.cross.service.wallet.model.TransactionResult;
+import com.boxfox.cross.service.wallet.WalletServiceManager;
+import com.boxfox.cross.service.wallet.WalletService;
+import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.vertx.router.Param;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -13,7 +13,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-import static com.boxfox.support.data.PostgresConfig.createContext;
+import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.Tables.COIN;
 import static io.one.sys.db.tables.Wallet.WALLET;
 

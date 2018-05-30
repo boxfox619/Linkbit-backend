@@ -1,6 +1,6 @@
 package com.boxfox.core.handler;
 
-import com.boxfox.support.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;

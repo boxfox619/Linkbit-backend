@@ -1,8 +1,8 @@
 package com.boxfox.core.router;
 
-import com.boxfox.support.data.PostgresConfig;
-import com.boxfox.support.vertx.router.Param;
-import com.boxfox.support.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.common.vertx.router.Param;
+import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -11,7 +11,7 @@ import io.vertx.ext.web.RoutingContext;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 
-import static com.boxfox.support.data.PostgresConfig.createContext;
+import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.Tables.FRIEND;
 import static io.one.sys.db.tables.Account.ACCOUNT;
 
