@@ -3,6 +3,7 @@ package com.boxfox.core.router;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.service.auth.AuthService;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Cookie;
@@ -31,8 +32,15 @@ public class AuthRouter {
     JsonObject result = authService.signinWithFacebook(accessToken);
         if (result.getBoolean("result")) {
             String token = AuthService.createToken(ctx.vertx(), result.getString("email"));
-            ctx.addCookie(Cookie.cookie("token", token));
-            ctx.response().end(token);
+            AuthService.createJWTAuth(ctx.vertx()).authenticate(new JsonObject().put("jwt", token), res->{
+                if(res.succeeded()){
+                    ctx.setUser(res.result());
+                    ctx.addCookie(Cookie.cookie("token", token));
+                    ctx.response().end(token);
+                }else{
+                    ctx.fail(401);
+                }
+            });
         } else {
             ctx.fail(401);
         }
