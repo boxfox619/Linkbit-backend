@@ -7,10 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import com.boxfox.cross.common.vertx.middleware.JWTAuthHandler;
+import com.boxfox.cross.common.vertx.JWTAuthUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.handler.JWTAuthHandler;
 import org.reflections.Reflections;
 
 import io.vertx.core.Handler;
@@ -45,7 +46,7 @@ public class RouteRegister {
             Reflections routerAnnotations = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
             Set<Class<?>> annotatedClass = routerAnnotations.getTypesAnnotatedWith(RouteRegistration.class);
             Set<Method> annotatedMethod = routerAnnotations.getMethodsAnnotatedWith(RouteRegistration.class);
-
+            JWTAuthHandler jwtAuthHandler = JWTAuthHandler.create(JWTAuthUtil.createAuth(Vertx.vertx()));
             annotatedClass.forEach(c -> {
                 RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
                 try {
@@ -53,7 +54,7 @@ public class RouteRegister {
                     Handler handler = (Handler<RoutingContext>) routingInstance;
                     for (HttpMethod method : annotation.method()){
                         if(annotation.auth()){
-                            router.route(method, annotation.uri()).handler(JWTAuthHandler.create());
+                            router.route(method, annotation.uri()).handler(jwtAuthHandler);
                         }
                         router.route(method, annotation.uri()).handler(handler);
                     }
@@ -72,7 +73,7 @@ public class RouteRegister {
                     Handler handler = createMethodHandler(instance, m);
                     for (HttpMethod method : annotation.method()){
                         if(annotation.auth()){
-                            router.route(method, annotation.uri()).handler(JWTAuthHandler.create());
+                            router.route(method, annotation.uri()).handler(jwtAuthHandler);
                         }
                         router.route(method, annotation.uri()).handler(handler);
                     }

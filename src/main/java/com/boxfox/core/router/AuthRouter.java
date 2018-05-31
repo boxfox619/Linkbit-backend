@@ -1,9 +1,10 @@
 package com.boxfox.core.router;
 
+import com.boxfox.cross.common.vertx.JWTAuthUtil;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.service.auth.AuthService;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import com.boxfox.cross.service.auth.Profile;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Cookie;
@@ -19,9 +20,10 @@ public class AuthRouter {
     @RouteRegistration(uri = "/signin", method = HttpMethod.POST)
     public void signin(RoutingContext ctx, @Param String id, @Param String password) {
         if (authService.signin(id, password)) {
-            String token = AuthService.createToken(ctx.vertx(), id);
+            String token = JWTAuthUtil.createToken(ctx.vertx(), id);
             ctx.addCookie(Cookie.cookie("token", token));
             ctx.response().end(token);
+            //HttpHeaders.AUTHORIZATION = put header the token
         } else {
             ctx.fail(401);
         }
@@ -29,18 +31,11 @@ public class AuthRouter {
 
     @RouteRegistration(uri = "/signin/fb", method = HttpMethod.POST)
     public void signin(RoutingContext ctx, @Param String accessToken) {
-    JsonObject result = authService.signinWithFacebook(accessToken);
-        if (result.getBoolean("result")) {
-            String token = AuthService.createToken(ctx.vertx(), result.getString("email"));
-            AuthService.createJWTAuth(ctx.vertx()).authenticate(new JsonObject().put("jwt", token), res->{
-                if(res.succeeded()){
-                    ctx.setUser(res.result());
-                    ctx.addCookie(Cookie.cookie("token", token));
-                    ctx.response().end(token);
-                }else{
-                    ctx.fail(401);
-                }
-            });
+    Profile result = authService.signinWithFacebook(accessToken);
+        if (result != null) {
+            String token = JWTAuthUtil.createToken(ctx.vertx(), result.getUid());
+            ctx.addCookie(Cookie.cookie("token", token));
+            ctx.response().end(token);
         } else {
             ctx.fail(401);
         }

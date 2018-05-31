@@ -73,7 +73,7 @@ public class WalletRouter {
 
     @RouteRegistration(uri = "/wallet/:symbol/create", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String password, @Param String symbol, @Param String name, @Param String description) {
-        String uid = (String) ctx.data().get("uid");
+        String uid = ctx.user().principal().getString("su");
         if (password != null) {
             WalletService service = WalletServiceManager.getService(name);
             WalletCreateResult result = service.createWallet(password, uid, symbol, name, description);
