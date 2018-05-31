@@ -39,6 +39,7 @@ Thumbs.db
 # Gradle Files #
 ################
 .gradle
+!gradle-wrapper.jar
 
 # JOOQ builded files #
 ######################

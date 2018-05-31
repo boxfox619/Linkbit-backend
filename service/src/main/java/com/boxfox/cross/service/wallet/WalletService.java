@@ -1,5 +1,8 @@
 package com.boxfox.cross.service.wallet;
 
+import static com.boxfox.cross.common.data.PostgresConfig.createContext;
+import static io.one.sys.db.tables.Wallet.WALLET;
+
 import com.boxfox.cross.service.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.service.wallet.indexing.IndexingService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
@@ -20,13 +23,7 @@ public abstract class WalletService {
 
   public final WalletCreateResult createWallet(String password, String uid, String symbol, String name, String description){
     WalletCreateResult walletCreateResult = createWallet(password);
-    WalletRecord walletRecord = Wallet.WALLET.newRecord();
-    walletRecord.setUid(uid);
-    walletRecord.setName(name);
-    walletRecord.setDescription(description);
-    walletRecord.setSymbol(symbol);
-    walletRecord.setAddress(walletCreateResult.getAddress());
-    walletRecord.store();
+    createContext().insertInto(WALLET).values(uid, symbol, name, walletCreateResult.getAddress(), description).execute();
     return walletCreateResult;
   }
 

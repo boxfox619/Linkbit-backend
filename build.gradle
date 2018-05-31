@@ -58,9 +58,13 @@ shadowJar {
 
 assemble.dependsOn shadowJar
 
+task stage(dependsOn: shadowJar) {
+}
 task start(dependsOn: shadowJar) {
-    jooqGenerate.execute()
     doLast {
-        javaexec { main = "-jar"; args += project.tasks.shadowJar.archivePath }
+        javaexec {
+            main = "-jar"
+            args += project.tasks.shadowJar.archivePath
+        }
     }
 }

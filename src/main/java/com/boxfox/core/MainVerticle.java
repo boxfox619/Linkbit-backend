@@ -27,12 +27,19 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/*").handler(CORSHandler.create());
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
-        server = vertx.createHttpServer().requestHandler(router::accept).listen(8999, rs -> {
-            System.out.println("Server started");
+        server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
+            System.out.println("Server started : "+ server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
             WalletServiceManager.register("eth", new EthereumService());
         });
         future.complete();
+    }
+
+    private int getPort(){
+        int port = 8999;
+        if(System.getenv("PORT")!=null)
+            port = Integer.valueOf(System.getenv("PORT"));
+        return port;
     }
 
     @Override
