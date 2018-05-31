@@ -100,21 +100,21 @@ public class WalletRouter {
         ctx.response().end();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/transaction/:hash", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/:symbol/transaction", method = HttpMethod.GET, auth = true)
     public void transaction(RoutingContext ctx, @Param String symbol, @Param String hash) {
         WalletService service = WalletServiceManager.getService(symbol);
         TransactionStatus transactionStatus = service.getTransaction(hash);
         ctx.response().setChunked(true).write(new Gson().toJson(transactionStatus)).end();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/transaction/count/:address", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/:symbol/transaction/count", method = HttpMethod.GET, auth = true)
     public void transactionCount(RoutingContext ctx, @Param String symbol, @Param String address) {
         WalletService service = WalletServiceManager.getService(symbol);
         int count = service.getTransactionCount(address);
         ctx.response().setChunked(true).write(count+"").end();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/transaction/list/:address", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/:symbol/transaction/list", method = HttpMethod.GET, auth = true)
     public void transactionList(RoutingContext ctx, @Param String symbol, @Param String address) {
         WalletService service = WalletServiceManager.getService(symbol);
         List<TransactionStatus> transactionStatusList = service.getTransactionList(address);

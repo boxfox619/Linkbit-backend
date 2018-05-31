@@ -2,14 +2,12 @@ package com.boxfox.cross.common.vertx.router;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import com.boxfox.cross.common.vertx.middleware.JWTAuthHandler;
-import com.google.common.net.HttpHeaders;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
