@@ -9,8 +9,10 @@ import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
 import com.boxfox.cross.common.data.Config;
+import com.boxfox.cross.service.wallet.model.WalletCreateResult;
 import com.google.common.io.Files;
-import io.vertx.core.json.JsonObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -76,20 +78,19 @@ public class EthereumService extends WalletService {
   }
 
   @Override
-  public JsonObject createWallet(String password) {
-    JsonObject result = new JsonObject();
-    result.put("result", false);
+  public WalletCreateResult createWallet(String password) {
+    WalletCreateResult result = new WalletCreateResult();
     try {
       String walletFileName = WalletUtils.generateFullNewWalletFile(password, cachePath);
       File jsonFile = new File(cachePath.getPath() + File.separator + walletFileName);
       String walletJson = Files.toString(jsonFile, Charset.defaultCharset());
       jsonFile.delete();
-      JsonObject walletJsonObj = new JsonObject(walletJson);
-      String address = "0x"+walletJsonObj.getString("address");
-      result.put("result", true);
-      result.put("name", walletFileName);
-      result.put("wallet", walletJsonObj);
-      result.put("address", address);
+      JsonObject walletJsonObj = (JsonObject) new JsonParser().parse(walletJson);
+      String address = "0x"+walletJsonObj.get("address").getAsString();
+      result.setResult(true);
+      result.setName(walletFileName);
+      result.setWallet(walletJsonObj);
+      result.setAddress(address);
       indexingTransactions(address);
     } catch (NoSuchAlgorithmException e) {
       e.printStackTrace();

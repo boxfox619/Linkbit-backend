@@ -4,9 +4,11 @@ import com.boxfox.cross.service.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.service.wallet.indexing.IndexingService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
+import com.boxfox.cross.service.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
+import io.one.sys.db.tables.Wallet;
+import io.one.sys.db.tables.records.WalletRecord;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 public abstract class WalletService {
@@ -14,7 +16,22 @@ public abstract class WalletService {
 
   public void init(){}
   public abstract String getBalance(String address);
-  public abstract JsonObject createWallet(String password);
+
+
+  public final WalletCreateResult createWallet(String password, String uid, String symbol, String name, String description){
+    WalletCreateResult walletCreateResult = createWallet(password);
+    WalletRecord walletRecord = Wallet.WALLET.newRecord();
+    walletRecord.setUid(uid);
+    walletRecord.setName(name);
+    walletRecord.setDescription(description);
+    walletRecord.setSymbol(symbol);
+    walletRecord.setAddress(walletCreateResult.getAddress());
+    walletRecord.store();
+    return walletCreateResult;
+  }
+
+  public abstract WalletCreateResult createWallet(String password);
+
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 
   public abstract List<TransactionStatus> getTransactionList(String address) throws WalletException;

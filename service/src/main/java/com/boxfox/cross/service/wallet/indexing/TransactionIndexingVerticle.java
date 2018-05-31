@@ -11,6 +11,7 @@ public class TransactionIndexingVerticle extends AbstractVerticle {
   @Override
   public void start() {
     vertx.eventBus().<String>consumer(EVENT_SUBJECT, message -> {
+      System.out.println(message);
       Gson gson = new Gson();
       IndexingMessage msg =  gson.fromJson(message.body(), IndexingMessage.class);
       IndexingService service = WalletServiceManager.getService(msg.getSymbol()).getIndexingService();

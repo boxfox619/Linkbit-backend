@@ -47,9 +47,9 @@ task jooqGenerate {
         new MarkupBuilder(writer).configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.10.0.xsd') {
             jdbc {
                 driver('org.postgresql.Driver')
-                url('jdbc:postgresql://localhost:5432/crossdb')
-                user('postgres')
-                password('dbpw1234')
+                url('jdbc:postgresql://ec2-54-235-206-118.compute-1.amazonaws.com:5432/dcj6bauvcs784i?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory')
+                user('khkybvsuyaudra')
+                password('fde2848764d0b920ea245a7e6e6adc1099801085d2bc8c5b2f34975386de5da6')
             }
             generator {
                 name('io.github.jklingsporn.vertx.jooq.generate.VertxGenerator')

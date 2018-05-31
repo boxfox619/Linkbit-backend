@@ -28,7 +28,7 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
         server = vertx.createHttpServer().requestHandler(router::accept).listen(8999, rs -> {
-            System.out.println("asdasd");
+            System.out.println("Server started");
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
             WalletServiceManager.register("eth", new EthereumService());
         });

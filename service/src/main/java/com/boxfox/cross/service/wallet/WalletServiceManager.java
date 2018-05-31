@@ -24,6 +24,7 @@ public class WalletServiceManager {
 
     public static void register(String[] symbols, WalletService service) {
         for (String symbol : symbols) {
+            service.init();
             getInstance().serviceMap.put(symbol, service);
         }
     }
