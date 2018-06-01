@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.one.sys.db.Tables.COIN;
-import static io.one.sys.db.tables.Wallet.WALLET;
 
 public class WalletLookupRouter extends WalletRouter {
 
@@ -29,7 +27,10 @@ public class WalletLookupRouter extends WalletRouter {
             WalletService service = WalletServiceManager.getService(wallet.getSymbol());
             String balance = service.getBalance(wallet.getAddress());
             double price = service.getPrice(wallet.getAddress());
-            wallets.add(Wallet.fromDao(wallet));
+            Wallet walletObj = Wallet.fromDao(wallet);
+            walletObj.setBalance(balance);
+            walletObj.setKrBalance(price);
+            wallets.add(walletObj);
         });
         ctx.response().end(gson.toJson(wallets));
     }
@@ -44,6 +45,18 @@ public class WalletLookupRouter extends WalletRouter {
             } else {
                 ctx.response().setStatusCode(200).setChunked(true).write(balance);
             }
+        } else {
+            ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
+        }
+        ctx.response().end();
+    }
+
+    @RouteRegistration(uri = "/wallet/:symbol/price", method = HttpMethod.GET, auth = true)
+    public void getPrice(RoutingContext ctx, @Param String symbol, @Param String address) {
+        WalletService service = WalletServiceManager.getService(symbol);
+        if (service != null) {
+            double price = service.getPrice(address);
+            ctx.response().setStatusCode(200).setChunked(true).write(price+"");
         } else {
             ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
         }

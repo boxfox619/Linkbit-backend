@@ -58,7 +58,7 @@ shadowJar {
 
 assemble.dependsOn shadowJar
 
-task stage(dependsOn: shadowJar) {
+task stage(dependsOn: build) {
 }
 task start(dependsOn: shadowJar) {
     doLast {
