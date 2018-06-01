@@ -1,20 +1,15 @@
-package com.boxfox.core.router;
+package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.service.model.Wallet;
 import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.WalletServiceManager;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
-import com.google.gson.Gson;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
-public class RemittanceRouter {
-    private Gson gson;
-
-    public RemittanceRouter(){
-        this.gson = new Gson();
-    }
+public class RemittanceRouter extends WalletRouter{
 
     @RouteRegistration(uri = "/wallet/:symbol/send", method = HttpMethod.POST, auth = true)
     public void send(RoutingContext ctx,
@@ -25,7 +20,12 @@ public class RemittanceRouter {
                      @Param String targetAddress,
                      @Param String amount) {
         WalletService service = WalletServiceManager.getService(symbol);
-        TransactionResult result = service.send(walletFileName, walletJsonFile, password, targetAddress, amount);
+        String destAddress = targetAddress;
+        if(addressService.isMathCrossAddress(targetAddress)){
+            Wallet wallet = addressService.findByAddress(symbol, targetAddress);
+            destAddress = wallet.getOriginalAddress();
+        }
+        TransactionResult result = service.send(walletFileName, walletJsonFile, password, destAddress, amount);
         ctx.response().putHeader("content-type", "application/json");
         ctx.response().setChunked(true).write(gson.toJson(result));
         ctx.response().end();

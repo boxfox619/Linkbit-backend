@@ -1,4 +1,4 @@
-package com.boxfox.cross.service.auth;
+package com.boxfox.cross.service.model;
 
 public class Profile {
     private String email, name, profile, uid;

@@ -9,8 +9,6 @@ import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
 import com.boxfox.cross.service.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
-import io.one.sys.db.tables.Wallet;
-import io.one.sys.db.tables.records.WalletRecord;
 import io.vertx.core.Vertx;
 import java.util.List;
 
@@ -31,11 +29,11 @@ public abstract class WalletService {
 
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 
-  public abstract List<TransactionStatus> getTransactionList(String address) throws WalletException;
+  public abstract List<TransactionStatus> getTransactionList(String address) throws WalletServiceException;
 
-  public abstract TransactionStatus getTransaction(String transactionHash) throws WalletException;
+  public abstract TransactionStatus getTransaction(String transactionHash) throws WalletServiceException;
 
-  public abstract int getTransactionCount(String address) throws WalletException;
+  public abstract int getTransactionCount(String address) throws WalletServiceException;
 
   public IndexingService getIndexingService(){ return this.indexingService; }
 

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vertx_jooq_version = '3.1.0'
+        vertx_jooq_version = '3.10'
         postgresql_version = '42.1.4'
     }
     repositories {

@@ -1,8 +1,13 @@
-package com.boxfox.cross.service.address;
+package com.boxfox.cross.service.model;
+
+import org.jooq.Record;
+
+import static io.one.sys.db.tables.Wallet.WALLET;
 
 public class Wallet {
     private String uid;
     private String owner;
+    private String ownerName;
     private String name;
     private String symbol;
     private String description;
@@ -63,5 +68,24 @@ public class Wallet {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public static Wallet fromRecord(Record record){
+        Wallet wallet = new Wallet();
+        wallet.setUid(record.getValue(WALLET.UID));
+        wallet.setName(record.getValue(WALLET.NAME));
+        wallet.setSymbol(record.getValue(WALLET.SYMBOL));
+        wallet.setDescription(record.getValue(WALLET.DESCRIPTION));
+        wallet.setOriginalAddress(record.get(WALLET.ADDRESS));
+        wallet.setCrossAddress(record.get(WALLET.CROSSADDRESS));
+        return wallet;
     }
 }

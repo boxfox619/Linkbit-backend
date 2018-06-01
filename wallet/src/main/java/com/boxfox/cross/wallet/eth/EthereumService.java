@@ -4,7 +4,7 @@ import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.tables.Wallet.WALLET;
 import static io.one.sys.db.tables.Transaction.TRANSACTION;
 
-import com.boxfox.cross.service.wallet.WalletException;
+import com.boxfox.cross.service.wallet.WalletServiceException;
 import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
@@ -169,7 +169,7 @@ public class EthereumService extends WalletService {
       status.setStatus(receipt.getStatus().equals("0x1"));
       return status;
     } catch (IOException e) {
-      throw new WalletException("Can not lookup transaction status");
+      throw new WalletServiceException("Can not lookup transaction status");
     }
   }
 
@@ -178,7 +178,7 @@ public class EthereumService extends WalletService {
     try {
       return web3.ethGetTransactionCount(address,DefaultBlockParameterName.LATEST).send().getTransactionCount().intValue();
     } catch (IOException e) {
-      throw new WalletException("Can not get transaction count");
+      throw new WalletServiceException("Can not get transaction count");
     }
   }
 }

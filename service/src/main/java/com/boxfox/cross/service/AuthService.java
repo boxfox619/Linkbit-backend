@@ -1,9 +1,10 @@
-package com.boxfox.cross.service.auth;
+package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.service.address.AddressService;
+import com.boxfox.cross.service.model.Profile;
 import com.boxfox.cross.service.auth.facebook.FacebookAuth;
 import io.one.sys.db.tables.daos.AccountDao;
+import io.one.sys.db.tables.pojos.Account;
 import org.jooq.DSLContext;
 
 import static com.boxfox.cross.common.data.PostgresConfig.createContext;
@@ -32,6 +33,16 @@ public class AuthService {
                         .forEach(p -> create.insertInto(FRIEND).values(profile.getUid(), p.getUid()).execute());
             }
         }
+        return profile;
+    }
+
+    public Profile getAccountByUid(String uid){
+        AccountDao dao = new AccountDao(PostgresConfig.create());
+        Account account = dao.fetchOneByUid(uid);
+        Profile profile = new Profile();
+        profile.setUid(account.getUid());
+        profile.setEmail(account.getEmail());
+        profile.setName(account.getName());
         return profile;
     }
 }
