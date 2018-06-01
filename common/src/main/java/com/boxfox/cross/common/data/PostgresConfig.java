@@ -13,21 +13,12 @@ public class PostgresConfig {
     public static Configuration create(){
         Configuration configuration = new DefaultConfiguration();
         configuration.set(SQLDialect.POSTGRES);
-        try {
-            configuration.set(DataSource.getConnection());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        configuration.set(DataSource.getDataSource());
         return configuration;
     }
 
     public static DSLContext createContext(){
-        DSLContext create = null;
-        try {
-            create = DSL.using(DataSource.getConnection(), SQLDialect.POSTGRES);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        DSLContext create = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
         return create;
     }
 }

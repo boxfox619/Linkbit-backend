@@ -1,15 +1,18 @@
 package com.boxfox.core.router.wallet;
 
+import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.service.model.Wallet;
 import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.WalletServiceManager;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.one.sys.db.Tables.COIN;
@@ -20,20 +23,15 @@ public class WalletLookupRouter extends WalletRouter {
     @RouteRegistration(uri = "/wallet/list", method = HttpMethod.GET, auth = true)
     public void getWallets(RoutingContext ctx) {
         String ownUid = (String) ctx.data().get("uid");
-        JsonArray wallets = new JsonArray();
-        create.select()
-                .from(WALLET.join(COIN).on(WALLET.SYMBOL.eq(COIN.SYMBOL)))
-                .where(WALLET.UID.equal(ownUid))
-                .fetch()
-                .forEach(r -> {
-                    String symbol = (String) r.getValue("symbol");
-                    String address = (String) r.getValue("address");
-                    String balance = WalletServiceManager.getService(symbol).getBalance(address);
-                    JsonObject obj = new JsonObject(r.formatJSON());
-                    obj.put("balance", balance);
-                    wallets.add(obj);
-                });
-        ctx.response().end(wallets.encode());
+        WalletDao dao = new WalletDao(PostgresConfig.create());
+        List<Wallet> wallets = new ArrayList<>();
+        dao.fetchByUid(ownUid).forEach(wallet -> {
+            WalletService service = WalletServiceManager.getService(wallet.getSymbol());
+            String balance = service.getBalance(wallet.getAddress());
+            double price = service.getPrice(wallet.getAddress());
+            wallets.add(Wallet.fromDao(wallet));
+        });
+        ctx.response().end(gson.toJson(wallets));
     }
 
     @RouteRegistration(uri = "/wallet/:symbol/balance", method = HttpMethod.GET, auth = true)

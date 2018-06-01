@@ -1,5 +1,6 @@
 package com.boxfox.cross.wallet.eth;
 
+import static com.boxfox.cross.common.data.PostgresConfig.create;
 import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.tables.Wallet.WALLET;
 import static io.one.sys.db.tables.Transaction.TRANSACTION;
@@ -24,6 +25,9 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import io.one.sys.db.tables.daos.WalletDao;
+import io.one.sys.db.tables.pojos.Wallet;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
@@ -49,7 +53,7 @@ public class EthereumService extends WalletService {
 
   public EthereumService(){
     this.web3 =  Web3j.build(new HttpService("https://mainnet.infura.io/JjSRoXryXbE6HgXJGILz"));
-    this.cachePath = new File(Config.getDefaultInstance().getString("walletCachePath"));
+    this.cachePath = new File(Config.getDefaultInstance().getString("cachePath"));
     if(!cachePath.exists())
       cachePath.mkdirs();
   }
@@ -104,6 +108,17 @@ public class EthereumService extends WalletService {
       e.printStackTrace();
     }
     return result;
+  }
+
+  @Override
+  public double getPrice(String address) {
+    double price = 0;
+    WalletDao dao = new WalletDao(create());
+    Wallet wallet = dao.fetchOneByAddress(address);
+    if (wallet != null) {
+      price = 643000 * Double.valueOf(getBalance(address));
+    }
+    return price;
   }
 
   @Override

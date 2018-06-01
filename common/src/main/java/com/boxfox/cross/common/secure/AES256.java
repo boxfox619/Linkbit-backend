@@ -19,7 +19,7 @@ import org.apache.commons.codec.binary.Base64;
 public class AES256 {
     private static String ips;
     private static Key keySpec;
-    private static String key = Config.getDefaultInstance().getString("AES-KEY");
+    private static String key = Config.getDefaultInstance().getString("aesKey");
     
     static {
         try {

@@ -27,6 +27,8 @@ public abstract class WalletService {
 
   public abstract WalletCreateResult createWallet(String password);
 
+  public abstract double getPrice(String address);
+
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 
   public abstract List<TransactionStatus> getTransactionList(String address) throws WalletServiceException;

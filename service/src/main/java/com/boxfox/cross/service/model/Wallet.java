@@ -13,6 +13,8 @@ public class Wallet {
     private String description;
     private String originalAddress;
     private String crossAddress;
+    private String balance;
+    private double krBalance;
 
     public String getUid() {
         return uid;
@@ -78,6 +80,22 @@ public class Wallet {
         this.ownerName = ownerName;
     }
 
+    public String getBalance() {
+        return balance;
+    }
+
+    public void setBalance(String balance) {
+        this.balance = balance;
+    }
+
+    public double getKrBalance() {
+        return krBalance;
+    }
+
+    public void setKrBalance(double krBalance) {
+        this.krBalance = krBalance;
+    }
+
     public static Wallet fromRecord(Record record){
         Wallet wallet = new Wallet();
         wallet.setUid(record.getValue(WALLET.UID));
@@ -87,5 +105,16 @@ public class Wallet {
         wallet.setOriginalAddress(record.get(WALLET.ADDRESS));
         wallet.setCrossAddress(record.get(WALLET.CROSSADDRESS));
         return wallet;
+    }
+
+    public static Wallet fromDao(io.one.sys.db.tables.pojos.Wallet wallet){
+        Wallet newWallet = new Wallet();
+        newWallet.setUid(wallet.getUid());
+        newWallet.setName(wallet.getName());
+        newWallet.setSymbol(wallet.getSymbol());
+        newWallet.setDescription(wallet.getDescription());
+        newWallet.setOriginalAddress(wallet.getAddress());
+        newWallet.setCrossAddress(wallet.getCrossaddress());
+        return newWallet;
     }
 }

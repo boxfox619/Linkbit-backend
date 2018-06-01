@@ -13,7 +13,7 @@ public class DataSource {
         ds.setDriverClassName("org.postgresql.Driver");
         ds.setUsername(id);
         ds.setPassword(pwd);
-        ds.setUrl("jdbc:postgresql://" + host + ":" + port + "/" + dbName);
+        ds.setUrl("jdbc:postgresql://" + host + ":" + port + "/" + dbName+"?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory");
     }
 
     private static class DataSourceInstance {
@@ -27,5 +27,9 @@ public class DataSource {
 
     protected static Connection getConnection() throws SQLException {
         return DataSourceInstance.instance.ds.getConnection();
+    }
+
+    public static BasicDataSource getDataSource(){
+        return DataSourceInstance.instance.ds;
     }
 }
