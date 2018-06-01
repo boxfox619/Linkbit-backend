@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import com.boxfox.cross.common.vertx.JWTAuthUtil;
+import com.boxfox.cross.common.vertx.middleware.JWTHandler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.handler.JWTAuthHandler;
 import org.reflections.Reflections;
 
 import io.vertx.core.Handler;
@@ -46,7 +46,7 @@ public class RouteRegister {
             Reflections routerAnnotations = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
             Set<Class<?>> annotatedClass = routerAnnotations.getTypesAnnotatedWith(RouteRegistration.class);
             Set<Method> annotatedMethod = routerAnnotations.getMethodsAnnotatedWith(RouteRegistration.class);
-            JWTAuthHandler jwtAuthHandler = JWTAuthHandler.create(JWTAuthUtil.createAuth(Vertx.vertx()));
+            JWTHandler jwtAuthHandler = JWTHandler.create();
             annotatedClass.forEach(c -> {
                 RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
                 try {

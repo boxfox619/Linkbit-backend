@@ -20,10 +20,13 @@ public class WalletLookupRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet/list", method = HttpMethod.GET, auth = true)
     public void getWallets(RoutingContext ctx) {
-        String ownUid = (String) ctx.data().get("uid");
+        System.out.println(ctx.user().principal());
+        String uid = ctx.user().principal().getString("su");
         WalletDao dao = new WalletDao(PostgresConfig.create());
         List<Wallet> wallets = new ArrayList<>();
-        dao.fetchByUid(ownUid).forEach(wallet -> {
+        List<io.one.sys.db.tables.pojos.Wallet> list = dao.fetchByUid(uid);
+        for(int i = 0 ; i < list.size() ; i++){
+            io.one.sys.db.tables.pojos.Wallet wallet = list.get(i);
             WalletService service = WalletServiceManager.getService(wallet.getSymbol());
             String balance = service.getBalance(wallet.getAddress());
             double price = service.getPrice(wallet.getAddress());
@@ -31,7 +34,7 @@ public class WalletLookupRouter extends WalletRouter {
             walletObj.setBalance(balance);
             walletObj.setKrBalance(price);
             wallets.add(walletObj);
-        });
+        }
         ctx.response().end(gson.toJson(wallets));
     }
 
@@ -57,6 +60,24 @@ public class WalletLookupRouter extends WalletRouter {
         if (service != null) {
             double price = service.getPrice(address);
             ctx.response().setStatusCode(200).setChunked(true).write(price+"");
+        } else {
+            ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
+        }
+        ctx.response().end();
+    }
+
+    @RouteRegistration(uri = "/wallet/:symbol/price/all", method = HttpMethod.GET, auth = true)
+    public void getTotalPrice(RoutingContext ctx, @Param String symbol) {
+        String uid = ctx.user().principal().getString("su");
+        WalletService service = WalletServiceManager.getService(symbol);
+        if (service != null) {
+            WalletDao dao = new WalletDao(PostgresConfig.create());
+            List<io.one.sys.db.tables.pojos.Wallet> list = dao.fetchByUid(uid);
+            double totlaPrice = 0;
+            for(int i = 0 ; i < list.size() ; i++){
+                totlaPrice += service.getPrice(list.get(i).getAddress());
+            }
+            ctx.response().setStatusCode(200).setChunked(true).write(totlaPrice+"");
         } else {
             ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
         }
