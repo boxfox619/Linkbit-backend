@@ -14,6 +14,8 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.boxfox.cross.common.data.PostgresConfig.createContext;
@@ -85,21 +87,6 @@ public class WalletRouter {
         ctx.response().end();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/send", method = HttpMethod.POST, auth = true)
-    public void send(RoutingContext ctx,
-                     @Param String symbol,
-                     @Param String walletFileName,
-                     @Param String walletJsonFile,
-                     @Param String password,
-                     @Param String targetAddress,
-                     @Param String amount) {
-        WalletService service = WalletServiceManager.getService(symbol);
-        TransactionResult result = service.send(walletFileName, walletJsonFile, password, targetAddress, amount);
-        ctx.response().putHeader("content-type", "application/json");
-        ctx.response().setChunked(true).write(gson.toJson(result));
-        ctx.response().end();
-    }
-
     @RouteRegistration(uri = "/wallet/:symbol/transaction", method = HttpMethod.GET, auth = true)
     public void transaction(RoutingContext ctx, @Param String symbol, @Param String hash) {
         WalletService service = WalletServiceManager.getService(symbol);
@@ -119,5 +106,9 @@ public class WalletRouter {
         WalletService service = WalletServiceManager.getService(symbol);
         List<TransactionStatus> transactionStatusList = service.getTransactionList(address);
         ctx.response().setChunked(true).write(new Gson().toJson(transactionStatusList)).end();
+    }
+
+    @RouteRegistration(uri = "/wallet/:symbol/lookup/", method = HttpMethod.GET, auth = true)
+    public void walletInfoLookup(RoutingContext ctx, @Param String symbol, @Param String address){
     }
 }

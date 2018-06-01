@@ -6,7 +6,6 @@ import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.service.auth.AuthService;
 import com.boxfox.cross.service.auth.Profile;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 

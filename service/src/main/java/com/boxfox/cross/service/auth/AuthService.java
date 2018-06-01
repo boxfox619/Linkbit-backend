@@ -1,6 +1,7 @@
 package com.boxfox.cross.service.auth;
 
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.service.address.AddressService;
 import com.boxfox.cross.service.auth.facebook.FacebookAuth;
 import io.one.sys.db.tables.daos.AccountDao;
 import org.jooq.DSLContext;
@@ -21,7 +22,7 @@ public class AuthService {
         Profile profile = FacebookAuth.validation(accessToken);
         if(profile!=null) {
             if (data.fetchByUid(profile.getUid()).size() == 0) {
-                String address = createRandomAddress(data);
+                String address = AddressService.createRandomAddress(data);
                 DSLContext create = createContext();
                 create.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS)
                         .values(profile.getUid(), profile.getEmail(), profile.getName(), address)
@@ -32,16 +33,5 @@ public class AuthService {
             }
         }
         return profile;
-    }
-
-    private static String createRandomAddress(AccountDao accountDao){
-        String address;
-        do {
-            int firstNum = (int) (Math.random() * 9999 + 1);
-            int secondNum = (int) (Math.random() * 999999 + 1);
-            int lastNum = (int) (Math.random() * 99 + 1);
-            address = String.format("%04d-%06d-$02d", firstNum, secondNum, lastNum);
-        }while(accountDao.fetchByAddress(address).size()>0);
-        return address;
     }
 }
