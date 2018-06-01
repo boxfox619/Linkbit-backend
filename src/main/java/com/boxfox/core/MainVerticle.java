@@ -33,6 +33,7 @@ public class MainVerticle extends AbstractVerticle {
             WalletServiceManager.register("eth", new EthereumService());
         });
         future.complete();
+
     }
 
     private int getPort(){

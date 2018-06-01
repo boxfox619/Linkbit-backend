@@ -3,13 +3,18 @@ package com.boxfox.core.router;
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.service.model.Profile;
+import com.google.gson.Gson;
 import io.one.sys.db.tables.daos.AccountDao;
+import io.one.sys.db.tables.pojos.Account;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.Tables.FRIEND;
@@ -20,20 +25,26 @@ public class FriendRouter {
     @RouteRegistration(uri = "/search/account/:type", method = HttpMethod.GET, auth = true)
     public void search(RoutingContext ctx, @Param String type, @Param String text) {
         SelectJoinStep step = createContext().select().from(ACCOUNT);
-        SelectConditionStep conditionStep = null;
+        AccountDao dao = new AccountDao(PostgresConfig.create());
+        List<Account> accounts = null;
         switch (type) {
             case "address":
-                conditionStep = step.where(ACCOUNT.ADDRESS.like(text));
+                accounts = dao.fetchByAddress(text);
                 break;
             case "name":
-                conditionStep = step.where(ACCOUNT.NAME.like(text));
+                accounts = dao.fetchByName(text);
                 break;
             default:
-                conditionStep = step.where(ACCOUNT.EMAIL.like(text));
+                accounts = dao.fetchByEmail(text);
         }
-        JsonArray accounts = new JsonArray();
-        conditionStep.fetch().map(r -> new JsonObject(r.formatJSON())).forEach(r -> accounts.add(r));
-        ctx.response().end(accounts.encode());
+        List<Profile> profileList = accounts.stream().map(a -> {
+            Profile profile = new Profile();
+            profile.setUid(a.getUid());
+            profile.setEmail(a.getUid());
+            profile.setName(a.getName());
+            return profile;
+        }).collect(Collectors.toList());
+        ctx.response().end(new Gson().toJson(profileList));
     }
 
     @RouteRegistration(uri = "/friend/", method = HttpMethod.GET, auth = true)

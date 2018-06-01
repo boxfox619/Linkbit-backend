@@ -8,9 +8,7 @@ import io.vertx.ext.auth.jwt.JWTOptions;
 public class JWTAuthUtil {
 
     public static JWTAuth createAuth(Vertx vertx) {
-        JsonObject config = new JsonObject()
-                .put("public-key", "KEYCLOAK_PUBLIC_KEY")
-                .put("permissionsClaimKey", "realm_access/roles");
+        JsonObject config = new JsonObject().put("keyStore", new JsonObject().put("path", "keystore.jck").put("password", "crosskeytest"));
         JWTAuth authProvider = JWTAuth.create(vertx, config);
         return authProvider;
     }
@@ -20,5 +18,6 @@ public class JWTAuthUtil {
         JWTAuth jwt = createAuth(vertx);
         String token = jwt.generateToken(new JsonObject().put("sub", uid), new JWTOptions());
         return token;
+
     }
 }
