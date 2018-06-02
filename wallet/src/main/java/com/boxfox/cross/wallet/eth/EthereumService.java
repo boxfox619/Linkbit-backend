@@ -167,7 +167,6 @@ public class EthereumService extends WalletService {
       List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
       transactionDao.fetchByTargetaddress(address).forEach(t -> {transactions.add(t);});
       transactionDao.fetchBySourceaddress(address).forEach(t -> {transactions.add(t);});
-      System.out.println(address+"   "+transactions.size() );
       for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
         TransactionStatus txStatus = new TransactionStatus();
         txStatus.setTransactionHash(tx.getHash());
