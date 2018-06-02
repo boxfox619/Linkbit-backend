@@ -2,11 +2,12 @@ package com.boxfox.cross.wallet.erc20;
 
 import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.wallet.ERC20Service;
+import io.vertx.core.Vertx;
 
 public class EOSService  extends ERC20Service{
 
-    public EOSService(){
-        super("EOS");
+    public EOSService(Vertx vertx){
+        super(vertx,"EOS");
     }
 
     @Override

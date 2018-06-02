@@ -2,11 +2,12 @@ package com.boxfox.cross.wallet.erc20;
 
 import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.wallet.ERC20Service;
+import io.vertx.core.Vertx;
 
 public class OMGService extends ERC20Service{
 
-    public OMGService(){
-        super("OMG");
+    public OMGService(Vertx vertx){
+        super(vertx,"OMG");
     }
 
     @Override

@@ -1,13 +1,20 @@
 package com.boxfox.cross.service.wallet.model;
 
+import com.boxfox.cross.service.model.Profile;
+import com.boxfox.cross.service.model.Wallet;
+
 import java.math.BigInteger;
 
 public class TransactionStatus {
   private String transactionHash;
   private String sourceAddress;
   private String targetAddress;
+  private boolean venefit;
   private boolean status;
   private double amount;
+  private Wallet targetWallet;
+  private Profile targetProfile;
+  private String date;
   private BigInteger blockNumber;
   private BigInteger confirmation;
 
@@ -65,5 +72,38 @@ public class TransactionStatus {
 
   public boolean getStatus() {
     return status;
+  }
+
+  public boolean isVenefit() {
+    return venefit;
+  }
+
+  public void setVenefit(boolean venefit) {
+    this.venefit = venefit;
+  }
+
+
+  public String getDate() {
+    return date;
+  }
+
+  public void setDate(String date) {
+    this.date = date;
+  }
+
+  public Wallet getTargetWallet() {
+    return targetWallet;
+  }
+
+  public void setTargetWallet(Wallet targetWallet) {
+    this.targetWallet = targetWallet;
+  }
+
+  public Profile getTargetProfile() {
+    return targetProfile;
+  }
+
+  public void setTargetProfile(Profile targetProfile) {
+    this.targetProfile = targetProfile;
   }
 }

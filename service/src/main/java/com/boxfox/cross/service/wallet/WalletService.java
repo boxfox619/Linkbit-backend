@@ -1,6 +1,7 @@
 package com.boxfox.cross.service.wallet;
 
 import static com.boxfox.cross.common.data.PostgresConfig.createContext;
+import static com.boxfox.cross.service.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
 import com.boxfox.cross.service.wallet.indexing.IndexingMessage;
@@ -9,14 +10,18 @@ import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
 import com.boxfox.cross.service.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+
 import java.util.List;
 
 public abstract class WalletService {
+  private Vertx vertx;
   private IndexingService indexingService;
   private String symbol;
 
-  public WalletService(String symbol){
+  public WalletService(Vertx vertx, String symbol){
+    this.vertx = vertx;
     this.symbol = symbol;
   }
 
@@ -36,7 +41,7 @@ public abstract class WalletService {
 
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 
-  public abstract List<TransactionStatus> getTransactionList(String address) throws WalletServiceException;
+  public abstract Future<List<TransactionStatus>> getTransactionList(String address) throws WalletServiceException;
 
   public abstract TransactionStatus getTransaction(String transactionHash) throws WalletServiceException;
 
@@ -51,7 +56,6 @@ public abstract class WalletService {
   public void indexingTransactions(String address){
     IndexingMessage msg = new IndexingMessage();
     msg.setSymbol(symbol);
-    System.out.println(address + "   " + msg);
-    Vertx.vertx().eventBus().send(IndexingMessage.EVENT_SUBJECT, new Gson().toJson(msg));
+    vertx.eventBus().publish(EVENT_SUBJECT, new Gson().toJson(msg));
   }
 }

@@ -34,9 +34,9 @@ public class MainVerticle extends AbstractVerticle {
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
             System.out.println("Server started : "+ server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
-            WalletServiceManager.register("ETH", new EthereumService());
-            WalletServiceManager.register("EOS", new EOSService());
-            WalletServiceManager.register("OMG", new OMGService());
+            WalletServiceManager.register("ETH", new EthereumService(vertx));
+            WalletServiceManager.register("EOS", new EOSService(vertx));
+            WalletServiceManager.register("OMG", new OMGService(vertx));
         });
         future.complete();
 

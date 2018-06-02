@@ -35,8 +35,9 @@ public class AuthRouter {
 
     @RouteRegistration(uri = "/signin/fb", method = HttpMethod.POST)
     public void signin(RoutingContext ctx, @Param String accessToken) {
-    Profile result = authService.signinWithFacebook(accessToken);
-        if (result != null) {
+    authService.signinWithFacebook(accessToken).setHandler(e->{
+        if (e.succeeded()) {
+            Profile result = e.result();
             String token = JWTAuthUtil.createToken(ctx.vertx(), result.getUid());
             JsonObject jsonObject = new JsonObject(gson.toJson(result));
             jsonObject.put("token", token);
@@ -45,6 +46,7 @@ public class AuthRouter {
         } else {
             ctx.fail(401);
         }
+    });
     }
 
     @RouteRegistration(uri = "/logout", method = HttpMethod.POST, auth = true)

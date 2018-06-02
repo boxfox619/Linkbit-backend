@@ -5,7 +5,9 @@ import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.tables.Wallet.WALLET;
 import static io.one.sys.db.tables.Transaction.TRANSACTION;
 
+import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.service.PriceService;
+import com.boxfox.cross.service.model.Profile;
 import com.boxfox.cross.service.wallet.WalletServiceException;
 import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
@@ -27,8 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import io.one.sys.db.tables.daos.AccountDao;
+import io.one.sys.db.tables.daos.TransactionDao;
 import io.one.sys.db.tables.daos.WalletDao;
+import io.one.sys.db.tables.pojos.Account;
 import io.one.sys.db.tables.pojos.Wallet;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
@@ -41,8 +48,12 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.utils.Async;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
+import rx.Observable;
+import rx.Observer;
+import rx.observables.AsyncOnSubscribe;
 
 public class EthereumService extends WalletService {
 
@@ -51,8 +62,8 @@ public class EthereumService extends WalletService {
   private Web3j web3;
   private File cachePath;
 
-  public EthereumService(){
-    super("ETH");
+  public EthereumService(Vertx vertx){
+    super(vertx,"ETH");
     this.web3 =  Web3j.build(new HttpService("https://mainnet.infura.io/JjSRoXryXbE6HgXJGILz"));
     this.cachePath = new File(Config.getDefaultInstance().getString("cachePath"));
     if(!cachePath.exists())
@@ -156,17 +167,38 @@ public class EthereumService extends WalletService {
   }
 
   @Override
-  public List<TransactionStatus> getTransactionList(String address) {
-    List<TransactionStatus> txStatusList = new ArrayList<>();
-    createContext().selectFrom(TRANSACTION).where(TRANSACTION.SOURCEADDRESS.eq(address).or(TRANSACTION.TARGETADDRESS.eq(address))).fetch().forEach(r->{
-      TransactionStatus txStatus = new TransactionStatus();
-      txStatus.setAmount(r.getAmount());
-      txStatus.setSourceAddress(r.getValue(TRANSACTION.SOURCEADDRESS));
-      txStatus.setTargetAddress(r.getValue(TRANSACTION.TARGETADDRESS));
-      txStatus.setTransactionHash(r.getValue(TRANSACTION.HASH));
-      txStatusList.add(txStatus);
-    });
-    return txStatusList;
+  public Future<List<TransactionStatus>> getTransactionList(String address) {
+    Future<List<TransactionStatus>> future = Future.future();
+    new Thread(() -> {
+      List<TransactionStatus> txStatusList = new ArrayList<>();
+      TransactionDao transactionDao = new TransactionDao(PostgresConfig.create());
+      AccountDao accountDao  = new AccountDao(PostgresConfig.create());
+      WalletDao walletDao = new WalletDao(PostgresConfig.create());
+      List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
+      transactionDao.fetchByTargetaddress(address).forEach(t -> {transactions.add(t);});
+      transactionDao.fetchBySourceaddress(address).forEach(t -> {transactions.add(t);});
+      for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
+        TransactionStatus txStatus = new TransactionStatus();
+        txStatus.setAmount(tx.getAmount());
+        txStatus.setSourceAddress(tx.getSourceaddress());
+        txStatus.setTargetAddress(tx.getTargetaddress());
+        txStatus.setTransactionHash(tx.getHash());
+        txStatus.setVenefit(tx.getTargetaddress().equals(address));
+        Wallet sourceWallet = walletDao.fetchOneByAddress((txStatus.isVenefit()) ? tx.getSourceaddress() : tx.getTargetaddress());
+        if (sourceWallet != null) {
+          Account account = accountDao.fetchOneByUid(sourceWallet.getUid());
+          Profile profile = new Profile();
+          profile.setUid(account.getUid());
+          profile.setEmail(account.getEmail());
+          profile.setName(account.getName());
+          txStatus.setTargetWallet(com.boxfox.cross.service.model.Wallet.fromDao(sourceWallet));
+          txStatus.setTargetProfile(profile);
+        }
+        txStatusList.add(txStatus);
+      }
+      future.complete(txStatusList);
+    }).start();
+    return future;
   }
 
   @Override
