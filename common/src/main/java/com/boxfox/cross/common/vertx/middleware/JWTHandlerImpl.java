@@ -15,8 +15,8 @@ public class JWTHandlerImpl implements JWTHandler {
         JWTAuthUtil.createAuth(ctx.vertx()).authenticate(new JsonObject().put("jwt", token), res -> {
             if (res.succeeded()) {
                 User theUser = res.result();
-                System.out.println(theUser.principal());
                 ctx.setUser(theUser);
+                ctx.data().put("uid", theUser.principal().getString("sub"));
                 ctx.next();
             } else {
                 ctx.fail(HttpResponseStatus.UNAUTHORIZED.code());

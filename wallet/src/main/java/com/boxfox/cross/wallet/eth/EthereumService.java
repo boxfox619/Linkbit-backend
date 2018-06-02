@@ -5,6 +5,7 @@ import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.tables.Wallet.WALLET;
 import static io.one.sys.db.tables.Transaction.TRANSACTION;
 
+import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.service.wallet.WalletServiceException;
 import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
@@ -47,11 +48,11 @@ public class EthereumService extends WalletService {
 
   static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
   static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
-
   private Web3j web3;
   private File cachePath;
 
   public EthereumService(){
+    super("ETH");
     this.web3 =  Web3j.build(new HttpService("https://mainnet.infura.io/JjSRoXryXbE6HgXJGILz"));
     this.cachePath = new File(Config.getDefaultInstance().getString("cachePath"));
     if(!cachePath.exists())
@@ -116,7 +117,7 @@ public class EthereumService extends WalletService {
     WalletDao dao = new WalletDao(create());
     Wallet wallet = dao.fetchOneByAddress(address);
     if (wallet != null) {
-      price = 643000 * Double.valueOf(getBalance(address));
+      price = PriceService.getPrice("ETH")* Double.valueOf(getBalance(address));
     }
     return price;
   }

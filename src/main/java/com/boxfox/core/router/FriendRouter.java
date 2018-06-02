@@ -51,7 +51,7 @@ public class FriendRouter {
     public void loadFriends(RoutingContext ctx) {
         String uid = (String) ctx.data().get("uid");
         JsonArray friends = new JsonArray();
-        createContext().selectFrom(FRIEND).where(FRIEND.UID.equal(uid)).fetch().forEach(r -> friends.add(new JsonObject(r.formatJSON())));
+        createContext().selectFrom(FRIEND).where(FRIEND.UID.eq(uid).or(FRIEND.FRIEND_.eq(uid))).fetch().forEach(r -> friends.add(new JsonObject(r.formatJSON())));
         ctx.response().end(friends.encode());
     }
 

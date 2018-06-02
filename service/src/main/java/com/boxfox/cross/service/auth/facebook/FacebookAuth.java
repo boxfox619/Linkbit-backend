@@ -11,6 +11,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.boxfox.cross.service.network.RequestService.request;
+
 public class FacebookAuth {
 
     public static Profile validation(String accessToken){
@@ -47,20 +49,5 @@ public class FacebookAuth {
             e.printStackTrace();
         }
         return friends;
-    }
-
-    private static String request(String url) throws IOException {
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0");
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-        return response.toString();
     }
 }

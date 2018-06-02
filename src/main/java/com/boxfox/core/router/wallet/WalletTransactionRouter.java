@@ -31,6 +31,9 @@ public class WalletTransactionRouter extends WalletRouter{
     public void transactionList(RoutingContext ctx, @Param String symbol, @Param String address) {
         WalletService service = WalletServiceManager.getService(symbol);
         List<TransactionStatus> transactionStatusList = service.getTransactionList(address);
+        if(transactionStatusList.size()==0){
+            service.indexingTransactions(address);
+        }
         ctx.response().setChunked(true).write(new Gson().toJson(transactionStatusList)).end();
     }
 

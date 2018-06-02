@@ -20,7 +20,6 @@ public class WalletLookupRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet/list", method = HttpMethod.GET, auth = true)
     public void getWallets(RoutingContext ctx) {
-        System.out.println(ctx.user().principal());
         String uid = ctx.user().principal().getString("su");
         WalletDao dao = new WalletDao(PostgresConfig.create());
         List<Wallet> wallets = new ArrayList<>();

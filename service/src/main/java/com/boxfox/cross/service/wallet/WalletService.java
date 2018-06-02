@@ -14,6 +14,11 @@ import java.util.List;
 
 public abstract class WalletService {
   private IndexingService indexingService;
+  private String symbol;
+
+  public WalletService(String symbol){
+    this.symbol = symbol;
+  }
 
   public void init(){}
   public abstract String getBalance(String address);
@@ -45,7 +50,7 @@ public abstract class WalletService {
 
   public void indexingTransactions(String address){
     IndexingMessage msg = new IndexingMessage();
-    msg.setSymbol("eth");
+    msg.setSymbol(symbol);
     msg.setAddress(address);
     Vertx.vertx().eventBus().send(IndexingMessage.EVENT_SUBJECT, new Gson().toJson(msg));
   }

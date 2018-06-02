@@ -13,7 +13,6 @@ public class RootHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext ctx) {
-        String apiDoc = "";
         JsonArray arr = RouterMapDoc.createAPIDoc(MainVerticle.class.getPackage().getName());
         ctx.response().setChunked(true);
         ctx.response().putHeader("Content-Type", "text/html; charset=utf-8");

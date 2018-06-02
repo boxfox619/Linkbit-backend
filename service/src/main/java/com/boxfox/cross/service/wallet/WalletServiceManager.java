@@ -39,7 +39,7 @@ public class WalletServiceManager {
 
     public static WalletService getService(String name) {
         if (name != null)
-            return getInstance().serviceMap.get(name);
+            return getInstance().serviceMap.get(name.toUpperCase());
         return null;
     }
 }
