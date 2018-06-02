@@ -19,9 +19,14 @@ public class TransactionIndexingVerticle extends AbstractVerticle {
           IndexingService service = WalletServiceManager.getService(msg.getSymbol()).getIndexingService();
           if (service != null) {
               System.out.println("start indexing : " + msg.getSymbol());
-              service.indexing(vertx, msg.getAddress());
+              service.indexing(vertx, msg.getAddress()).setHandler(e->{
+                  if(e.succeeded()){
+                      System.out.println("success indexing : " + msg.getSymbol()+" - "+msg.getAddress());
+                  }else{
+                      System.out.println("fail indexing : " + msg.getSymbol()+" - "+msg.getAddress());
+                  }
+              });
           }
-          System.out.println("finish indexing : " + msg.getSymbol());
       });
   }
 }

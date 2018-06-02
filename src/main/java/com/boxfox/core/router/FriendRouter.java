@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.pojos.Account;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -49,30 +50,46 @@ public class FriendRouter {
 
     @RouteRegistration(uri = "/friend/", method = HttpMethod.GET, auth = true)
     public void loadFriends(RoutingContext ctx) {
-        String uid = (String) ctx.data().get("uid");
-        JsonArray friends = new JsonArray();
-        createContext().selectFrom(FRIEND).where(FRIEND.UID.eq(uid).or(FRIEND.FRIEND_.eq(uid))).fetch().forEach(r -> friends.add(new JsonObject(r.formatJSON())));
-        ctx.response().end(friends.encode());
+        new Thread(() -> {
+            String uid = (String) ctx.data().get("uid");
+            JsonArray friends = new JsonArray();
+            AccountDao dao = new AccountDao(PostgresConfig.create());
+            createContext().selectFrom(FRIEND).where(FRIEND.UID.eq(uid).or(FRIEND.FRIEND_.eq(uid))).fetch().forEach(r -> {
+                String target = r.getFriend().equals(uid) ? r.getUid() : r.getFriend();
+                Account acc = dao.fetchOneByUid(target);
+                Profile profile = new Profile();
+                profile.setName(acc.getName());
+                profile.setEmail(acc.getEmail());
+                profile.setUid(acc.getUid());
+                friends.add(new JsonObject(new Gson().toJson(profile)));
+            });
+            ctx.response().end(friends.encode());
+        }).start();
     }
 
 
     @RouteRegistration(uri = "/friend/", method = HttpMethod.PUT, auth = true)
     public void addFriend(RoutingContext ctx, @Param String uid) {
-        AccountDao dao = new AccountDao(PostgresConfig.create());
-        String ownUid = (String) ctx.data().get("uid");
-        int statusCode = 400;
-        String errorMessage = null;
-        if (dao.fetchOneByUid(uid) == null) {
-            errorMessage = "Target user can not found";
-        } else {
-            int result = createContext().insertInto(FRIEND, FRIEND.UID, FRIEND.FRIEND_).values(ownUid, uid).execute();
-            if (result == 1) {
-                statusCode = 200;
-            } else {
-                errorMessage = "Update fail";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AccountDao dao = new AccountDao(PostgresConfig.create());
+                String ownUid = (String) ctx.data().get("uid");
+                int statusCode = 400;
+                String errorMessage = null;
+                if (dao.fetchOneByUid(uid) == null) {
+                    errorMessage = "Target user can not found";
+                } else {
+                    int result = createContext().insertInto(FRIEND, FRIEND.UID, FRIEND.FRIEND_).values(ownUid, uid).execute();
+                    if (result == 1) {
+                        statusCode = 200;
+                    } else {
+                        errorMessage = "Update fail";
+                    }
+                }
+                ctx.response().setStatusMessage(errorMessage).setStatusCode(statusCode).end();
             }
-        }
-        ctx.response().setStatusMessage(errorMessage).setStatusCode(statusCode).end();
+        }).start();
     }
 
 

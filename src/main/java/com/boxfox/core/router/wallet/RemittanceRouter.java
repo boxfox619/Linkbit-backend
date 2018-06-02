@@ -19,15 +19,17 @@ public class RemittanceRouter extends WalletRouter{
                      @Param String password,
                      @Param String targetAddress,
                      @Param String amount) {
-        WalletService service = WalletServiceManager.getService(symbol);
-        String destAddress = targetAddress;
-        if(addressService.isMathCrossAddress(targetAddress)){
-            Wallet wallet = addressService.findByAddress(symbol, targetAddress);
-            destAddress = wallet.getOriginalAddress();
-        }
-        TransactionResult result = service.send(walletFileName, walletJsonFile, password, destAddress, amount);
-        ctx.response().putHeader("content-type", "application/json");
-        ctx.response().setChunked(true).write(gson.toJson(result));
-        ctx.response().end();
+        new Thread(() -> {
+            WalletService service = WalletServiceManager.getService(symbol);
+            String destAddress = targetAddress;
+            if(addressService.isMathCrossAddress(targetAddress)){
+                Wallet wallet = addressService.findByAddress(symbol, targetAddress);
+                destAddress = wallet.getOriginalAddress();
+            }
+            TransactionResult result = service.send(walletFileName, walletJsonFile, password, destAddress, amount);
+            ctx.response().putHeader("content-type", "application/json");
+            ctx.response().setChunked(true).write(gson.toJson(result));
+            ctx.response().end();
+        }).start();
     }
 }

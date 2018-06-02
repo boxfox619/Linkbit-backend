@@ -35,7 +35,7 @@ public class WalletTransactionRouter extends WalletRouter{
     @RouteRegistration(uri = "/wallet/:symbol/transaction/list", method = HttpMethod.GET, auth = true)
     public void transactionList(RoutingContext ctx, @Param String symbol, @Param String address) {
         WalletService service = WalletServiceManager.getService(symbol);
-        service.getTransactionList(address).setHandler(transactionStatusListResult -> {
+        service.getTransactionList(address.toLowerCase()).setHandler(transactionStatusListResult -> {
             List<TransactionStatus> transactionStatusList = transactionStatusListResult.result();
             if(transactionStatusList.size()==0){
                 service.indexingTransactions(address);

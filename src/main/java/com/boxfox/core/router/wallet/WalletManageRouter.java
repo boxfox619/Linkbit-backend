@@ -17,19 +17,24 @@ public class WalletManageRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet/:symbol/create", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String password, @Param String symbol, @Param String name, @Param String description, @Param boolean major) {
-        String uid = ctx.user().principal().getString("su");
-        if (password != null) {
-            WalletService service = WalletServiceManager.getService(symbol);
-            WalletCreateResult result = service.createWallet(password, uid, symbol, name, description);
-            if(result.isSuccess() && major){
-                addressService.setMajorWallet(uid, symbol, result.getAddress());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String uid = ctx.user().principal().getString("su");
+                if (password != null) {
+                    WalletService service = WalletServiceManager.getService(symbol);
+                    WalletCreateResult result = service.createWallet(password, uid, symbol, name, description);
+                    if(result.isSuccess() && major){
+                        addressService.setMajorWallet(uid, symbol, result.getAddress());
+                    }
+                    ctx.response().putHeader("content-type", "application/json");
+                    ctx.response().setChunked(true).write(new Gson().toJson(result));
+                } else {
+                    ctx.response().setStatusMessage("Illegal Argument").setStatusCode(HttpResponseStatus.BAD_REQUEST.code());
+                }
+                ctx.response().end();
             }
-            ctx.response().putHeader("content-type", "application/json");
-            ctx.response().setChunked(true).write(new Gson().toJson(result));
-        } else {
-            ctx.response().setStatusMessage("Illegal Argument").setStatusCode(HttpResponseStatus.BAD_REQUEST.code());
-        }
-        ctx.response().end();
+        }).start();
     }
 
     @RouteRegistration(uri = "/wallet/:symbol/setting", method = HttpMethod.PUT, auth = true)

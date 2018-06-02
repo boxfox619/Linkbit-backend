@@ -1,65 +1,63 @@
 package com.boxfox.cross.wallet.eth;
 
-import static com.boxfox.cross.common.data.PostgresConfig.createContext;
-
+import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.service.wallet.indexing.IndexingService;
+import io.one.sys.db.tables.daos.TransactionDao;
+import io.one.sys.db.tables.pojos.Transaction;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.List;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.EthBlock.Block;
-import org.web3j.protocol.core.methods.response.EthBlock.TransactionResult;
-import org.web3j.protocol.core.methods.response.Transaction;
-import static io.one.sys.db.tables.Transaction.TRANSACTION;
+import org.web3j.utils.Convert;
+
+import static com.boxfox.cross.service.network.RequestService.request;
 
 public class EthIndexingService implements IndexingService {
-  private Web3j web3;
+    private Web3j web3;
+    private static final String URL = "http://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM";
 
-  protected EthIndexingService(Web3j web3){
-    this.web3 = web3;
-  }
-
-  @Override
-  public void indexing(Vertx vertx, String address) {
-    try {
-      BigInteger lastBlockNumber = web3.ethBlockNumber().send().getBlockNumber();
-      int txCount = web3.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST).send().getTransactionCount().intValue();
-      int balance = web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance().intValue();
-      int idx = lastBlockNumber.intValue();
-      for (; idx >= 0 && (txCount > 0 || balance > 0); --idx) {
-        Block block = web3.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(idx)), false).send().getBlock();
-        List<TransactionResult> transactions =  block.getTransactions();
-        if (block!=null && block.getTransactions()!=null) {
-          for(EthBlock.TransactionResult txResult : transactions){
-            Transaction tx = (Transaction) txResult.get();
-            if (address.equals(tx.getFrom())) {
-              if (!tx.getFrom().equals(tx.getTo()))
-                balance += tx.getValue().intValue();
-              txCount-=1;
-              indexingTransaction(tx);
-            }
-            if (address.equals(tx.getTo())) {
-              if (!tx.getFrom().equals(tx.getTo()))
-                balance-= tx.getValue().intValue();
-              indexingTransaction(tx);
-            }
-          }
-        }
-      }
-    } catch (IOException e) {
-
+    protected EthIndexingService(Web3j web3) {
+        this.web3 = web3;
     }
-  }
 
-  private void indexingTransaction(Transaction tx) {
-    String from = tx.getFrom();
-    String to = tx.getTo();
-    String txHash = tx.getHash();
-    BigInteger amount = tx.getValue();
-    createContext().insertInto(TRANSACTION).values(from, to, amount, txHash).execute();
-  }
+    @Override
+    public Future<Void> indexing(Vertx vertx, String address) {
+        Future future = Future.future();
+        request(URL + "&address=" + address).setHandler(e -> {
+            if (e.succeeded()) {
+                JsonObject obj = new JsonObject(e.result());
+                JsonArray transactions = obj.getJsonArray("result");
+                for (int i = 0; i < transactions.size(); i++) {
+                    JsonObject tx = transactions.getJsonObject(i);
+                    String hash = tx.getString("hash");
+                    String from = tx.getString("from");
+                    String to = tx.getString("to");
+                    String value = tx.getString("value");
+                    String timeStamp = tx.getString("timeStamp");
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis()-Integer.valueOf(timeStamp));
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
+                    String dateTime = simpleDateFormat.format(timestamp);
+                    BigDecimal amount = Convert.fromWei(value, Convert.Unit.ETHER);
+                    TransactionDao dao = new TransactionDao(PostgresConfig.create());
+                    Transaction transaction = new Transaction();
+                    transaction.setHash(hash);
+                    transaction.setSourceaddress(from);
+                    transaction.setTargetaddress(to);
+                    transaction.setAmount(Double.valueOf(amount.toPlainString()));
+                    transaction.setDatetime(dateTime);
+                    dao.insert(transaction);
+                }
+                future.complete();
+            } else {
+                future.fail(e.cause());
+            }
+        });
+        return future;
+    }
 }

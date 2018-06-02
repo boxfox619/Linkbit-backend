@@ -25,7 +25,7 @@ public abstract class WalletService {
     this.symbol = symbol;
   }
 
-  public void init(){}
+  public WalletService init(){return this;}
   public abstract String getBalance(String address);
 
 
@@ -56,6 +56,7 @@ public abstract class WalletService {
   public void indexingTransactions(String address){
     IndexingMessage msg = new IndexingMessage();
     msg.setSymbol(symbol);
+    msg.setAddress(address);
     vertx.eventBus().publish(EVENT_SUBJECT, new Gson().toJson(msg));
   }
 }

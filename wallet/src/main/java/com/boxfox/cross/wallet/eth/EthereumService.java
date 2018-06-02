@@ -48,12 +48,8 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.utils.Async;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
-import rx.Observable;
-import rx.Observer;
-import rx.observables.AsyncOnSubscribe;
 
 public class EthereumService extends WalletService {
 
@@ -70,15 +66,9 @@ public class EthereumService extends WalletService {
       cachePath.mkdirs();
   }
 
-  public void init(){
+  public WalletService init(){
     setIndexingService(new EthIndexingService(web3));
-    web3.transactionObservable().subscribe(tx -> {
-      String from = tx.getFrom();
-      String to = tx.getTo();
-      if(createContext().selectFrom(WALLET).where(WALLET.ADDRESS.equal(from).or(WALLET.ADDRESS.equal(to))).fetch().size()>0){
-        createContext().insertInto(TRANSACTION).values(from, to, tx.getHash());
-      }
-    });
+    return this;
   }
 
   @Override
@@ -177,12 +167,15 @@ public class EthereumService extends WalletService {
       List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
       transactionDao.fetchByTargetaddress(address).forEach(t -> {transactions.add(t);});
       transactionDao.fetchBySourceaddress(address).forEach(t -> {transactions.add(t);});
+      System.out.println(address+"   "+transactions.size() );
       for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
         TransactionStatus txStatus = new TransactionStatus();
+        txStatus.setTransactionHash(tx.getHash());
         txStatus.setAmount(tx.getAmount());
         txStatus.setSourceAddress(tx.getSourceaddress());
         txStatus.setTargetAddress(tx.getTargetaddress());
         txStatus.setTransactionHash(tx.getHash());
+        txStatus.setDate(tx.getDatetime());
         txStatus.setVenefit(tx.getTargetaddress().equals(address));
         Wallet sourceWallet = walletDao.fetchOneByAddress((txStatus.isVenefit()) ? tx.getSourceaddress() : tx.getTargetaddress());
         if (sourceWallet != null) {
