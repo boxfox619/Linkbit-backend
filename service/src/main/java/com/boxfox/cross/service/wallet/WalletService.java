@@ -51,7 +51,7 @@ public abstract class WalletService {
   public void indexingTransactions(String address){
     IndexingMessage msg = new IndexingMessage();
     msg.setSymbol(symbol);
-    msg.setAddress(address);
+    System.out.println(address + "   " + msg);
     Vertx.vertx().eventBus().send(IndexingMessage.EVENT_SUBJECT, new Gson().toJson(msg));
   }
 }

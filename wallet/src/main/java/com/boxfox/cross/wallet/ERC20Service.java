@@ -95,7 +95,7 @@ public abstract class ERC20Service extends WalletService {
             BigInteger value = Convert.toWei(amount, Convert.Unit.ETHER).toBigInteger();
             RawTransaction transaction = RawTransaction.createTransaction(new BigInteger("0x0"), GAS_PRICE, GAS_LIMIT, contractAddr, value, contractData);
             byte [] signedMessage = TransactionEncoder.signMessage(transaction, credentials);
-            String hexValue = Hex.toHexString(signedMessage);
+            String hexValue = Numeric.toHexString(signedMessage);
             String transactionHash = web3.ethSendRawTransaction(hexValue).send().getTransactionHash();
             result.setStatus(true);
             result.setTransactionHash(transactionHash);
