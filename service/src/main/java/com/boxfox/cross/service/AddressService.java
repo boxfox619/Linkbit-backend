@@ -1,11 +1,8 @@
 package com.boxfox.cross.service;
 
-import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.service.model.Wallet;
 import io.one.sys.db.tables.daos.AccountDao;
-import io.one.sys.db.tables.daos.MajorwalletDao;
 import io.one.sys.db.tables.records.MajorwalletRecord;
-import io.one.sys.db.tables.records.WalletRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -16,7 +13,7 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 
 public class AddressService {
-    private static final String ADDRESS_REGEX = "[0-9]{4}-[0-9]{6}-[0-9]{2}";
+    private static final String ADDRESS_REGEX = "cross-[0-9]{0,4}-[0-9]{0,4}";
 
     public Wallet findByAddress(String symbol, String address) {
         Wallet wallet = null;
@@ -74,8 +71,7 @@ public class AddressService {
         do {
             int firstNum = (int) (Math.random() * 9999 + 1);
             int secondNum = (int) (Math.random() * 999999 + 1);
-            int lastNum = (int) (Math.random() * 99 + 1);
-            address = String.format("%04d-%06d-$02d", firstNum, secondNum, lastNum);
+            address = String.format("cross-%04d-%04d", firstNum, secondNum);
         } while (accountDao.fetchByAddress(address).size() > 0);
         return address;
     }

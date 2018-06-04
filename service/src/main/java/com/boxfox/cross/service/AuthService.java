@@ -27,6 +27,7 @@ public class AuthService {
                 Profile profile = e.result();
                 if (data.fetchByUid(profile.getUid()).size() == 0) {
                     String address = AddressService.createRandomAddress(data);
+                    profile.setCrossAddress(address);
                     DSLContext create = createContext();
                     create.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS)
                             .values(profile.getUid(), profile.getEmail(), profile.getName(), address)
@@ -36,7 +37,10 @@ public class AuthService {
                             event.result().forEach(p -> create.insertInto(FRIEND).values(profile.getUid(), p.getUid()).execute());
                         }
                     });
+                }else{
+                    profile.setCrossAddress(data.fetchByUid(profile.getUid()).get(0).getAddress());
                 }
+
                 future.complete(profile);
             }else{
                 future.fail(e.cause());

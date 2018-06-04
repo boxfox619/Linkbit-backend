@@ -4,12 +4,15 @@ import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static com.boxfox.cross.service.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
+import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.service.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.service.wallet.indexing.IndexingService;
 import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
 import com.boxfox.cross.service.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
+import io.one.sys.db.tables.daos.AccountDao;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
@@ -31,7 +34,8 @@ public abstract class WalletService {
 
   public final WalletCreateResult createWallet(String password, String uid, String symbol, String name, String description){
     WalletCreateResult walletCreateResult = createWallet(password);
-    createContext().insertInto(WALLET).values(uid, symbol, name, walletCreateResult.getAddress(), description).execute();
+    AccountDao dao = new AccountDao(PostgresConfig.create());
+    createContext().insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(dao)).execute();
     return walletCreateResult;
   }
 

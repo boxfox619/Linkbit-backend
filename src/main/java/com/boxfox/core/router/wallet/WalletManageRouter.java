@@ -16,11 +16,12 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 public class WalletManageRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet/:symbol/create", method = HttpMethod.POST, auth = true)
-    public void create(RoutingContext ctx, @Param String password, @Param String symbol, @Param String name, @Param String description, @Param boolean major) {
+    public void create(RoutingContext ctx, @Param String password, @Param String symbol, @Param String name, @Param String description) {
+        boolean major = false;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String uid = ctx.user().principal().getString("su");
+                String uid = (String) ctx.data().get("uid");
                 if (password != null) {
                     WalletService service = WalletServiceManager.getService(symbol);
                     WalletCreateResult result = service.createWallet(password, uid, symbol, name, description);

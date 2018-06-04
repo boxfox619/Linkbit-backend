@@ -61,6 +61,7 @@ public class FriendRouter {
                 profile.setName(acc.getName());
                 profile.setEmail(acc.getEmail());
                 profile.setUid(acc.getUid());
+                profile.setCrossAddress(acc.getAddress());
                 friends.add(new JsonObject(new Gson().toJson(profile)));
             });
             ctx.response().end(friends.encode());

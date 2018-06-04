@@ -92,7 +92,7 @@ public class WalletLookupRouter extends WalletRouter {
         }).start();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/lookup/", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/:symbol/lookup", method = HttpMethod.GET, auth = true)
     public void walletInfoLookup(RoutingContext ctx, @Param String symbol, @Param String address) {
         new Thread(() -> {
             Wallet wallet = addressService.findByAddress(symbol, address);

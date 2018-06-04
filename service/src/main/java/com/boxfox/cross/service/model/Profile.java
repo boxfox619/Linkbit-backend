@@ -1,7 +1,7 @@
 package com.boxfox.cross.service.model;
 
 public class Profile {
-    private String email, name, profile, uid;
+    private String email, name, profile, uid, crossAddress;
 
     public String getProfile() {
         return profile;
@@ -33,5 +33,13 @@ public class Profile {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getCrossAddress() {
+        return crossAddress;
+    }
+
+    public void setCrossAddress(String crossAddress) {
+        this.crossAddress = crossAddress;
     }
 }

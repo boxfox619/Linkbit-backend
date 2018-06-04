@@ -61,7 +61,7 @@ public class EthereumService extends WalletService {
   public EthereumService(Vertx vertx){
     super(vertx,"ETH");
     this.web3 =  Web3j.build(new HttpService("https://mainnet.infura.io/JjSRoXryXbE6HgXJGILz"));
-    this.cachePath = new File(Config.getDefaultInstance().getString("cachePath"));
+    this.cachePath = new File(Config.getDefaultInstance().getString("cachePath","wallets"));
     if(!cachePath.exists())
       cachePath.mkdirs();
   }

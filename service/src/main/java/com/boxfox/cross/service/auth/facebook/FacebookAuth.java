@@ -24,13 +24,15 @@ public class FacebookAuth {
             request(url).setHandler(event -> {
                 if(event.succeeded()){
                     Profile profile = new Profile();
-                    JsonObject responseObj = new JsonObject();
+                    JsonObject responseObj = new JsonObject(event.result());
                     profile.setUid(responseObj.getString("id"));
                     profile.setName(responseObj.getString("name"));
                     profile.setEmail(responseObj.getString("email"));
                     JsonObject picture_reponse = responseObj.getJsonObject("picture");
-                    JsonObject data_response = picture_reponse.getJsonObject("data");
-                    profile.setProfile(data_response.getString("url"));
+                    if(picture_reponse!=null) {
+                        JsonObject data_response = picture_reponse.getJsonObject("data");
+                        profile.setProfile(data_response.getString("url"));
+                    }
                     future.complete(profile);
                 }else{
                     future.fail(event.cause());
