@@ -6,11 +6,11 @@ import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.service.AuthService;
 import com.boxfox.cross.service.model.Profile;
 import com.google.gson.Gson;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.JWTAuthHandler;
 
 public class AuthRouter {
     private AuthService authService;
@@ -34,8 +34,20 @@ public class AuthRouter {
     }
 
     @RouteRegistration(uri = "/signin/fb", method = HttpMethod.POST)
-    public void signin(RoutingContext ctx, @Param String accessToken) {
-    authService.signinWithFacebook(accessToken).setHandler(e->{
+    public void signinFacebook(RoutingContext ctx, @Param String accessToken) {
+        authService.signinWithFacebook(accessToken).setHandler(e -> {
+            signinWithSNS(ctx, e);
+        });
+    }
+
+    @RouteRegistration(uri = "/signin/google", method = HttpMethod.POST)
+    public void signinGoogle(RoutingContext ctx, @Param String accessToken) {
+        authService.signinWithGoogle(accessToken).setHandler(e -> {
+            signinWithSNS(ctx, e);
+        });
+    }
+
+    private void signinWithSNS(RoutingContext ctx, AsyncResult<Profile> e) {
         if (e.succeeded()) {
             Profile result = e.result();
             String token = JWTAuthUtil.createToken(ctx.vertx(), result.getUid());
@@ -46,7 +58,6 @@ public class AuthRouter {
         } else {
             ctx.fail(401);
         }
-    });
     }
 
     @RouteRegistration(uri = "/logout", method = HttpMethod.POST, auth = true)

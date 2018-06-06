@@ -1,4 +1,4 @@
-package com.boxfox.cross.service.auth.facebook;
+package com.boxfox.cross.service.auth;
 
 import com.boxfox.cross.service.model.Profile;
 import io.vertx.core.AsyncResult;

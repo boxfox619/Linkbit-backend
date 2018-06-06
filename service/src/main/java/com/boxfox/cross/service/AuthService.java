@@ -1,8 +1,9 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.service.auth.GoogleAuth;
 import com.boxfox.cross.service.model.Profile;
-import com.boxfox.cross.service.auth.facebook.FacebookAuth;
+import com.boxfox.cross.service.auth.FacebookAuth;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.pojos.Account;
 import io.vertx.core.Future;
@@ -19,10 +20,20 @@ public class AuthService {
         return true;
     }
 
-    public Future<Profile> signinWithFacebook(String accessToken) {
+    public Future<Profile> signinWithFacebook(String accessToken){
+        Future<Profile> signinFuture = FacebookAuth.validation(accessToken);
+        return signinWithSNS(signinFuture);
+    }
+
+    public Future<Profile> signinWithGoogle(String accessToken){
+        Future<Profile> signinFuture = GoogleAuth.validation(accessToken);
+        return signinWithSNS(signinFuture);
+    }
+
+    public Future<Profile> signinWithSNS(Future<Profile> snsFutrue) {
         Future<Profile> future = Future.future();
         AccountDao data = new AccountDao(PostgresConfig.create());
-        FacebookAuth.validation(accessToken).setHandler(e -> {
+        snsFutrue.setHandler(e -> {
             if(e.succeeded()) {
                 Profile profile = e.result();
                 if (data.fetchByUid(profile.getUid()).size() == 0) {
@@ -32,11 +43,11 @@ public class AuthService {
                     create.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS)
                             .values(profile.getUid(), profile.getEmail(), profile.getName(), address)
                             .execute();
-                    FacebookAuth.getFriends(accessToken).setHandler(event -> {
+                    /*FacebookAuth.getFriends(accessToken).setHandler(event -> {
                         if (event.succeeded()) {
                             event.result().forEach(p -> create.insertInto(FRIEND).values(profile.getUid(), p.getUid()).execute());
                         }
-                    });
+                    });*/
                 }else{
                     profile.setCrossAddress(data.fetchByUid(profile.getUid()).get(0).getAddress());
                 }
