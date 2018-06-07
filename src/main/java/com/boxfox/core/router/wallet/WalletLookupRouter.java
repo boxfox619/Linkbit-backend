@@ -30,10 +30,8 @@ public class WalletLookupRouter extends WalletRouter {
                 io.one.sys.db.tables.pojos.Wallet wallet = list.get(i);
                 WalletService service = WalletServiceManager.getService(wallet.getSymbol());
                 String balance = service.getBalance(wallet.getAddress());
-                double price = service.getPrice(wallet.getAddress());
                 Wallet walletObj = Wallet.fromDao(wallet);
                 walletObj.setBalance(balance);
-                walletObj.setKrBalance(price);
                 wallets.add(walletObj);
             }
             ctx.response().end(gson.toJson(wallets));
@@ -92,7 +90,7 @@ public class WalletLookupRouter extends WalletRouter {
         }).start();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/lookup", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/:symbol", method = HttpMethod.GET, auth = true)
     public void walletInfoLookup(RoutingContext ctx, @Param String symbol, @Param String address) {
         new Thread(() -> {
             Wallet wallet = addressService.findByAddress(symbol, address);

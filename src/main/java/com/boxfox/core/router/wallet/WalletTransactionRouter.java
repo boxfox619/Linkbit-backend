@@ -18,7 +18,7 @@ import java.util.List;
 
 public class WalletTransactionRouter extends WalletRouter{
 
-    @RouteRegistration(uri = "/wallet/:symbol/transaction", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/transaction/:symbol", method = HttpMethod.GET, auth = true)
     public void transaction(RoutingContext ctx, @Param String symbol, @Param String hash) {
         WalletService service = WalletServiceManager.getService(symbol);
         TransactionStatus transactionStatus = service.getTransaction(hash);

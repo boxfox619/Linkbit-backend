@@ -1,9 +1,6 @@
 package com.boxfox.cross.wallet.eth;
 
 import static com.boxfox.cross.common.data.PostgresConfig.create;
-import static com.boxfox.cross.common.data.PostgresConfig.createContext;
-import static io.one.sys.db.tables.Wallet.WALLET;
-import static io.one.sys.db.tables.Transaction.TRANSACTION;
 
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.service.PriceService;
@@ -94,7 +91,7 @@ public class EthereumService extends WalletService {
       JsonObject walletJsonObj = (JsonObject) new JsonParser().parse(walletJson);
       String address = "0x"+walletJsonObj.get("address").getAsString();
       result.setResult(true);
-      result.setName(walletFileName);
+      result.setWalletName(walletFileName);
       result.setWallet(walletJsonObj);
       result.setAddress(address);
       indexingTransactions(address);

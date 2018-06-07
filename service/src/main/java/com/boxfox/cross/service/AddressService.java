@@ -30,7 +30,7 @@ public class AddressService {
         if(result.size()>0){
             Record record = result.get(0);
             wallet = Wallet.fromRecord(record);
-            wallet.setOwner(record.get(ACCOUNT.EMAIL));
+            wallet.setOwnerEmail(record.get(ACCOUNT.EMAIL));
             wallet.setOwnerName(record.getValue(ACCOUNT.NAME));
         }
         ctx.close();

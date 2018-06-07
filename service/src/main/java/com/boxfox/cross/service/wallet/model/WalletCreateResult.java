@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 public class WalletCreateResult {
   private boolean result;
   private String address;
-  private String name;
+  private String walletName;
   private JsonObject wallet;
 
   public boolean isSuccess() {
@@ -24,12 +24,12 @@ public class WalletCreateResult {
     this.address = address;
   }
 
-  public String getName() {
-    return name;
+  public String getWalletName() {
+    return walletName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setWalletName(String name) {
+    this.walletName = name;
   }
 
   public JsonObject getWallet() {

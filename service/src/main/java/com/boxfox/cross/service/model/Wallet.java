@@ -6,7 +6,7 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 
 public class Wallet {
     private String uid;
-    private String owner;
+    private String ownerEmail;
     private String ownerName;
     private String name;
     private String symbol;
@@ -14,7 +14,6 @@ public class Wallet {
     private String originalAddress;
     private String crossAddress;
     private String balance;
-    private double krBalance;
 
     public String getUid() {
         return uid;
@@ -24,12 +23,12 @@ public class Wallet {
         this.uid = uid;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getOwnerEmail() {
+        return ownerEmail;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setOwnerEmail(String ownerEmail) {
+        this.ownerEmail = ownerEmail;
     }
 
     public String getName() {
@@ -86,14 +85,6 @@ public class Wallet {
 
     public void setBalance(String balance) {
         this.balance = balance;
-    }
-
-    public double getKrBalance() {
-        return krBalance;
-    }
-
-    public void setKrBalance(double krBalance) {
-        this.krBalance = krBalance;
     }
 
     public static Wallet fromRecord(Record record){
