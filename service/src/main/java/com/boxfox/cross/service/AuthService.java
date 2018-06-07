@@ -29,11 +29,10 @@ public class AuthService {
 
     public void init(){
         try {
-            FileInputStream serviceAccount = new FileInputStream("keystore/serviceAccountKey.json");
+            FileInputStream serviceAccount = new FileInputStream("keystore/cross-c863f-3861d7d0cc90.json");
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
                 .build();
 
             FirebaseApp.initializeApp(options);
