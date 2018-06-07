@@ -8,7 +8,7 @@ import io.vertx.ext.auth.jwt.JWTOptions;
 public class JWTAuthUtil {
 
     public static JWTAuth createAuth(Vertx vertx) {
-        JsonObject config = new JsonObject().put("keyStore", new JsonObject().put("path", "keystore.jceks").put("password", "crosstestkey"));
+        JsonObject config = new JsonObject().put("keyStore", new JsonObject().put("path", "keystore/keystore.jceks").put("password", "crosstestkey"));
         JWTAuth authProvider = JWTAuth.create(vertx, config);
         return authProvider;
     }

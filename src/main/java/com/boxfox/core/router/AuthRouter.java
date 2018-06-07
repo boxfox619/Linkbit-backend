@@ -19,45 +19,23 @@ public class AuthRouter {
     public AuthRouter(){
         authService = new AuthService();
         gson = new Gson();
+        authService.init();
     }
 
-    @RouteRegistration(uri = "/signin", method = HttpMethod.POST)
-    public void signin(RoutingContext ctx, @Param String id, @Param String password) {
-        if (authService.signin(id, password)) {
-            String token = JWTAuthUtil.createToken(ctx.vertx(), id);
-            ctx.addCookie(Cookie.cookie("token", token));
-            ctx.response().end(token);
-            //HttpHeaders.AUTHORIZATION = put header the token
-        } else {
-            ctx.fail(401);
-        }
-    }
-
-    @RouteRegistration(uri = "/signin/fb", method = HttpMethod.POST)
+    @RouteRegistration(uri = "/signin/", method = HttpMethod.POST)
     public void signinFacebook(RoutingContext ctx, @Param String accessToken) {
-        authService.signinWithFacebook(accessToken).setHandler(e -> {
-            signinWithSNS(ctx, e);
+        authService.signin(accessToken).setHandler(e -> {
+            if (e.succeeded()) {
+                Profile result = e.result();
+                String token = authService.createJWT(ctx.vertx(), accessToken);
+                JsonObject jsonObject = new JsonObject(gson.toJson(result));
+                jsonObject.put("token", token);
+                ctx.addCookie(Cookie.cookie("token", token));
+                ctx.response().end(jsonObject.encode());
+            } else {
+                ctx.fail(401);
+            }
         });
-    }
-
-    @RouteRegistration(uri = "/signin/google", method = HttpMethod.POST)
-    public void signinGoogle(RoutingContext ctx, @Param String accessToken) {
-        authService.signinWithGoogle(accessToken).setHandler(e -> {
-            signinWithSNS(ctx, e);
-        });
-    }
-
-    private void signinWithSNS(RoutingContext ctx, AsyncResult<Profile> e) {
-        if (e.succeeded()) {
-            Profile result = e.result();
-            String token = JWTAuthUtil.createToken(ctx.vertx(), result.getUid());
-            JsonObject jsonObject = new JsonObject(gson.toJson(result));
-            jsonObject.put("token", token);
-            ctx.addCookie(Cookie.cookie("token", token));
-            ctx.response().end(jsonObject.encode());
-        } else {
-            ctx.fail(401);
-        }
     }
 
     @RouteRegistration(uri = "/logout", method = HttpMethod.POST, auth = true)
