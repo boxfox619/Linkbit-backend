@@ -11,6 +11,7 @@ import com.boxfox.cross.service.wallet.model.TransactionResult;
 import com.boxfox.cross.service.wallet.model.TransactionStatus;
 import com.boxfox.cross.common.data.Config;
 import com.boxfox.cross.service.wallet.model.WalletCreateResult;
+import com.boxfox.cross.util.FileUtil;
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -87,14 +88,13 @@ public class EthereumService extends WalletService {
       String walletFileName = WalletUtils.generateFullNewWalletFile(password, cachePath);
       File jsonFile = new File(cachePath.getPath() + File.separator + walletFileName);
       String walletJson = Files.toString(jsonFile, Charset.defaultCharset());
-      jsonFile.delete();
       JsonObject walletJsonObj = (JsonObject) new JsonParser().parse(walletJson);
       String address = "0x"+walletJsonObj.get("address").getAsString();
       result.setResult(true);
-      result.setWalletName(walletFileName);
-      result.setWallet(walletJsonObj);
       result.setAddress(address);
       indexingTransactions(address);
+      File file = FileUtil.encryptFile(jsonFile);
+      result.setWalletName(file.getName());
     } catch (NoSuchAlgorithmException e) {
       e.printStackTrace();
     } catch (NoSuchProviderException e) {

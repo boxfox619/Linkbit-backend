@@ -4,6 +4,7 @@ import static com.boxfox.cross.service.wallet.indexing.IndexingMessage.EVENT_SUB
 import static io.one.sys.db.tables.Wallet.WALLET;
 
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.common.secure.AES256;
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.service.wallet.indexing.IndexingMessage;
@@ -31,13 +32,19 @@ public abstract class WalletService extends AbstractService{
 
   public abstract String getBalance(String address);
 
-  public final void createWallet( String uid, String name,String password, String description, Handler<AsyncResult<WalletCreateResult>> res){
+  public final void createWallet( String uid, String name,String password, String description, Handler<AsyncResult<String>> res){
     doAsync(future -> {
       WalletCreateResult walletCreateResult = createWallet(password);
-      AccountDao dao = new AccountDao(PostgresConfig.create());
-      useContext(ctx->{
-        ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(dao)).execute();
-      });
+      if(walletCreateResult.isSuccess()) {
+        String walletFileName = AES256.encrypt(walletCreateResult.getWalletName());
+        AccountDao dao = new AccountDao(PostgresConfig.create());
+        useContext(ctx -> {
+          ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(dao), walletFileName).execute();
+        });
+        future.complete(walletCreateResult.getAddress());
+      }else{
+        future.fail("Wallet create fail");
+      }
     }, res);
   }
 

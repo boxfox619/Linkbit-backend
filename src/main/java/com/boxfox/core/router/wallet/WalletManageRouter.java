@@ -22,10 +22,8 @@ public class WalletManageRouter extends WalletRouter {
         if (password != null) {
             WalletService service = WalletServiceManager.getService(symbol);
             service.createWallet(uid, name, password, description, res->{
-                ctx.response().putHeader("content-type", "application/json");
-                ctx.response().setChunked(true).write(new Gson().toJson(res.result()));
                 if (res.succeeded() && major) {
-                    addressService.setMajorWallet(uid, symbol, res.result().getAddress(), res2 -> {
+                    addressService.setMajorWallet(uid, symbol, res.result(), res2 -> {
                         ctx.response().end();
                     });
                 }else{

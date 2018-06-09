@@ -1,11 +1,10 @@
 package com.boxfox.cross.service.wallet.model;
 
-import com.google.gson.JsonObject;
 
 public class WalletCreateResult {
   private boolean result;
   private String address;
-  private String walletName;
+  private transient  String walletName;
 
   public boolean isSuccess() {
     return result;
