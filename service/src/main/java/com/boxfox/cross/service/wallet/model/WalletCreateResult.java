@@ -6,7 +6,6 @@ public class WalletCreateResult {
   private boolean result;
   private String address;
   private String walletName;
-  private JsonObject wallet;
 
   public boolean isSuccess() {
     return result;
@@ -30,13 +29,5 @@ public class WalletCreateResult {
 
   public void setWalletName(String name) {
     this.walletName = name;
-  }
-
-  public JsonObject getWallet() {
-    return wallet;
-  }
-
-  public void setWallet(JsonObject wallet) {
-    this.wallet = wallet;
   }
 }

@@ -16,7 +16,7 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 public class WalletManageRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = true)
-    public void create(RoutingContext ctx, @Param String password, @Param String symbol, @Param String name, @Param String description) {
+    public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description) {
         boolean major = false;
         String uid = (String) ctx.data().get("uid");
         if (password != null) {

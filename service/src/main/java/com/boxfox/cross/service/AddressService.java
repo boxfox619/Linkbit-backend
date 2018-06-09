@@ -16,17 +16,17 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 public class AddressService  extends AbstractService{
     private static final String ADDRESS_REGEX = "cross-[0-9]{0,4}-[0-9]{0,4}";
 
-    public void findByAddress(String symbol, String address, Handler<AsyncResult<Wallet>> res) {
+    public void findByAddress(String address, Handler<AsyncResult<Wallet>> res) {
         doAsync(future -> {
                 useContext(ctx -> {
                     Result<Record> result;
                     if(isMathCrossAddress(address)){
-                        result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.SYMBOL.eq(symbol).and(WALLET.CROSSADDRESS.eq(address))).fetch();
+                        result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.CROSSADDRESS.eq(address)).fetch();
                         if(result.size()==0){
                             result = ctx.selectFrom(ACCOUNT.join(MAJORWALLET).on(MAJORWALLET.UID.eq(ACCOUNT.UID)).join(WALLET).on(WALLET.ADDRESS.eq(MAJORWALLET.ADDRESS))).where(ACCOUNT.ADDRESS.eq(address)).fetch();
                         }
                     } else {
-                        result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.ADDRESS.eq(address).and(WALLET.SYMBOL.eq(symbol))).fetch();
+                        result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.ADDRESS.eq(address)).fetch();
                     }
                     if(result.size()>0){
                         Record record = result.get(0);

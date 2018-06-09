@@ -3,6 +3,8 @@ package com.boxfox.core.router.wallet;
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.vertx.service.Service;
+import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.service.model.Wallet;
 import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.WalletServiceManager;
@@ -17,6 +19,8 @@ import java.util.List;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 
 public class WalletLookupRouter extends WalletRouter {
+    @Service
+    private AddressService service;
 
     @RouteRegistration(uri = "/wallet/list", method = HttpMethod.GET, auth = true)
     public void getWallets(RoutingContext ctx) {
@@ -38,11 +42,11 @@ public class WalletLookupRouter extends WalletRouter {
         }).start();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/balance", method = HttpMethod.GET, auth = true)
-    public void getBalance(RoutingContext ctx, @Param String symbol, @Param String address) {
-        new Thread(() -> {
-            WalletService service = WalletServiceManager.getService(symbol);
-            if (service != null) {
+    @RouteRegistration(uri = "/wallet/balance", method = HttpMethod.GET, auth = true)
+    public void getBalance(RoutingContext ctx, @Param String address) {
+        service.findByAddress(address, res -> {
+            if (res.result() != null) {
+                WalletService service = WalletServiceManager.getService(res.result().getSymbol());
                 String balance = service.getBalance(address);
                 if (balance == null) {
                     ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
@@ -53,21 +57,21 @@ public class WalletLookupRouter extends WalletRouter {
                 ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
             }
             ctx.response().end();
-        }).start();
+        });
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol/price", method = HttpMethod.GET, auth = true)
-    public void getPrice(RoutingContext ctx, @Param String symbol, @Param String address) {
-        new Thread(() -> {
-            WalletService service = WalletServiceManager.getService(symbol);
-            if (service != null) {
+    @RouteRegistration(uri = "/wallet/price", method = HttpMethod.GET, auth = true)
+    public void getPrice(RoutingContext ctx, @Param String address) {
+        service.findByAddress(address, res -> {
+            if (res.result() != null) {
+                WalletService service = WalletServiceManager.getService(res.result().getSymbol());
                 double price = service.getPrice(address);
-                ctx.response().setStatusCode(200).setChunked(true).write(price+"");
+                ctx.response().setStatusCode(200).setChunked(true).write(price + "");
             } else {
                 ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
             }
             ctx.response().end();
-        }).start();
+        });
     }
 
     @RouteRegistration(uri = "/wallet/:symbol/price/all", method = HttpMethod.GET, auth = true)
@@ -90,9 +94,9 @@ public class WalletLookupRouter extends WalletRouter {
         }).start();
     }
 
-    @RouteRegistration(uri = "/wallet/:symbol", method = HttpMethod.GET, auth = true)
-    public void walletInfoLookup(RoutingContext ctx, @Param String symbol, @Param String address) {
-        addressService.findByAddress(symbol, address, res -> {
+    @RouteRegistration(uri = "/wallet", method = HttpMethod.GET, auth = true)
+    public void walletInfoLookup(RoutingContext ctx,  @Param String address) {
+        addressService.findByAddress(address, res -> {
             if (res.result() == null) {
                 ctx.response().setStatusCode(NO_CONTENT.code());
             } else {

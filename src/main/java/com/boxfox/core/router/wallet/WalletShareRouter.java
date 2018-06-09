@@ -2,6 +2,7 @@ package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.ShareService;
 import com.boxfox.cross.service.model.ShareContent;
 import com.boxfox.cross.service.model.Wallet;
@@ -11,6 +12,8 @@ import io.vertx.ext.web.RoutingContext;
 import java.io.File;
 
 public class WalletShareRouter extends WalletRouter{
+
+    @Service
     private ShareService shareService;
 
     public WalletShareRouter(){
@@ -36,7 +39,7 @@ public class WalletShareRouter extends WalletRouter{
 
     @RouteRegistration(uri="/transaction/share/qr", method=HttpMethod.GET)
     public void createQrCode(RoutingContext ctx, @Param String symbol, @Param String address, @Param int amount){
-        addressService.findByAddress(symbol, address, res->{
+        addressService.findByAddress(address, res->{
             if(res.result() != null) {
                 String urlPrefix = ctx.request().uri().replace(ctx.currentRoute().getPath(), "");
                 String data = shareService.createTransactionData(symbol, address, amount);
@@ -55,7 +58,7 @@ public class WalletShareRouter extends WalletRouter{
 
     @RouteRegistration(uri="/transaction/share/link/:symbol", method = HttpMethod.POST)
     public void createLink(RoutingContext ctx, @Param String symbol, @Param String address, @Param int amount){
-        addressService.findByAddress(symbol, address, res -> {
+        addressService.findByAddress(address, res -> {
             if(res.result() != null) {
                 String urlPrefix = ctx.request().uri().replace(ctx.currentRoute().getPath(), "");
                 String data = shareService.createTransactionData(symbol, address, amount);

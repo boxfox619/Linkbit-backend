@@ -1,6 +1,7 @@
 package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.google.gson.Gson;
@@ -13,6 +14,8 @@ import io.vertx.ext.web.RoutingContext;
 
 
 public class WalletRouter {
+
+    @Service
     protected AddressService addressService;
     protected Gson gson;
 
@@ -22,7 +25,7 @@ public class WalletRouter {
         this.addressService = new AddressService();
     }
 
-    @RouteRegistration(uri = "/support/wallet/list", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/support/wallet", method = HttpMethod.GET, auth = true)
     public void getSupportWalletList(RoutingContext ctx) {
         CoinDao dao = new CoinDao(PostgresConfig.create());
         JsonArray coins = new JsonArray();
