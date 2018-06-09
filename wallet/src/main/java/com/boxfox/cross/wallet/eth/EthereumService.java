@@ -63,9 +63,9 @@ public class EthereumService extends WalletService {
       cachePath.mkdirs();
   }
 
-  public WalletService init(){
+  @Override
+  public void init(){
     setIndexingService(new EthIndexingService(web3));
-    return this;
   }
 
   @Override

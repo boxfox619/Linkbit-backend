@@ -1,4 +1,4 @@
-package com.boxfox.cross.common.vertx.verticle;
+package com.boxfox.cross.common.vertx.service;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface WorkerVerticle {
+@Target({ElementType.FIELD})
+public @interface Service {
 
 }

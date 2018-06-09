@@ -92,14 +92,13 @@ public class WalletLookupRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet/:symbol", method = HttpMethod.GET, auth = true)
     public void walletInfoLookup(RoutingContext ctx, @Param String symbol, @Param String address) {
-        new Thread(() -> {
-            Wallet wallet = addressService.findByAddress(symbol, address);
-            if (wallet == null) {
+        addressService.findByAddress(symbol, address, res -> {
+            if (res.result() == null) {
                 ctx.response().setStatusCode(NO_CONTENT.code());
             } else {
-                ctx.response().setChunked(true).write(gson.toJson(wallet));
+                ctx.response().setChunked(true).write(gson.toJson(res.result()));
             }
             ctx.response().end();
-        }).start();
+        });
     }
 }

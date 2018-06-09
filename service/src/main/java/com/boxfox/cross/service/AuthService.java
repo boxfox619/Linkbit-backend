@@ -1,10 +1,10 @@
 package com.boxfox.cross.service;
 
-import static com.boxfox.cross.common.data.PostgresConfig.createContext;
 import static io.one.sys.db.Tables.ACCOUNT;
 
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.JWTAuthUtil;
+import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.model.Profile;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -13,27 +13,26 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.pojos.Account;
-import io.vertx.core.Future;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTOptions;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import org.jooq.DSLContext;
 
 
-public class AuthService {
+public class AuthService extends AbstractService {
 
-    static{
+    public void init(){
         try {
+            System.out.println("Initilize firebase");
             FileInputStream serviceAccount = new FileInputStream("keystore/cross-c863f-3861d7d0cc90.json");
 
             FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .build();
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
 
             FirebaseApp.initializeApp(options);
         }catch (IOException e){
@@ -41,10 +40,9 @@ public class AuthService {
         }
     }
 
-    public Future<Profile> signin(String token){
-        Future<Profile> future = Future.future();
-        AccountDao data = new AccountDao(PostgresConfig.create());
-        new Thread(() -> {
+    public void signin(String token, Handler<AsyncResult<Profile>> hander){
+        doAsync(future -> {
+            AccountDao data = new AccountDao(PostgresConfig.create());
             try {
                 FirebaseToken decodedToken  = FirebaseAuth.getInstance().verifyIdTokenAsync(token).get();
                 if(decodedToken!=null){
@@ -56,8 +54,9 @@ public class AuthService {
                     if (data.fetchByUid(decodedToken.getUid()).size() == 0) {
                         String address = AddressService.createRandomAddress(data);
                         profile.setCrossAddress(address);
-                        DSLContext create = createContext();
-                        create.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(decodedToken.getUid(), decodedToken.getEmail(), decodedToken.getName(), address).execute();
+                        useContext(ctx -> {
+                            ctx.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(decodedToken.getUid(), decodedToken.getEmail(), decodedToken.getName(), address).execute();
+                        });
                         /*FacebookAuth.getFriends(accessToken).setHandler(event -> {
                             if (event.succeeded()) {
                                 event.result().forEach(p -> create.insertInto(FRIEND).values(profile.getUid(), p.getUid()).execute());
@@ -65,7 +64,7 @@ public class AuthService {
                         });*/
                     } else {
                         profile.setCrossAddress(
-                            data.fetchByUid(profile.getUid()).get(0).getAddress());
+                                data.fetchByUid(profile.getUid()).get(0).getAddress());
                     }
                     future.complete(profile);
                 }else{
@@ -74,8 +73,7 @@ public class AuthService {
             } catch (InterruptedException | ExecutionException e) {
                 future.fail(e);
             }
-        }).start();
-        return future;
+        }, hander);
     }
 
     public String createJWT(Vertx vertx, String firebaseToken){

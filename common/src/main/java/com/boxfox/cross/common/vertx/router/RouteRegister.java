@@ -1,14 +1,13 @@
 package com.boxfox.cross.common.vertx.router;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import com.boxfox.cross.common.vertx.JWTAuthUtil;
 import com.boxfox.cross.common.vertx.middleware.JWTHandler;
+import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.cross.common.vertx.service.Service;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -26,15 +25,20 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 
 public class RouteRegister {
     private List<RouterContext> routerList;
+    private Map<Class, AbstractService> serviceMap;
     private Router router;
+    private Vertx vertx;
 
     public static RouteRegister routing(Vertx vertx) {
-        return new RouteRegister(Router.router(vertx));
+        RouteRegister register = new RouteRegister(Router.router(vertx));
+        register.vertx = vertx;
+        return register;
     }
 
     private RouteRegister(Router router) {
         this.router = router;
         this.routerList = new ArrayList();
+        this.serviceMap = new HashMap<>();
     }
 
     public void route(Handler<RoutingContext> handler) {
@@ -43,11 +47,9 @@ public class RouteRegister {
 
     public void route(String... packages) {
         Arrays.stream(packages).forEach(packageName -> {
-            Reflections routerAnnotations = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
-            Set<Class<?>> annotatedClass = routerAnnotations.getTypesAnnotatedWith(RouteRegistration.class);
-            Set<Method> annotatedMethod = routerAnnotations.getMethodsAnnotatedWith(RouteRegistration.class);
+            Reflections scanner = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
             JWTHandler jwtAuthHandler = JWTHandler.create();
-            annotatedClass.forEach(c -> {
+            scanner.getTypesAnnotatedWith(RouteRegistration.class).forEach(c -> {
                 RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
                 try {
                     Object routingInstance = c.newInstance();
@@ -64,22 +66,17 @@ public class RouteRegister {
                 }
             });
 
-            annotatedMethod.forEach(m -> {
+            scanner.getMethodsAnnotatedWith(RouteRegistration.class).forEach(m -> {
                 RouteRegistration annotation = m.getAnnotation(RouteRegistration.class);
-                try {
-                    Object instance = searchCreatedInstance(m.getDeclaringClass());
-                    if (instance == null)
-                        instance = m.getDeclaringClass().newInstance();
-                    Handler handler = createMethodHandler(instance, m);
-                    for (HttpMethod method : annotation.method()){
-                        if(annotation.auth()){
-                            router.route(method, annotation.uri()).handler(jwtAuthHandler);
-                        }
-                        router.route(method, annotation.uri()).handler(handler);
+                Object instance = createRouterInstance(m.getDeclaringClass());
+                Handler handler = createMethodHandler(instance, m);
+                for (HttpMethod method : annotation.method()) {
+                    if (annotation.auth()) {
+                        router.route(method, annotation.uri()).handler(jwtAuthHandler);
                     }
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    router.route(method, annotation.uri()).handler(handler);
                 }
+                routerList.add(new RouterContext(annotation, instance));
             });
         });
     }
@@ -155,6 +152,43 @@ public class RouteRegister {
             }
         }
         return paramData;
+    }
+
+    private Object createRouterInstance(Class<?> clazz){
+        Object instance = searchCreatedInstance(clazz);
+        if(instance==null) {
+            try {
+                instance = clazz.newInstance();
+                for (Field field : clazz.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (field.getAnnotation(Service.class) != null && field.getDeclaringClass().equals(AbstractService.class)) {
+                        AbstractService service = serviceMap.get(field.getClass());
+                        if(service==null) {
+                            service = (AbstractService) field.getDeclaringClass().newInstance();
+                            try {
+                                Field vertxField = service.getClass().getField("vertx");
+                                if(vertxField!=null){
+                                    vertxField.setAccessible(true);
+                                    vertxField.set(service, this.vertx);
+                                }
+                            } catch (NoSuchFieldException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                service.getClass().getMethod("init").invoke(service);
+                            } catch (NoSuchMethodException | InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                            serviceMap.put(field.getClass(), service);
+                        }
+                        field.set(instance, service);
+                    }
+                }
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return instance;
     }
 
     private Object searchCreatedInstance(Class<?> clazz) {

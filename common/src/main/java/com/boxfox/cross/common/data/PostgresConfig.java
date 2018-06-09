@@ -17,8 +17,4 @@ public class PostgresConfig {
         return configuration;
     }
 
-    public static DSLContext createContext(){
-        DSLContext create = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
-        return create;
-    }
 }

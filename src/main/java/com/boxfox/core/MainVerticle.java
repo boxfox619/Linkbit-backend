@@ -1,9 +1,7 @@
 package com.boxfox.core;
 
-import com.boxfox.cross.service.wallet.WalletService;
 import com.boxfox.cross.service.wallet.WalletServiceManager;
 import com.boxfox.cross.service.wallet.indexing.TransactionIndexingVerticle;
-import com.boxfox.cross.wallet.ERC20Service;
 import com.boxfox.cross.wallet.erc20.EOSService;
 import com.boxfox.cross.wallet.erc20.OMGService;
 import com.boxfox.cross.wallet.eth.EthereumService;
@@ -34,7 +32,9 @@ public class MainVerticle extends AbstractVerticle {
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
             System.out.println("Server started : "+ server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
-            WalletServiceManager.register("ETH", new EthereumService(vertx).init());
+            EthereumService ethereumService = new EthereumService(vertx);
+            ethereumService.init();
+            WalletServiceManager.register("ETH", ethereumService);
             WalletServiceManager.register("EOS", new EOSService(vertx));
             WalletServiceManager.register("OMG", new OMGService(vertx));
         });
