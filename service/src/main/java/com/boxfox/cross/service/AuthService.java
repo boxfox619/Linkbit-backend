@@ -27,7 +27,7 @@ import org.jooq.DSLContext;
 
 public class AuthService {
 
-    public void init(){
+    static{
         try {
             FileInputStream serviceAccount = new FileInputStream("keystore/cross-c863f-3861d7d0cc90.json");
 

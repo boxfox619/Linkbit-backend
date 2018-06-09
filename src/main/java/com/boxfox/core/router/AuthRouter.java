@@ -19,7 +19,6 @@ public class AuthRouter {
     public AuthRouter(){
         authService = new AuthService();
         gson = new Gson();
-        authService.init();
     }
 
     @RouteRegistration(uri = "/signin/", method = HttpMethod.POST)
