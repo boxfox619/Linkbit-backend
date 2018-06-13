@@ -2,6 +2,7 @@ package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.Config;
 import com.boxfox.cross.common.secure.AES256;
+import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.model.ShareContent;
 import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
@@ -18,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
-public class ShareService {
+public class ShareService extends AbstractService{
     private Gson gson;
 
     public ShareService() {

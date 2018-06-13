@@ -161,12 +161,12 @@ public class RouteRegister {
                 instance = clazz.newInstance();
                 for (Field field : clazz.getDeclaredFields()) {
                     field.setAccessible(true);
-                    if (field.getAnnotation(Service.class) != null && field.getDeclaringClass().equals(AbstractService.class)) {
-                        AbstractService service = serviceMap.get(field.getClass());
+                    if (field.getAnnotation(Service.class) != null) {
+                        AbstractService service = serviceMap.get(field.getType());
                         if(service==null) {
-                            service = (AbstractService) field.getDeclaringClass().newInstance();
+                            service = (AbstractService) field.getType().newInstance();
                             try {
-                                Field vertxField = service.getClass().getField("vertx");
+                                Field vertxField = service.getClass().getSuperclass().getDeclaredField("vertx");
                                 if(vertxField!=null){
                                     vertxField.setAccessible(true);
                                     vertxField.set(service, this.vertx);

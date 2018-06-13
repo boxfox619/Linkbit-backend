@@ -13,7 +13,7 @@ import static io.one.sys.db.tables.Account.ACCOUNT;
 import static io.one.sys.db.tables.Majorwallet.MAJORWALLET;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
-public class AddressService  extends AbstractService{
+public class AddressService extends AbstractService{
     private static final String ADDRESS_REGEX = "cross-[0-9]{0,4}-[0-9]{0,4}";
 
     public void findByAddress(String address, Handler<AsyncResult<Wallet>> res) {
@@ -60,9 +60,7 @@ public class AddressService  extends AbstractService{
             useContext(ctx -> {
                 Result<MajorwalletRecord> records = ctx.selectFrom(MAJORWALLET).where(MAJORWALLET.UID.eq(uid).and(MAJORWALLET.SYMBOL.eq(symbol))).fetch();
                 if (records.size() > 0) {
-                    MajorwalletRecord record = records.get(0);
-                    record.setAddress(address);
-                    record.store();
+                    ctx.update(MAJORWALLET).set(MAJORWALLET.ADDRESS, address).where(MAJORWALLET.UID.eq(uid).and(MAJORWALLET.SYMBOL.eq(symbol))).execute();
                 } else {
                     ctx.insertInto(MAJORWALLET).values(uid, symbol, address).execute();
                 }
