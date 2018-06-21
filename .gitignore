@@ -76,3 +76,5 @@ atlassian-ide-plugin.xml
 
 # Vagrant files
 .vagrant
+
+cache/

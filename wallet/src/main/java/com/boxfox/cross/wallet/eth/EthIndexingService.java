@@ -1,7 +1,7 @@
 package com.boxfox.cross.wallet.eth;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.service.wallet.indexing.IndexingService;
+import com.boxfox.cross.wallet.indexing.IndexingService;
 import io.one.sys.db.tables.daos.TransactionDao;
 import io.one.sys.db.tables.pojos.Transaction;
 import io.vertx.core.Future;

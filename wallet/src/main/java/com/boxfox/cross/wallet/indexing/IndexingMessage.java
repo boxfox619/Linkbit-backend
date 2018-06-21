@@ -1,4 +1,4 @@
-package com.boxfox.cross.service.wallet.indexing;
+package com.boxfox.cross.wallet.indexing;
 
 public class IndexingMessage {
   public static transient final String EVENT_SUBJECT = "wallet.indexing";

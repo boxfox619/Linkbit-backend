@@ -5,13 +5,12 @@ import static com.boxfox.cross.common.data.PostgresConfig.create;
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.service.model.Profile;
-import com.boxfox.cross.service.wallet.WalletServiceException;
-import com.boxfox.cross.service.wallet.WalletService;
-import com.boxfox.cross.service.wallet.model.TransactionResult;
-import com.boxfox.cross.service.wallet.model.TransactionStatus;
 import com.boxfox.cross.common.data.Config;
-import com.boxfox.cross.service.wallet.model.WalletCreateResult;
-import com.boxfox.cross.util.FileUtil;
+import com.boxfox.cross.wallet.WalletService;
+import com.boxfox.cross.wallet.WalletServiceException;
+import com.boxfox.cross.wallet.model.TransactionResult;
+import com.boxfox.cross.wallet.model.TransactionStatus;
+import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -92,9 +91,10 @@ public class EthereumService extends WalletService {
       String address = "0x"+walletJsonObj.get("address").getAsString();
       result.setResult(true);
       result.setAddress(address);
+      result.setWalletName(walletFileName);
+      result.setWalletData(walletJsonObj);
       indexingTransactions(address);
-      File file = FileUtil.encryptFile(jsonFile);
-      result.setWalletName(file.getName());
+      jsonFile.delete();
     } catch (NoSuchAlgorithmException e) {
       e.printStackTrace();
     } catch (NoSuchProviderException e) {

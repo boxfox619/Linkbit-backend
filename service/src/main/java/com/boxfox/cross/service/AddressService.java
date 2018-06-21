@@ -6,6 +6,7 @@ import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.records.MajorwalletRecord;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -73,13 +74,13 @@ public class AddressService extends AbstractService{
         return address.matches(ADDRESS_REGEX);
     }
 
-    public static String createRandomAddress(AccountDao accountDao) {
+    public static String createRandomAddress(DSLContext ctx) {
         String address;
         do {
             int firstNum = (int) (Math.random() * 9999 + 1);
             int secondNum = (int) (Math.random() * 999999 + 1);
             address = String.format("cross-%04d-%04d", firstNum, secondNum);
-        } while (accountDao.fetchByAddress(address).size() > 0);
+        } while (ctx.selectFrom(WALLET).where(WALLET.ADDRESS.eq(address)).fetch().size()>0);
         return address;
     }
 }

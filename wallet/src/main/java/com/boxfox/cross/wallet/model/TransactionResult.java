@@ -1,4 +1,4 @@
-package com.boxfox.cross.service.wallet.model;
+package com.boxfox.cross.wallet.model;
 
 public class TransactionResult {
   private boolean status = false;

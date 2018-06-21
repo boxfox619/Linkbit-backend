@@ -52,16 +52,16 @@ public class AuthService extends AbstractService {
                     profile.setEmail(decodedToken.getEmail());
                     profile.setProfile(decodedToken.getPicture());
                     if (data.fetchByUid(decodedToken.getUid()).size() == 0) {
-                        String address = AddressService.createRandomAddress(data);
-                        profile.setCrossAddress(address);
                         useContext(ctx -> {
+                            String address = AddressService.createRandomAddress(ctx);
+                            profile.setCrossAddress(address);
                             ctx.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(decodedToken.getUid(), decodedToken.getEmail(), decodedToken.getName(), address).execute();
-                        });
                         /*FacebookAuth.getFriends(accessToken).setHandler(event -> {
                             if (event.succeeded()) {
                                 event.result().forEach(p -> create.insertInto(FRIEND).values(profile.getUid(), p.getUid()).execute());
                             }
                         });*/
+                        });
                     } else {
                         profile.setCrossAddress(
                                 data.fetchByUid(profile.getUid()).get(0).getAddress());

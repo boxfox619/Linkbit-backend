@@ -1,4 +1,4 @@
-package com.boxfox.cross.service.wallet.indexing;
+package com.boxfox.cross.wallet.indexing;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;

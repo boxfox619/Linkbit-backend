@@ -1,10 +1,13 @@
-package com.boxfox.cross.service.wallet.model;
+package com.boxfox.cross.wallet.model;
 
+
+import com.google.gson.JsonObject;
 
 public class WalletCreateResult {
   private boolean result;
   private String address;
-  private transient  String walletName;
+  private String walletName;
+  private JsonObject walletData;
 
   public boolean isSuccess() {
     return result;
@@ -28,5 +31,13 @@ public class WalletCreateResult {
 
   public void setWalletName(String name) {
     this.walletName = name;
+  }
+
+  public JsonObject getWalletData() {
+    return walletData;
+  }
+
+  public void setWalletData(JsonObject walletData) {
+    this.walletData = walletData;
   }
 }

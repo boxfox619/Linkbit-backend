@@ -1,24 +1,22 @@
-package com.boxfox.cross.service.wallet;
+package com.boxfox.cross.wallet;
 
-import static com.boxfox.cross.service.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
+import static com.boxfox.cross.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.secure.AES256;
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.AddressService;
-import com.boxfox.cross.service.wallet.indexing.IndexingMessage;
-import com.boxfox.cross.service.wallet.indexing.IndexingService;
-import com.boxfox.cross.service.wallet.model.TransactionResult;
-import com.boxfox.cross.service.wallet.model.TransactionStatus;
-import com.boxfox.cross.service.wallet.model.WalletCreateResult;
+import com.boxfox.cross.wallet.indexing.IndexingMessage;
+import com.boxfox.cross.wallet.indexing.IndexingService;
+import com.boxfox.cross.wallet.model.TransactionResult;
+import com.boxfox.cross.wallet.model.TransactionStatus;
+import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-
 import java.util.List;
 
 public abstract class WalletService extends AbstractService{
@@ -32,16 +30,15 @@ public abstract class WalletService extends AbstractService{
 
   public abstract String getBalance(String address);
 
-  public final void createWallet( String uid, String name,String password, String description, Handler<AsyncResult<String>> res){
+  public final void createWallet( String uid, String name, String password, String description, Handler<AsyncResult<WalletCreateResult>> res){
     doAsync(future -> {
       WalletCreateResult walletCreateResult = createWallet(password);
       if(walletCreateResult.isSuccess()) {
-        String walletFileName = AES256.encrypt(walletCreateResult.getWalletName());
         AccountDao dao = new AccountDao(PostgresConfig.create());
         useContext(ctx -> {
-          ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(dao), walletFileName).execute();
+          ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(ctx)).execute();
         });
-        future.complete(walletCreateResult.getAddress());
+        future.complete(walletCreateResult);
       }else{
         future.fail("Wallet create fail");
       }

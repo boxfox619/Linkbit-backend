@@ -2,27 +2,28 @@ package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.service.wallet.WalletService;
-import com.boxfox.cross.service.wallet.WalletServiceManager;
+import com.boxfox.cross.wallet.WalletService;
+import com.boxfox.cross.wallet.WalletServiceManager;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
 public class WalletManageRouter extends WalletRouter {
 
-    @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = true)
+    @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = false)
     public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description) {
         boolean major = false;
-        String uid = (String) ctx.data().get("uid");
+        //String uid = (String) ctx.data().get("uid");
+        String uid = "vKEVPGh2r4h0dVpuONLuZ4Uwuh02";
         if (password != null) {
             WalletService service = WalletServiceManager.getService(symbol);
             service.createWallet(uid, name, password, description, res->{
                 if (res.succeeded() && major) {
-                    addressService.setMajorWallet(uid, symbol, res.result(), res2 -> {
-                        ctx.response().end();
+                    addressService.setMajorWallet(uid, symbol, res.result().getAddress(), res2 -> {
+                        System.out.println(res.result());
                     });
                 }else{
-                    ctx.response().end();
+                    ctx.response().end(gson.toJson(res.result()));
                 }
             });
         } else {

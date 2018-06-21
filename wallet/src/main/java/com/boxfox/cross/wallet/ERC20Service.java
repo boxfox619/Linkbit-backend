@@ -1,15 +1,11 @@
 package com.boxfox.cross.wallet;
 
 import com.boxfox.cross.common.data.Config;
-import com.boxfox.cross.service.wallet.WalletService;
-import com.boxfox.cross.service.wallet.WalletServiceException;
-import com.boxfox.cross.service.wallet.model.TransactionResult;
-import com.boxfox.cross.service.wallet.model.TransactionStatus;
-import com.boxfox.cross.service.wallet.model.WalletCreateResult;
+import com.boxfox.cross.wallet.model.TransactionResult;
+import com.boxfox.cross.wallet.model.TransactionStatus;
+import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.common.io.Files;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import org.web3j.crypto.*;

@@ -1,8 +1,7 @@
-package com.boxfox.cross.service.wallet.model;
+package com.boxfox.cross.wallet.model;
 
 import com.boxfox.cross.service.model.Profile;
 import com.boxfox.cross.service.model.Wallet;
-
 import java.math.BigInteger;
 
 public class TransactionStatus {

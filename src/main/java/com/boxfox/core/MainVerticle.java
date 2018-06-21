@@ -1,12 +1,12 @@
 package com.boxfox.core;
 
-import com.boxfox.cross.service.wallet.WalletServiceManager;
-import com.boxfox.cross.service.wallet.indexing.TransactionIndexingVerticle;
+import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.erc20.EOSService;
 import com.boxfox.cross.wallet.erc20.OMGService;
 import com.boxfox.cross.wallet.eth.EthereumService;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.cross.common.vertx.router.RouteRegister;
+import com.boxfox.cross.wallet.indexing.TransactionIndexingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
