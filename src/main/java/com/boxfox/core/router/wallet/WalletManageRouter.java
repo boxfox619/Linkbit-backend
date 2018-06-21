@@ -10,11 +10,10 @@ import io.vertx.ext.web.RoutingContext;
 
 public class WalletManageRouter extends WalletRouter {
 
-    @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = false)
+    @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description) {
         boolean major = false;
-        //String uid = (String) ctx.data().get("uid");
-        String uid = "vKEVPGh2r4h0dVpuONLuZ4Uwuh02";
+        String uid = (String) ctx.data().get("uid");
         if (password != null) {
             WalletService service = WalletServiceManager.getService(symbol);
             service.createWallet(uid, name, password, description, res->{
