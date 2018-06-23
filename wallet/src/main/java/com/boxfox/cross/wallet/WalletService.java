@@ -36,7 +36,7 @@ public abstract class WalletService extends AbstractService{
       if(walletCreateResult.isSuccess()) {
         AccountDao dao = new AccountDao(PostgresConfig.create());
         useContext(ctx -> {
-          ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(ctx)).execute();
+          ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(uid)).execute();
         });
         future.complete(walletCreateResult);
       }else{

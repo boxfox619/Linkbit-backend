@@ -16,7 +16,7 @@ public class RemittanceRouter extends WalletRouter{
     public void send(RoutingContext ctx,
                      @Param String symbol,
                      @Param String walletFileName,
-                     @Param String walletJsonFile,
+                     @Param String walletFileData,
                      @Param String password,
                      @Param String targetAddress,
                      @Param String amount) {
@@ -27,7 +27,7 @@ public class RemittanceRouter extends WalletRouter{
                 String destAddress = targetAddress;
                 if (res != null)
                     destAddress = wallet.getOriginalAddress();
-                TransactionResult result = service.send(walletFileName, walletJsonFile, password, destAddress, amount);
+                TransactionResult result = service.send(walletFileName, walletFileData, password, destAddress, amount);
                 ctx.response().putHeader("content-type", "application/json");
                 ctx.response().setChunked(true).write(gson.toJson(result));
             }else{

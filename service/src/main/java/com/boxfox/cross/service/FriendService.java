@@ -25,8 +25,8 @@ public class FriendService extends AbstractService{
             List<Profile> friends = new ArrayList();
             AccountDao dao = new AccountDao(PostgresConfig.create());
             useContext(ctx -> {
-                ctx.selectFrom(FRIEND).where(FRIEND.UID.eq(uid).or(FRIEND.FRIEND_.eq(uid))).fetch().forEach(r -> {
-                    String target = r.getFriend().equals(uid) ? r.getUid() : r.getFriend();
+                ctx.selectFrom(FRIEND).where(FRIEND.UID_1.eq(uid).or(FRIEND.UID_2.eq(uid))).fetch().forEach(r -> {
+                    String target = r.getUid_1().equals(uid) ? r.getUid_2() : r.getUid_1();
                     Account acc = dao.fetchOneByUid(target);
                     Profile profile = new Profile();
                     profile.setName(acc.getName());
@@ -47,7 +47,7 @@ public class FriendService extends AbstractService{
                 future.fail("Target user can not found");
             } else {
                 useContext(ctx->{
-                    int result = ctx.insertInto(FRIEND, FRIEND.UID, FRIEND.FRIEND_).values(ownUid, uid).execute();
+                    int result = ctx.insertInto(FRIEND, FRIEND.UID_1, FRIEND.UID_2).values(ownUid, uid).execute();
                     if (result == 1) {
                         future.complete();
                     } else {
@@ -67,7 +67,7 @@ public class FriendService extends AbstractService{
                 useContext(ctx -> {
                     int result = ctx
                             .deleteFrom(FRIEND)
-                            .where(FRIEND.UID.equal(ownUid).and(FRIEND.FRIEND_.equal(uid))).execute();
+                            .where(FRIEND.UID_1.equal(ownUid).and(FRIEND.UID_2.equal(uid))).execute();
                     if (result == 1) {
                         future.complete();
                     } else {
