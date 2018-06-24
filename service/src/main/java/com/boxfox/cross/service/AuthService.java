@@ -53,7 +53,7 @@ public class AuthService extends AbstractService {
                     profile.setProfile(decodedToken.getPicture());
                     if (data.fetchByUid(decodedToken.getUid()).size() == 0) {
                         useContext(ctx -> {
-                            String address = AddressService.createRandomAddress(profile.getUid());
+                            String address = AddressService.createRandomAddress(ctx);
                             profile.setCrossAddress(address);
                             ctx.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(decodedToken.getUid(), decodedToken.getEmail(), decodedToken.getName(), address).execute();
                         /*FacebookAuth.getFriends(accessToken).setHandler(event -> {

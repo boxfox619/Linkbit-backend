@@ -1,13 +1,11 @@
 package com.boxfox.cross.service;
 
-import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.model.Wallet;
-import io.one.sys.db.tables.daos.AddressDao;
-import io.one.sys.db.tables.pojos.Address;
 import io.one.sys.db.tables.records.MajorwalletRecord;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -75,18 +73,18 @@ public class AddressService extends AbstractService{
         return address.matches(ADDRESS_REGEX);
     }
 
-    public static String createRandomAddress(String uid) {
-        AddressDao dao = new AddressDao(PostgresConfig.create());
+    public static String createRandomAddress(DSLContext ctx) {
         String address;
         do {
             int firstNum = (int) (Math.random() * 9999 + 1);
             int secondNum = (int) (Math.random() * 999999 + 1);
             address = String.format("cross-%04d-%04d", firstNum, secondNum);
-        } while (dao.fetchByAddress(address).size()>0);
-        Address addressDTO = new Address();
-        addressDTO.setUid(uid);
-        addressDTO.setAddress(address);
-        dao.insert(addressDTO);
+        } while (isValidAddress(ctx, address));
         return address;
+    }
+
+    public static boolean isValidAddress(DSLContext ctx, String address){
+        return (ctx.selectFrom(ACCOUNT).where(ACCOUNT.ADDRESS.eq(address)).fetch().size() > 0 ||
+                ctx.selectFrom(WALLET).where(WALLET.CROSSADDRESS.eq(address)).fetch().size() > 0);
     }
 }
