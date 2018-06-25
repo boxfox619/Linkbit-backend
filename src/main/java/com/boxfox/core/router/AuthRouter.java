@@ -26,10 +26,7 @@ public class AuthRouter {
         authService.signin(accessToken,res -> {
             if (res.succeeded()) {
                 Profile result = res.result();
-                String token = authService.createJWT(ctx.vertx(), accessToken);
                 JsonObject jsonObject = new JsonObject(gson.toJson(result));
-                jsonObject.put("token", token);
-                ctx.addCookie(Cookie.cookie("token", token));
                 ctx.response().end(jsonObject.encode());
             } else {
                 ctx.fail(401);

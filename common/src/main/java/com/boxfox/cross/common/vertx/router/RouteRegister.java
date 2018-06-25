@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import com.boxfox.cross.common.vertx.middleware.JWTHandler;
+import com.boxfox.cross.common.vertx.middleware.AuthHandler;
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.common.vertx.service.Service;
 import io.vertx.core.Vertx;
@@ -48,7 +48,7 @@ public class RouteRegister {
     public void route(String... packages) {
         Arrays.stream(packages).forEach(packageName -> {
             Reflections scanner = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
-            JWTHandler jwtAuthHandler = JWTHandler.create();
+            AuthHandler jwtAuthHandler = AuthHandler.create();
             scanner.getTypesAnnotatedWith(RouteRegistration.class).forEach(c -> {
                 RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
                 try {
