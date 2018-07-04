@@ -20,8 +20,8 @@ public class FriendRouter {
     }
 
     @RouteRegistration(uri = "/search/user", method = HttpMethod.GET, auth = true)
-    public void search(RoutingContext ctx, @Param String type, @Param String text) {
-        friendService.serachUsers(type, text, res -> {
+    public void search(RoutingContext ctx, @Param String text) {
+        friendService.serachUsers(text, res -> {
             ctx.response().end(new Gson().toJson(res.result()));
         });
     }

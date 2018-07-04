@@ -69,15 +69,15 @@ public class EthereumService extends WalletService {
   }
 
   @Override
-  public String getBalance(String address) {
+  public double getBalance(String address) {
     try {
       String wei = web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance().toString();
       BigDecimal bigDecimal = Convert.fromWei(wei, Convert.Unit.ETHER);
-      return bigDecimal.toPlainString();
+      return bigDecimal.doubleValue();
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return null;
+    return 0;
   }
 
   @Override

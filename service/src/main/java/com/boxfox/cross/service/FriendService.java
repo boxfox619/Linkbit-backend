@@ -10,12 +10,16 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jooq.Record;
+import org.jooq.Result;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.one.sys.db.Tables.ACCOUNT;
 import static io.one.sys.db.Tables.FRIEND;
+import static io.one.sys.db.Tables.WALLET;
 
 
 public class FriendService extends AbstractService{
@@ -31,6 +35,7 @@ public class FriendService extends AbstractService{
                     Profile profile = new Profile();
                     profile.setName(acc.getName());
                     profile.setEmail(acc.getEmail());
+                    profile.setProfile(acc.getProfile());
                     profile.setUid(acc.getUid());
                     profile.setCrossAddress(acc.getAddress());
                     friends.add(profile);
@@ -78,28 +83,30 @@ public class FriendService extends AbstractService{
         }, res);
     }
 
-    public void serachUsers(String type, String text, Handler<AsyncResult<List<Profile>>> res){
+    public void serachUsers(String text, Handler<AsyncResult<List<Profile>>> res){
         doAsync(future -> {
-            AccountDao dao = new AccountDao(PostgresConfig.create());
-            List<Account> accounts = null;
-            switch (type) {
-                case "address":
-                    accounts = dao.fetchByAddress(text);
-                    break;
-                case "name":
-                    accounts = dao.fetchByName(text);
-                    break;
-                default:
-                    accounts = dao.fetchByEmail(text);
-            }
-            List<Profile> profileList = accounts.stream().map(a -> {
-                Profile profile = new Profile();
-                profile.setUid(a.getUid());
-                profile.setEmail(a.getUid());
-                profile.setName(a.getName());
-                return profile;
-            }).collect(Collectors.toList());
-            future.complete(profileList);
+            useContext(ctx -> {
+                List<Profile> accounts = new ArrayList();
+                Result<Record> records = ctx.selectFrom(ACCOUNT.join(WALLET).on(ACCOUNT.UID.eq(WALLET.UID)))
+                        .where(
+                                ACCOUNT.ADDRESS.like(text)
+                                .or(WALLET.ADDRESS.like(text))
+                                .or(WALLET.CROSSADDRESS.like(text))
+                                .or(ACCOUNT.EMAIL.like(text))
+                                .or(ACCOUNT.NAME.like(text))
+                        ).fetch();
+                records.forEach(r->{
+                    Profile profile = new Profile();
+                    profile.setName(r.getValue(ACCOUNT.NAME));
+                    profile.setEmail(r.getValue(ACCOUNT.EMAIL));
+                    profile.setCrossAddress(r.getValue(ACCOUNT.ADDRESS));
+                    profile.setUid(r.getValue(ACCOUNT.UID));
+                    profile.setProfile(r.getValue(ACCOUNT.PROFILE));
+                    accounts.add(profile);
+                });
+                future.complete(accounts);
+            });
+
         }, res);
     }
 }

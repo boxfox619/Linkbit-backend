@@ -20,7 +20,7 @@ public class AddressService extends AbstractService{
         doAsync(future -> {
                 useContext(ctx -> {
                     Result<Record> result;
-                    if(isMathCrossAddress(address)){
+                    if(isCrossAddress(address)){
                         result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.CROSSADDRESS.eq(address)).fetch();
                         if(result.size()==0){
                             result = ctx.selectFrom(ACCOUNT.join(MAJORWALLET).on(MAJORWALLET.UID.eq(ACCOUNT.UID)).join(WALLET).on(WALLET.ADDRESS.eq(MAJORWALLET.ADDRESS))).where(ACCOUNT.ADDRESS.eq(address)).fetch();
@@ -69,7 +69,7 @@ public class AddressService extends AbstractService{
         }, res);
     }
 
-    public static boolean isMathCrossAddress(String address) {
+    public static boolean isCrossAddress(String address) {
         return address.matches(ADDRESS_REGEX);
     }
 

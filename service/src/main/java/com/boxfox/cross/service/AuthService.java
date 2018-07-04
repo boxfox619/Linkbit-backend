@@ -31,7 +31,7 @@ public class AuthService extends AbstractService {
                         useContext(ctx -> {
                             String address = AddressService.createRandomAddress(ctx);
                             profile.setCrossAddress(address);
-                            ctx.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.ADDRESS).values(decodedToken.getUid(), decodedToken.getEmail(), decodedToken.getName(), address).execute();
+                            ctx.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME, ACCOUNT.PROFILE, ACCOUNT.ADDRESS).values(decodedToken.getUid(), decodedToken.getEmail(), decodedToken.getName(), profile.getProfile(), address).execute();
                         /*FacebookAuth.getFriends(accessToken).setHandler(event -> {
                             if (event.succeeded()) {
                                 event.result().forEach(p -> create.insertInto(FRIEND).values(profile.getUid(), p.getUid()).execute());

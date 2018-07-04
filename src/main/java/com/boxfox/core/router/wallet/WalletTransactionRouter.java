@@ -1,5 +1,6 @@
 package com.boxfox.core.router.wallet;
 
+import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
@@ -8,9 +9,12 @@ import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.model.TransactionStatus;
 import com.google.gson.Gson;
+import io.one.sys.db.tables.Transaction;
+import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WalletTransactionRouter extends WalletRouter{
@@ -38,7 +42,7 @@ public class WalletTransactionRouter extends WalletRouter{
         });
     }
 
-    @RouteRegistration(uri = "/transaction/list", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/wallet/transaction/list", method = HttpMethod.GET, auth = true)
     public void transactionList(RoutingContext ctx, @Param String address) {
         service.findByAddress(address, res -> {
             if (res.result() != null) {
@@ -52,6 +56,39 @@ public class WalletTransactionRouter extends WalletRouter{
                 });
             } else {
                 ctx.response().setStatusCode(404).end();
+            }
+        });
+    }
+
+    @RouteRegistration(uri = "/transaction/wallet/list", method = HttpMethod.GET, auth = true)
+    public void transactionList(RoutingContext ctx) {
+        String uid = (String) ctx.data().get("uid");
+        doAsync(future -> {
+            WalletDao dao = new WalletDao(PostgresConfig.create());
+            List<TransactionStatus> totalTxStatusList = new ArrayList<>();
+            dao.fetchByUid(uid).forEach(w -> {
+                WalletService service = WalletServiceManager.getService(w.getSymbol());
+                try {
+                    String originalAddress = w.getAddress();
+                    service.getTransactionList(originalAddress.toLowerCase()).setHandler(transactionStatusListResult -> {
+                        List<TransactionStatus> txStatutsList = transactionStatusListResult.result();
+                        if (txStatutsList.size() == 0) {
+                            service.indexingTransactions(originalAddress);
+                        }
+                        totalTxStatusList.addAll(txStatutsList);
+                    }).wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    future.fail(e);
+                }
+            });
+            future.complete(totalTxStatusList);
+        }, e -> {
+            if(e.succeeded()){
+                List<TransactionStatus> txList = (List<TransactionStatus>)e.result();
+                ctx.response().setChunked(true).write(new Gson().toJson(txList)).end();
+            }else{
+                ctx.response().setStatusCode(400).end();
             }
         });
     }

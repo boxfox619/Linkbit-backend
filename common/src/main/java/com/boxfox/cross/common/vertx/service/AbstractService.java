@@ -29,21 +29,11 @@ public abstract class AbstractService {
         void execute(DSLContext ctx);
     }
 
-    protected WorkerExecutor getExecutor(){
-        return vertx.createSharedWorkerExecutor("service-worker-pool");
-    }
-
-    protected <T> void doAsync(Handler<Future<T>> hander, Handler<AsyncResult<T>> resultHandler) {
-        getExecutor().executeBlocking(event -> {
-            try {
-                hander.handle(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, resultHandler);
-    }
-
     protected Vertx getVertx(){
         return this.vertx;
+    }
+
+    protected <T> void doAsync( Handler<Future<T>> handler, Handler<AsyncResult<T>> resultHandler){
+        AsyncService.getInstance().doAsync("service-worker-executor", handler,resultHandler);
     }
 }

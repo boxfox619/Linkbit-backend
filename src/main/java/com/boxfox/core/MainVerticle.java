@@ -1,8 +1,7 @@
 package com.boxfox.core;
 
+import com.boxfox.cross.common.vertx.service.AsyncService;
 import com.boxfox.cross.wallet.WalletServiceManager;
-import com.boxfox.cross.wallet.erc20.EOSService;
-import com.boxfox.cross.wallet.erc20.OMGService;
 import com.boxfox.cross.wallet.eth.EthereumService;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.cross.common.vertx.router.RouteRegister;
@@ -22,6 +21,7 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> future) {
+        AsyncService.create(vertx);
         RouteRegister routeRegister = RouteRegister.routing(vertx);
         Router router = routeRegister.getRouter();
         router.route().handler(CookieHandler.create());
@@ -35,11 +35,8 @@ public class MainVerticle extends AbstractVerticle {
             EthereumService ethereumService = new EthereumService(vertx);
             ethereumService.init();
             WalletServiceManager.register("ETH", ethereumService);
-            WalletServiceManager.register("EOS", new EOSService(vertx));
-            WalletServiceManager.register("OMG", new OMGService(vertx));
         });
         future.complete();
-
     }
 
     private int getPort(){

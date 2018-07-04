@@ -6,6 +6,7 @@ import static io.one.sys.db.tables.Wallet.WALLET;
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.AddressService;
+import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.wallet.indexing.IndexingService;
 import com.boxfox.cross.wallet.model.TransactionResult;
@@ -28,13 +29,13 @@ public abstract class WalletService extends AbstractService{
     this.symbol = symbol;
   }
 
-  public abstract String getBalance(String address);
+  public abstract double getBalance(String originalAddress);
+
 
   public final void createWallet( String uid, String name, String password, String description, Handler<AsyncResult<WalletCreateResult>> res){
     doAsync(future -> {
       WalletCreateResult walletCreateResult = createWallet(password);
       if(walletCreateResult.isSuccess()) {
-        AccountDao dao = new AccountDao(PostgresConfig.create());
         useContext(ctx -> {
           ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(ctx)).execute();
         });
@@ -47,7 +48,14 @@ public abstract class WalletService extends AbstractService{
 
   public abstract WalletCreateResult createWallet(String password);
 
-  public abstract double getPrice(String address);
+  public double getPrice(String originalAddress){
+    double balance = getBalance(originalAddress);
+    if(balance > 0){
+      double coinKRW = PriceService.getPrice(symbol);
+      balance = balance * coinKRW;
+    }
+    return balance;
+  }
 
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 

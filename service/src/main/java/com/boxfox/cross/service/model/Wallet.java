@@ -13,7 +13,8 @@ public class Wallet {
     private String description;
     private String originalAddress;
     private String crossAddress;
-    private String balance;
+    private double balance;
+    private double krBalance;
 
     public String getUid() {
         return uid;
@@ -79,11 +80,11 @@ public class Wallet {
         this.ownerName = ownerName;
     }
 
-    public String getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -107,5 +108,13 @@ public class Wallet {
         newWallet.setOriginalAddress(wallet.getAddress());
         newWallet.setCrossAddress(wallet.getCrossaddress());
         return newWallet;
+    }
+
+    public double getKrBalance() {
+        return krBalance;
+    }
+
+    public void setKrBalance(double krBalance) {
+        this.krBalance = krBalance;
     }
 }
