@@ -58,7 +58,7 @@ public abstract class ERC20Service extends WalletService {
     }
 
     @Override
-    public String getBalance(String address) {
+    public double getBalance(String address) {
         String balance = null;
         String contractAddr = getContractAddress("EOS");
         String tknAddress = (address).substring(2);
@@ -69,7 +69,7 @@ public abstract class ERC20Service extends WalletService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return balance;
+        return Double.valueOf(balance);
     }
 
 

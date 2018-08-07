@@ -11,12 +11,10 @@ import io.one.sys.db.tables.daos.CoinDao;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.WorkerExecutor;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import sun.plugin2.server.main.ResultHandler;
 
 
 public class WalletRouter {

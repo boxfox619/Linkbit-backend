@@ -32,7 +32,7 @@ public class WalletManageRouter extends WalletRouter {
 
     @RouteRegistration(uri = "/wallet", method = HttpMethod.PUT, auth = true)
     public void walletOptionsSetting(RoutingContext ctx, @Param String symbol, @Param String address, @Param boolean major){
-        String uid = ctx.user().principal().getString("su");
+        String uid = (String) ctx.data().get("uid");
         addressService.setMajorWallet(uid, symbol, address, res->{
 
         });
