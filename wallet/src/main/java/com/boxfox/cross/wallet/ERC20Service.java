@@ -25,7 +25,7 @@ import static com.boxfox.cross.service.network.RequestService.request;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
 
-public abstract class ERC20Service extends WalletService {
+public class ERC20Service extends WalletService {
 
     protected static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
     protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
@@ -58,14 +58,14 @@ public abstract class ERC20Service extends WalletService {
     }
 
     @Override
-    public String getBalance(String address) {
-        String balance = null;
+    public double getBalance(String address) {
+        double balance = -1;
         String contractAddr = getContractAddress("EOS");
         String tknAddress = (address).substring(2);
         String contractData = ("0x70a08231000000000000000000000000" + tknAddress);
         try {
             String value = web3.ethCall(Transaction.createEthCallTransaction(address, contractAddr, contractData), LATEST).send().getValue();
-            balance = Convert.fromWei(Numeric.toBigInt(value).toString(), Convert.Unit.ETHER).toBigInteger().toString();
+            balance = Convert.fromWei(Numeric.toBigInt(value).toString(), Convert.Unit.ETHER).toBigInteger().doubleValue();
         } catch (IOException e) {
             e.printStackTrace();
         }

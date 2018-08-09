@@ -8,7 +8,6 @@ import com.boxfox.cross.service.model.Profile;
 import com.google.gson.Gson;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
 public class AuthRouter {

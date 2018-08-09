@@ -18,11 +18,6 @@ public class WalletShareRouter extends WalletRouter{
     @Service
     private AddressService addressService;
 
-    public WalletShareRouter(){
-        super();
-        this.shareService = new ShareService();
-    }
-
     @RouteRegistration(uri="/share/send", method=HttpMethod.GET)
     public void connectShareLink(RoutingContext ctx, @Param String data){
         ctx.response().end(shareService.createTransactionHtml(data));
@@ -48,9 +43,7 @@ public class WalletShareRouter extends WalletRouter{
                 String url = urlPrefix + data;
                 File qrFile = shareService.createQRImage(url);
                 ctx.response().sendFile(qrFile.getName());
-                ctx.response().closeHandler((e) -> {
-                    qrFile.delete();
-                });
+                ctx.response().closeHandler((e) -> qrFile.delete());
             }else{
                 ctx.fail(400);
             }
