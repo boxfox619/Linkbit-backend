@@ -69,7 +69,7 @@ public class ERC20Service extends WalletService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return balance;
+        return Double.valueOf(balance);
     }
 
 
