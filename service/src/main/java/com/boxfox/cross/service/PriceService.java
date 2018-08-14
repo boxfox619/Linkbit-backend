@@ -1,53 +1,77 @@
 package com.boxfox.cross.service;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
+import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.cross.common.vertx.service.Service;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import io.vertx.core.json.JsonObject;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+public class PriceService extends AbstractService {
 
-public class PriceService {
-    private static final String COINMARKET_CAP_URL = "https://api.coinmarketcap.com/v2/";
-    private Map<String, Integer> coinIdMap;
+  private static final String COINMARKET_CAP_URL = "https://api.coinmarketcap.com/v2/";
+  private Map<String, Integer> coinIdMap;
 
-    private PriceService(){
-        this.coinIdMap = new HashMap<>();
-        try {
-            JSONArray array = Unirest.get(COINMARKET_CAP_URL + "listings/").asJson().getBody().getObject().getJSONArray("data");
-            array.forEach(obj -> {
-                JSONObject coin = (JSONObject)obj;
-                String symbol = coin.getString("symbol");
-                int id = coin.getInt("id");
-                coinIdMap.put(symbol, id);
-            });
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
+  @Service
+  LocaleService localeService;
+
+  private PriceService() {
+    this.coinIdMap = new HashMap<>();
+    try {
+      JSONArray array = Unirest.get(COINMARKET_CAP_URL + "listings/").asJson().getBody().getObject()
+          .getJSONArray("data");
+      array.forEach(obj -> {
+        JSONObject coin = (JSONObject) obj;
+        String symbol = coin.getString("symbol");
+        int id = coin.getInt("id");
+        coinIdMap.put(symbol, id);
+      });
+    } catch (UnirestException e) {
+      e.printStackTrace();
     }
+  }
 
-    private static class PriceServiceInstance{
-        private static PriceService instance = new PriceService();
-    }
+  private static class PriceServiceInstance {
 
-    public static double getPrice(String symbol){
-        PriceService service = PriceServiceInstance.instance;
-        symbol = symbol.toUpperCase();
-        if(service.coinIdMap.containsKey(symbol)){
-            try {
-                int id = service.coinIdMap.get(symbol);
-                JSONObject obj = Unirest.get(COINMARKET_CAP_URL+"ticker/"+id+"/?convert=KRW").asJson().getBody().getObject();
-                JSONObject krw = obj.getJSONObject("data").getJSONObject("quotes").getJSONObject("KRW");
-                return krw.getDouble("price");
-            } catch (UnirestException e) {
-                e.printStackTrace();
-            }
-        }
-        return -1;
+    private static PriceService instance = new PriceService();
+  }
+
+  public double getPrice(String symbol, double balance) {
+    return getPrice(symbol, Locale.KOREA.toString(), balance);
+  }
+
+  public double getPrice(String symbol, String locale, double balance) {
+    double price = getPrice(symbol, locale);
+    if (price > 0) {
+      return price * balance; //@TODO dobule calculate improve
+    } else {
+      return -1;
     }
+  }
+
+  public double getPrice(String symbol) {
+    return getPrice(symbol, Locale.KOREA.toString());
+  }
+
+  public double getPrice(String symbol, String locale) {
+    PriceService service = PriceServiceInstance.instance;
+    String moneySymbol = localeService.getLocaleMoneySymbol(locale);
+    symbol = symbol.toUpperCase();
+    if (service.coinIdMap.containsKey(symbol)) {
+      try {
+        int id = service.coinIdMap.get(symbol);
+        JSONObject obj = Unirest
+            .get(COINMARKET_CAP_URL + "ticker/" + id + "/?convert=" + moneySymbol).asJson()
+            .getBody().getObject();
+        JSONObject krw = obj.getJSONObject("data").getJSONObject("quotes").getJSONObject("KRW");
+        return krw.getDouble("price");
+      } catch (UnirestException e) {
+        e.printStackTrace();
+      }
+    }
+    return -1;
+  }
 }
