@@ -28,19 +28,19 @@ public class PriceService extends AbstractService {
         }
     }
 
-    public String getUnit(String locale){
+    public String getMoneyUnit(String locale){
         //@TODO Implemnt money symbol
         return "";
     }
 
-    public double getPrice(String symbol, String moneySymbol) {
+    public double getPrice(String symbol, String moneyUnit) {
         symbol = symbol.toUpperCase();
         if (coinIdMap.containsKey(symbol)) {
             try {
                 int id = coinIdMap.get(symbol);
-                String url = String.format("%s%s/?convert=", COINMARKET_CAP_URL, id, moneySymbol);
+                String url = String.format("%s%s/?convert=", COINMARKET_CAP_URL, id, moneyUnit);
                 JSONObject obj = Unirest.get(url).asJson().getBody().getObject();
-                JSONObject krw = obj.getJSONObject("data").getJSONObject("quotes").getJSONObject(moneySymbol);
+                JSONObject krw = obj.getJSONObject("data").getJSONObject("quotes").getJSONObject(moneyUnit);
                 return krw.getDouble("price");
             } catch (UnirestException e) {
                 e.printStackTrace();

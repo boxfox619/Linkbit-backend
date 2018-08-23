@@ -30,7 +30,7 @@ public class CoinRouter extends AbstractRouter{
 
     @RouteRegistration(uri = "/coin/price", method = HttpMethod.GET, auth = true)
     public void getCoinPrice(RoutingContext ctx, @Param String symbol, @Param String locale) {
-        String unit = priceService.getUnit(locale);
+        String unit = priceService.getMoneyUnit(locale);
         double price = priceService.getPrice(symbol, locale);
         if(price > 0){
             CoinPriceNetworkObject result = new CoinPriceNetworkObject();

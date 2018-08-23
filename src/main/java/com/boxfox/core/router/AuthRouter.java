@@ -1,5 +1,6 @@
 package com.boxfox.core.router;
 
+import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
@@ -8,10 +9,9 @@ import com.boxfox.cross.service.model.Profile;
 import com.google.gson.Gson;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
-public class AuthRouter {
+public class AuthRouter extends AbstractRouter {
 
     @Service
     private AuthService authService;

@@ -1,5 +1,6 @@
 package com.boxfox.core.router.wallet;
 
+import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
@@ -11,17 +12,12 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.io.File;
 
-public class WalletShareRouter extends WalletRouter{
+public class WalletShareRouter extends AbstractRouter{
 
     @Service
     private ShareService shareService;
     @Service
     private AddressService addressService;
-
-    public WalletShareRouter(){
-        super();
-        this.shareService = new ShareService();
-    }
 
     @RouteRegistration(uri="/share/send", method=HttpMethod.GET)
     public void connectShareLink(RoutingContext ctx, @Param String data){

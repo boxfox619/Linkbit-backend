@@ -1,5 +1,6 @@
 package com.boxfox.core.router;
 
+import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
@@ -9,7 +10,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
 
-public class FriendRouter {
+public class FriendRouter extends AbstractRouter {
 
     @Service
     private FriendService friendService;

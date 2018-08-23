@@ -1,14 +1,20 @@
 package com.boxfox.core.router.wallet;
 
+import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
+import com.boxfox.cross.common.vertx.service.Service;
+import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
-public class WalletManageRouter extends WalletRouter {
+public class WalletManageRouter extends AbstractRouter {
+
+    @Service
+    protected AddressService addressService;
 
     @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description, @Param boolean major, @Param boolean visible) {

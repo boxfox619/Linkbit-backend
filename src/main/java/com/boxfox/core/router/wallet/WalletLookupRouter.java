@@ -1,6 +1,7 @@
 package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
@@ -20,7 +21,7 @@ import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 
-public class WalletLookupRouter extends WalletRouter {
+public class WalletLookupRouter extends AbstractRouter {
     @Service
     private AddressService addressService;
 
