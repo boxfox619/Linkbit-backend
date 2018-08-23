@@ -48,7 +48,7 @@ public class WalletTransactionRouter extends AbstractRouter {
         service.findByAddress(address, res -> {
             if (res.result() != null) {
                 WalletService service = WalletServiceManager.getService(res.result().getSymbol());
-                service.getTransactionList(address.toLowerCase()).setHandler(transactionStatusListResult -> {
+                service.getTransactionList(address).setHandler(transactionStatusListResult -> {
                     List<TransactionStatus> transactionStatusList = transactionStatusListResult.result();
                     if (transactionStatusList.size() == 0) {
                         service.indexingTransactions(address);
@@ -70,13 +70,13 @@ public class WalletTransactionRouter extends AbstractRouter {
             dao.fetchByUid(uid).forEach(w -> {
                 WalletService service = WalletServiceManager.getService(w.getSymbol());
                 try {
-                    String originalAddress = w.getAddress();
-                    service.getTransactionList(originalAddress.toLowerCase()).setHandler(transactionStatusListResult -> {
-                        List<TransactionStatus> txStatutsList = transactionStatusListResult.result();
-                        if (txStatutsList.size() == 0) {
-                            service.indexingTransactions(originalAddress);
+                    String accountAddress = w.getAddress();
+                    service.getTransactionList(accountAddress).setHandler(txStatusListResult -> {
+                        List<TransactionStatus> txStatusList = txStatusListResult.result();
+                        if (txStatusList.size() == 0) {
+                            service.indexingTransactions(accountAddress);
                         }
-                        totalTxStatusList.addAll(txStatutsList);
+                        totalTxStatusList.addAll(txStatusList);
                     }).wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

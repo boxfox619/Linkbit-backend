@@ -48,15 +48,6 @@ public abstract class WalletService extends AbstractService{
 
   public abstract WalletCreateResult createWallet(String password);
 
-  public double getPrice(String originalAddress){
-    double balance = getBalance(originalAddress);
-    if(balance > 0){
-      double coinKRW = PriceService.getPrice(symbol);
-      balance = balance * coinKRW;
-    }
-    return balance;
-  }
-
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 
   public abstract Future<List<TransactionStatus>> getTransactionList(String address) throws WalletServiceException;

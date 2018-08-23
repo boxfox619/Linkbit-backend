@@ -44,9 +44,7 @@ public class WalletShareRouter extends AbstractRouter{
                 String url = urlPrefix + data;
                 File qrFile = shareService.createQRImage(url);
                 ctx.response().sendFile(qrFile.getName());
-                ctx.response().closeHandler((e) -> {
-                    qrFile.delete();
-                });
+                ctx.response().closeHandler((e) -> qrFile.delete());
             }else{
                 ctx.fail(400);
             }
