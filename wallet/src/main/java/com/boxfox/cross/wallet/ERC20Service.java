@@ -2,12 +2,13 @@ package com.boxfox.cross.wallet;
 
 import com.boxfox.cross.common.data.Config;
 import com.boxfox.cross.wallet.model.TransactionResult;
-import com.boxfox.cross.wallet.model.TransactionStatus;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.common.io.Files;
+import com.linkbit.android.entity.TransactionModel;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
+import java.util.List;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.request.Transaction;
@@ -19,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import static com.boxfox.cross.service.network.RequestService.request;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
@@ -106,12 +106,12 @@ public class ERC20Service extends WalletService {
     }
 
     @Override
-    public Future<List<TransactionStatus>> getTransactionList(String address) throws WalletServiceException {
+    public Future<List<TransactionModel>> getTransactionList(String address) throws WalletServiceException {
         return null;
     }
 
     @Override
-    public TransactionStatus getTransaction(String transactionHash) throws WalletServiceException {
+    public TransactionModel getTransaction(String transactionHash) throws WalletServiceException {
         return null;
     }
 

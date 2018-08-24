@@ -22,13 +22,13 @@ public class AddressService extends AbstractService {
       useContext(ctx -> {
         Result<Record> result;
         if (isCrossAddress(address)) {
-          result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID)))
-              .where(WALLET.CROSSADDRESS.eq(address)).fetch();
+          result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.CROSSADDRESS.eq(address)).fetch();
           if (result.size() == 0) {
             result = ctx.selectFrom(
-                ACCOUNT.join(MAJORWALLET).on(MAJORWALLET.UID.eq(ACCOUNT.UID)).join(WALLET)
-                    .on(WALLET.ADDRESS.eq(MAJORWALLET.ADDRESS))).where(ACCOUNT.ADDRESS.eq(address))
-                .fetch();
+                ACCOUNT
+                    .join(MAJORWALLET).on(MAJORWALLET.UID.eq(ACCOUNT.UID))
+                    .join(WALLET).on(WALLET.ADDRESS.eq(MAJORWALLET.ADDRESS))).where(ACCOUNT.ADDRESS.eq(address))
+                    .fetch();
           }
         } else {
           result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID)))

@@ -8,10 +8,8 @@ import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
-import com.boxfox.cross.wallet.model.TransactionStatus;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
-import io.one.sys.db.tables.Transaction;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
@@ -22,7 +20,7 @@ import java.util.List;
 public class TransactionRouter extends AbstractRouter {
 
     @Service
-    private AddressService service;
+    private AddressService addressService;
 
     @RouteRegistration(uri = "/transaction", method = HttpMethod.GET, auth = true)
     public void transaction(RoutingContext ctx, @Param String symbol, @Param String txHash) {
@@ -33,9 +31,9 @@ public class TransactionRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/transaction/count", method = HttpMethod.GET, auth = true)
     public void transactionCount(RoutingContext ctx, @Param String address) {
-        service.findByAddress(address, res->{
+        addressService.findByAddress(address, res->{
             if(res.result() != null){
-                WalletService service = WalletServiceManager.getService(res.result().getSymbol());
+                WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
                 int count = service.getTransactionCount(address);
                 ctx.response().setChunked(true).write(count+"").end();
             }else {
@@ -46,9 +44,9 @@ public class TransactionRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/transaction/:address/list", method = HttpMethod.GET, auth = true)
     public void transactionList(RoutingContext ctx, @Param String address) {
-        service.findByAddress(address, res -> {
+        addressService.findByAddress(address, res -> {
             if (res.result() != null) {
-                WalletService service = WalletServiceManager.getService(res.result().getSymbol());
+                WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
                 service.getTransactionList(address).setHandler(transactionStatusListResult -> {
                     List<TransactionModel> transactionStatusList = transactionStatusListResult.result();
                     if (transactionStatusList.size() == 0) {
@@ -87,8 +85,7 @@ public class TransactionRouter extends AbstractRouter {
             future.complete(totalTxStatusList);
         }, e -> {
             if(e.succeeded()){
-                List<TransactionStatus> txList = (List<TransactionStatus>)e.result();
-                ctx.response().setChunked(true).write(new Gson().toJson(txList)).end();
+                ctx.response().setChunked(true).write(gson.toJson(e.result())).end();
             }else{
                 ctx.response().setStatusCode(400).end();
             }
