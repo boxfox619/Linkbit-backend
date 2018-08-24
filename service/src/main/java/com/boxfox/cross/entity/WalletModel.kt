@@ -1,7 +1,7 @@
 package com.linkbit.android.entity
 
 
-class WalletModel {
+open class WalletModel {
     lateinit var  ownerId: String
     lateinit var  ownerName: String
     lateinit var  walletName: String
