@@ -6,6 +6,7 @@ import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.FriendService;
 import com.google.gson.Gson;
+import com.linkbit.android.entity.UserModel;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
@@ -20,7 +21,7 @@ public class FriendRouter extends AbstractRouter {
         this.gson = new Gson();
     }
 
-    @RouteRegistration(uri = "/search/user", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/search/account", method = HttpMethod.GET, auth = true)
     public void search(RoutingContext ctx, @Param String text) {
         friendService.serachUsers(text, res -> {
             ctx.response().end(new Gson().toJson(res.result()));
@@ -49,9 +50,9 @@ public class FriendRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/friend", method = HttpMethod.DELETE, auth = true)
-    public void deleteFriend(RoutingContext ctx, @Param String uid) {
+    public void deleteFriend(RoutingContext ctx, @Param String targetUid) {
         String ownUid = (String) ctx.data().get("uid");
-        friendService.deleteFriend(ownUid, uid, res -> {
+        friendService.deleteFriend(ownUid, targetUid, res -> {
             if (res.succeeded()) {
                 ctx.response().setStatusCode(200).end();
             } else {

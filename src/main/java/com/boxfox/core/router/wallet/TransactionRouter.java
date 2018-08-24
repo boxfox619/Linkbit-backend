@@ -10,6 +10,7 @@ import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.model.TransactionStatus;
 import com.google.gson.Gson;
+import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.Transaction;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
@@ -18,16 +19,16 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WalletTransactionRouter extends AbstractRouter {
+public class TransactionRouter extends AbstractRouter {
 
     @Service
     private AddressService service;
 
     @RouteRegistration(uri = "/transaction", method = HttpMethod.GET, auth = true)
-    public void transaction(RoutingContext ctx, @Param String symbol, @Param String hash) {
+    public void transaction(RoutingContext ctx, @Param String symbol, @Param String txHash) {
         WalletService service = WalletServiceManager.getService(symbol);
-        TransactionStatus transactionStatus = service.getTransaction(hash);
-        ctx.response().setChunked(true).write(new Gson().toJson(transactionStatus)).end();
+        TransactionModel transaction = service.getTransaction(txHash);
+        ctx.response().setChunked(true).write(gson.toJson(transaction)).end();
     }
 
     @RouteRegistration(uri = "/transaction/count", method = HttpMethod.GET, auth = true)
@@ -43,13 +44,13 @@ public class WalletTransactionRouter extends AbstractRouter {
         });
     }
 
-    @RouteRegistration(uri = "/wallet/transaction/list", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/transaction/:address/list", method = HttpMethod.GET, auth = true)
     public void transactionList(RoutingContext ctx, @Param String address) {
         service.findByAddress(address, res -> {
             if (res.result() != null) {
                 WalletService service = WalletServiceManager.getService(res.result().getSymbol());
                 service.getTransactionList(address).setHandler(transactionStatusListResult -> {
-                    List<TransactionStatus> transactionStatusList = transactionStatusListResult.result();
+                    List<TransactionModel> transactionStatusList = transactionStatusListResult.result();
                     if (transactionStatusList.size() == 0) {
                         service.indexingTransactions(address);
                     }
@@ -61,18 +62,18 @@ public class WalletTransactionRouter extends AbstractRouter {
         });
     }
 
-    @RouteRegistration(uri = "/transaction/wallet/list", method = HttpMethod.GET, auth = true)
-    public void transactionList(RoutingContext ctx) {
+    @RouteRegistration(uri = "/transaction/list", method = HttpMethod.GET, auth = true)
+    public void transactionList(RoutingContext ctx, @Param int page, @Param int count) {
         String uid = (String) ctx.data().get("uid");
         doAsync(future -> {
             WalletDao dao = new WalletDao(PostgresConfig.create());
-            List<TransactionStatus> totalTxStatusList = new ArrayList<>();
+            List<TransactionModel> totalTxStatusList = new ArrayList<>();
             dao.fetchByUid(uid).forEach(w -> {
                 WalletService service = WalletServiceManager.getService(w.getSymbol());
                 try {
                     String accountAddress = w.getAddress();
                     service.getTransactionList(accountAddress).setHandler(txStatusListResult -> {
-                        List<TransactionStatus> txStatusList = txStatusListResult.result();
+                        List<TransactionModel> txStatusList = txStatusListResult.result();
                         if (txStatusList.size() == 0) {
                             service.indexingTransactions(accountAddress);
                         }
