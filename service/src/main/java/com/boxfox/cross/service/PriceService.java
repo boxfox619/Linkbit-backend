@@ -57,7 +57,7 @@ public class PriceService extends AbstractService {
         if (coinIdMap.containsKey(symbol)) {
             try {
                 int id = coinIdMap.get(symbol);
-                String url = String.format("%s%s/?convert=", COINMARKET_CAP_URL, id, moneySymbol);
+                String url = String.format("%s%s/?convert=%s", COINMARKET_CAP_URL, id, moneySymbol);
                 JSONObject obj = Unirest
                         .get(url).asJson()
                         .getBody().getObject();
