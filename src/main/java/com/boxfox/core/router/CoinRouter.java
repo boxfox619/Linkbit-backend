@@ -8,6 +8,7 @@ import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.LocaleService;
 import com.boxfox.cross.service.PriceService;
 import com.linkbit.android.data.model.coin.CoinPriceNetworkObject;
+import com.linkbit.android.entity.CoinModel;
 import io.one.sys.db.tables.daos.CoinDao;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -27,7 +28,10 @@ public class CoinRouter extends AbstractRouter {
         CoinDao dao = new CoinDao(PostgresConfig.create());
         JsonArray coins = new JsonArray();
         dao.findAll().forEach(c -> {
-            coins.add(new JsonObject().put("symbol", c.getSymbol()).put("name", c.getName()));
+          CoinModel coin = new CoinModel();
+          coin.setSymbol(c.getSymbol());
+          coin.setName(c.getName());
+            coins.add(gson.toJson(coin));
         });
         ctx.response().end(coins.encode());
     }

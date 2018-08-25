@@ -19,7 +19,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WalletLookupRouter extends WalletRouter {
+public class WalletLookupRouter extends AbstractRouter {
 
   @Service
   private AddressService addressService;

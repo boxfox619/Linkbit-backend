@@ -1,19 +1,15 @@
 package com.boxfox.cross.wallet.eth;
 
-import static com.boxfox.cross.common.data.PostgresConfig.create;
-
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.service.PriceService;
-import com.boxfox.cross.service.model.Profile;
 import com.boxfox.cross.common.data.Config;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceException;
 import com.boxfox.cross.wallet.model.TransactionResult;
-import com.boxfox.cross.wallet.model.TransactionStatus;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.linkbit.android.entity.TransactionModel;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -110,17 +106,6 @@ public class EthereumService extends WalletService {
   }
 
   @Override
-  public double getPrice(String address) {
-    double price = 0;
-    WalletDao dao = new WalletDao(create());
-    Wallet wallet = dao.fetchOneByAddress(address);
-    if (wallet != null) {
-      price = PriceService.getPrice("ETH")* Double.valueOf(getBalance(address));
-    }
-    return price;
-  }
-
-  @Override
   public TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount) {
     File tmpWallet = new File(cachePath.getPath() + File.separator + walletFileName);
     TransactionResult result = new TransactionResult();
@@ -154,10 +139,10 @@ public class EthereumService extends WalletService {
   }
 
   @Override
-  public Future<List<TransactionStatus>> getTransactionList(String address) {
-    Future<List<TransactionStatus>> future = Future.future();
+  public Future<List<TransactionModel>> getTransactionList(String address) {
+    Future<List<TransactionModel>> future = Future.future();
     new Thread(() -> {
-      List<TransactionStatus> txStatusList = new ArrayList<>();
+      List<TransactionModel> txStatusList = new ArrayList<>();
       TransactionDao transactionDao = new TransactionDao(PostgresConfig.create());
       AccountDao accountDao  = new AccountDao(PostgresConfig.create());
       WalletDao walletDao = new WalletDao(PostgresConfig.create());
@@ -165,24 +150,23 @@ public class EthereumService extends WalletService {
       transactionDao.fetchByTargetaddress(address).forEach(t -> {transactions.add(t);});
       transactionDao.fetchBySourceaddress(address).forEach(t -> {transactions.add(t);});
       for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
-        TransactionStatus txStatus = new TransactionStatus();
+        TransactionModel txStatus = new TransactionModel();
         txStatus.setTransactionHash(tx.getHash());
         txStatus.setAmount(tx.getAmount());
         txStatus.setSourceAddress(tx.getSourceaddress());
         txStatus.setTargetAddress(tx.getTargetaddress());
         txStatus.setTransactionHash(tx.getHash());
         txStatus.setDate(tx.getDatetime());
-        txStatus.setVenefit(tx.getTargetaddress().equals(address));
-        Wallet sourceWallet = walletDao.fetchOneByAddress((txStatus.isVenefit()) ? tx.getSourceaddress() : tx.getTargetaddress());
-        if (sourceWallet != null) {
-          Account account = accountDao.fetchOneByUid(sourceWallet.getUid());
-          Profile profile = new Profile();
-          profile.setUid(account.getUid());
-          profile.setEmail(account.getEmail());
-          profile.setName(account.getName());
-          txStatus.setTargetWallet(com.boxfox.cross.service.model.Wallet.fromDao(sourceWallet));
-          txStatus.setTargetProfile(profile);
+        List<Wallet> wallets = walletDao.fetchByAddress(tx.getTargetaddress());
+        if(wallets.size() > 0){
+          txStatus.setTargetProfile(wallets.get(0).getName());
+        }else{
+         txStatus.setTargetProfile("Unknown");
         }
+        //txStatus.setStatus();
+        //txStatus.setBlockNumber();
+        //txStatus.setConfirmation();
+        //@TODO more add tx status
         txStatusList.add(txStatus);
       }
       future.complete(txStatusList);
@@ -191,19 +175,25 @@ public class EthereumService extends WalletService {
   }
 
   @Override
-  public TransactionStatus getTransaction(String transactionHash) {
+  public TransactionModel getTransaction(String transactionHash) {
     try {
       Transaction tx = web3.ethGetTransactionByHash(transactionHash).send().getTransaction().get();
       TransactionReceipt receipt = web3.ethGetTransactionReceipt(transactionHash).send().getTransactionReceipt().get();
       BigInteger lastBlockNumber = web3.ethBlockNumber().send().getBlockNumber();
-      TransactionStatus status = new TransactionStatus();
+      TransactionModel status = new TransactionModel();
       BigInteger confirmation = lastBlockNumber.subtract(receipt.getBlockNumber());
-      status.setConfirmation(confirmation);
+      status.setConfirmation(confirmation.intValue());
       status.setSourceAddress(receipt.getFrom());
       status.setTargetAddress(receipt.getTo());
       status.setTransactionHash(receipt.getBlockHash());
       status.setAmount(Double.valueOf(Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER).toPlainString()));
       status.setStatus(receipt.getStatus().equals("0x1"));
+      status.setBlockNumber(receipt.getBlockNumber().intValue());
+      //txStatus.setDate(tx.getDatetime());
+      //txStatus.setTargetProfile();
+      //txStatus.setBlockNumber();
+      //@TODO more add tx status
+
       return status;
     } catch (IOException e) {
       throw new WalletServiceException("Can not lookup transaction status");

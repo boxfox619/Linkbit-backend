@@ -3,17 +3,14 @@ package com.boxfox.cross.wallet;
 import static com.boxfox.cross.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
-import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.service.AddressService;
-import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.wallet.indexing.IndexingService;
 import com.boxfox.cross.wallet.model.TransactionResult;
-import com.boxfox.cross.wallet.model.TransactionStatus;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
-import io.one.sys.db.tables.daos.AccountDao;
+import com.linkbit.android.entity.TransactionModel;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -50,9 +47,9 @@ public abstract class WalletService extends AbstractService{
 
   public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
 
-  public abstract Future<List<TransactionStatus>> getTransactionList(String address) throws WalletServiceException;
+  public abstract Future<List<TransactionModel>> getTransactionList(String address) throws WalletServiceException;
 
-  public abstract TransactionStatus getTransaction(String transactionHash) throws WalletServiceException;
+  public abstract TransactionModel getTransaction(String transactionHash) throws WalletServiceException;
 
   public abstract int getTransactionCount(String address) throws WalletServiceException;
 
