@@ -9,9 +9,9 @@ import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.service.PriceService;
-import com.boxfox.cross.service.model.Wallet;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
+import com.linkbit.android.entity.WalletModel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
@@ -33,16 +33,16 @@ public class WalletLookupRouter extends AbstractRouter {
       String uid = (String) ctx.data().get("uid");
       System.out.println("Wallet list lookup : " + uid);
       WalletDao dao = new WalletDao(PostgresConfig.create());
-      List<Wallet> wallets = new ArrayList<>();
+      List<WalletModel> wallets = new ArrayList<>();
       List<io.one.sys.db.tables.pojos.Wallet> list = dao.fetchByUid(uid);
       for (int i = 0; i < list.size(); i++) {
         io.one.sys.db.tables.pojos.Wallet wallet = list.get(i);
         WalletService service = WalletServiceManager.getService(wallet.getSymbol());
         double balance = service.getBalance(wallet.getAddress());
         double krBalance = priceService.getPrice(wallet.getAddress(), locale, balance);
-        Wallet walletObj = Wallet.fromDao(wallet);
+        WalletModel walletObj = WalletService.getWalletFromDao(wallet);
         walletObj.setBalance(balance);
-        walletObj.setKrBalance(krBalance);
+        //walletObj.setKrBalance(krBalance);
         wallets.add(walletObj);
       }
       ctx.response().end(gson.toJson(wallets));
@@ -53,7 +53,7 @@ public class WalletLookupRouter extends AbstractRouter {
   public void getBalance(RoutingContext ctx, @Param String address) {
     addressService.findByAddress(address, res -> {
       if (res.result() != null) {
-        WalletService service = WalletServiceManager.getService(res.result().getSymbol());
+        WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
         double balance = service.getBalance(res.result().getOriginalAddress());
         if (balance < 0) {
           ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
@@ -71,12 +71,12 @@ public class WalletLookupRouter extends AbstractRouter {
   public void getPrice(RoutingContext ctx, @Param String address) {
     String locale = ctx.data().get("locale").toString();
     addressService.findByAddress(address, res -> {
-      String symbol = res.result().getSymbol();
+      String symbol = res.result().getCoinSymbol();
       String originalAddress = res.result().getOriginalAddress();
       WalletService service = WalletServiceManager.getService(symbol);
       if (res.result() != null && service != null) {
         double price = priceService
-            .getPrice(res.result().getSymbol(), locale, service.getBalance(originalAddress));
+            .getPrice(res.result().getCoinSymbol(), locale, service.getBalance(originalAddress));
         ctx.response().setStatusCode(200).setChunked(true).write(String.valueOf(price));
       } else {
         ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());

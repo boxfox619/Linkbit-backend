@@ -40,7 +40,7 @@ public class WalletShareRouter extends AbstractRouter{
         addressService.findByAddress(address, res->{
             if(res.result() != null) {
                 String urlPrefix = ctx.request().uri().replace(ctx.currentRoute().getPath(), "");
-                String data = shareService.createTransactionData(res.result().getSymbol(), address, amount);
+                String data = shareService.createTransactionData(res.result().getCoinSymbol(), address, amount);
                 String url = urlPrefix + data;
                 File qrFile = shareService.createQRImage(url);
                 ctx.response().sendFile(qrFile.getName());
@@ -57,7 +57,7 @@ public class WalletShareRouter extends AbstractRouter{
         addressService.findByAddress(address, res -> {
             if(res.result() != null) {
                 String urlPrefix = ctx.request().uri().replace(ctx.currentRoute().getPath(), "");
-                String data = shareService.createTransactionData(res.result().getSymbol(), address, amount);
+                String data = shareService.createTransactionData(res.result().getCoinSymbol(), address, amount);
                 ctx.response().end(urlPrefix+"/"+data);
             }else{
                 ctx.fail(400);

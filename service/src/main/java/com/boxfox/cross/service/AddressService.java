@@ -100,17 +100,4 @@ public class AddressService extends AbstractService {
     return (ctx.selectFrom(ACCOUNT).where(ACCOUNT.ADDRESS.eq(address)).fetch().size() > 0 ||
         ctx.selectFrom(WALLET).where(WALLET.CROSSADDRESS.eq(address)).fetch().size() > 0);
   }
-
-
-  public static WalletModel getWalletFromRecord(Record record) {
-    WalletModel wallet = new WalletModel();
-    wallet.setOwnerId(record.getValue(WALLET.UID));
-    wallet.setOwnerName(record.getValue(ACCOUNT.NAME));
-    wallet.setWalletName(record.getValue(WALLET.NAME));
-    wallet.setCoinSymbol(record.getValue(WALLET.SYMBOL));
-    wallet.setDescription(record.getValue(WALLET.DESCRIPTION));
-    wallet.setOriginalAddress(record.get(WALLET.ADDRESS));
-    wallet.setLinkbitAddress(record.get(WALLET.CROSSADDRESS));
-    return wallet;
-  }
 }

@@ -5,10 +5,10 @@ import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.AddressService;
-import com.boxfox.cross.service.model.Wallet;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.model.TransactionResult;
+import com.linkbit.android.entity.WalletModel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
@@ -28,7 +28,7 @@ public class RemittanceRouter extends AbstractRouter {
                      @Param String amount) {
         WalletService service = WalletServiceManager.getService(symbol);
         addressService.findByAddress(targetAddress, res -> {
-            Wallet wallet = res.result();
+            WalletModel wallet = res.result();
             if (wallet != null) {
                 String destAddress = targetAddress;
                 if (res != null)

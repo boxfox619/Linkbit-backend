@@ -1,6 +1,7 @@
 package com.boxfox.cross.wallet;
 
 import static com.boxfox.cross.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
+import static io.one.sys.db.tables.Account.ACCOUNT;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
 import com.boxfox.cross.common.vertx.service.AbstractService;
@@ -11,10 +12,14 @@ import com.boxfox.cross.wallet.model.TransactionResult;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
+import com.linkbit.android.entity.WalletModel;
+import io.one.sys.db.tables.pojos.Wallet;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import org.jooq.Record;
+
 import java.util.List;
 
 public abstract class WalletService extends AbstractService{
@@ -64,5 +69,29 @@ public abstract class WalletService extends AbstractService{
     msg.setSymbol(symbol);
     msg.setAddress(address);
     getVertx().eventBus().publish(EVENT_SUBJECT, new Gson().toJson(msg));
+  }
+
+  public static WalletModel getWalletFromRecord(Record record) {
+    WalletModel wallet = new WalletModel();
+    wallet.setOwnerId(record.getValue(WALLET.UID));
+    wallet.setOwnerName(record.getValue(ACCOUNT.NAME));
+    wallet.setWalletName(record.getValue(WALLET.NAME));
+    wallet.setCoinSymbol(record.getValue(WALLET.SYMBOL));
+    wallet.setDescription(record.getValue(WALLET.DESCRIPTION));
+    wallet.setOriginalAddress(record.get(WALLET.ADDRESS));
+    wallet.setLinkbitAddress(record.get(WALLET.CROSSADDRESS));
+    return wallet;
+  }
+
+  public static WalletModel getWalletFromDao(Wallet wallet){
+    WalletModel newWallet = new WalletModel();
+    newWallet.setOwnerId(wallet.getUid());
+    //newWallet.setOwnerName(wallet.());
+    newWallet.setWalletName(wallet.getName());
+    newWallet.setCoinSymbol(wallet.getSymbol());
+    newWallet.setDescription(wallet.getDescription());
+    newWallet.setOriginalAddress(wallet.getAddress());
+    newWallet.setLinkbitAddress(wallet.getCrossaddress());
+    return newWallet;
   }
 }
