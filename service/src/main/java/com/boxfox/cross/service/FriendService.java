@@ -18,9 +18,9 @@ import static io.one.sys.db.Tables.FRIEND;
 import static io.one.sys.db.Tables.WALLET;
 
 
-public class FriendService extends AbstractService{
+public class FriendService extends AbstractService {
 
-    public void loadFriends(String uid, Handler<AsyncResult<List<UserModel>>> res){
+    public void loadFriends(String uid, Handler<AsyncResult<List<UserModel>>> res) {
         doAsync(future -> {
             List<UserModel> friends = new ArrayList();
             AccountDao dao = new AccountDao(PostgresConfig.create());
@@ -28,26 +28,49 @@ public class FriendService extends AbstractService{
                 ctx.selectFrom(FRIEND).where(FRIEND.UID_1.eq(uid).or(FRIEND.UID_2.eq(uid))).fetch().forEach(r -> {
                     String target = r.getUid_1().equals(uid) ? r.getUid_2() : r.getUid_1();
                     Account acc = dao.fetchOneByUid(target);
-                  UserModel user = new UserModel();
-                  user.setName(acc.getName());
-                  user.setEmail(acc.getEmail());
-                  user.setProfileUrl(acc.getProfile());
-                  user.setUid(acc.getUid());
-                  user.setLinkbitAddress(acc.getAddress());
+                    UserModel user = new UserModel();
+                    user.setName(acc.getName());
+                    user.setEmail(acc.getEmail());
+                    user.setProfileUrl(acc.getProfile());
+                    user.setUid(acc.getUid());
+                    user.setLinkbitAddress(acc.getAddress());
                     friends.add(user);
                 });
             });
             future.complete(friends);
-        },res);
+        }, res);
     }
 
-    public void addFriend(String ownUid, String uid, Handler<AsyncResult<Void>> res){
+    public void getUser(String uid, Handler<AsyncResult<UserModel>> res) {
+        doAsync(future -> {
+            AccountDao dao = new AccountDao(PostgresConfig.create());
+            useContext(ctx -> {
+                ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).fetch().forEach(r -> {
+                    if (r.size() > 0) {
+                        Account acc = (Account) r.get(0);
+                        UserModel user = new UserModel();
+                        user.setName(acc.getName());
+                        user.setEmail(acc.getEmail());
+                        user.setProfileUrl(acc.getProfile());
+                        user.setUid(acc.getUid());
+                        user.setLinkbitAddress(acc.getAddress());
+                        future.complete(user);
+                    }
+                });
+            });
+            if (!future.isComplete()) {
+                future.fail("User not found");
+            }
+        }, res);
+    }
+
+    public void addFriend(String ownUid, String uid, Handler<AsyncResult<Void>> res) {
         doAsync(future -> {
             AccountDao dao = new AccountDao(PostgresConfig.create());
             if (dao.fetchOneByUid(uid) == null) {
                 future.fail("Target user can not found");
             } else {
-                useContext(ctx->{
+                useContext(ctx -> {
                     int result = ctx.insertInto(FRIEND, FRIEND.UID_1, FRIEND.UID_2).values(ownUid, uid).execute();
                     if (result == 1) {
                         future.complete();
@@ -56,7 +79,7 @@ public class FriendService extends AbstractService{
                     }
                 });
             }
-        },res);
+        }, res);
     }
 
     public void deleteFriend(String ownUid, String uid, Handler<AsyncResult<Void>> res) {
@@ -79,19 +102,19 @@ public class FriendService extends AbstractService{
         }, res);
     }
 
-    public void serachUsers(String text, Handler<AsyncResult<List<UserModel>>> res){
+    public void serachUsers(String text, Handler<AsyncResult<List<UserModel>>> res) {
         doAsync(future -> {
             useContext(ctx -> {
                 List<UserModel> accounts = new ArrayList();
                 Result<Record> records = ctx.selectFrom(ACCOUNT.join(WALLET).on(ACCOUNT.UID.eq(WALLET.UID)))
                         .where(
                                 ACCOUNT.ADDRESS.like(text)
-                                .or(WALLET.ADDRESS.like(text))
-                                .or(WALLET.CROSSADDRESS.like(text))
-                                .or(ACCOUNT.EMAIL.like(text))
-                                .or(ACCOUNT.NAME.like(text))
+                                        .or(WALLET.ADDRESS.like(text))
+                                        .or(WALLET.CROSSADDRESS.like(text))
+                                        .or(ACCOUNT.EMAIL.like(text))
+                                        .or(ACCOUNT.NAME.like(text))
                         ).fetch();
-                records.forEach(r->{
+                records.forEach(r -> {
                     UserModel user = new UserModel();
                     user.setName(r.getValue(ACCOUNT.NAME));
                     user.setEmail(r.getValue(ACCOUNT.EMAIL));

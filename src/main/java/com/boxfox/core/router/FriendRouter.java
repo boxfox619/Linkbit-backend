@@ -21,10 +21,17 @@ public class FriendRouter extends AbstractRouter {
         this.gson = new Gson();
     }
 
-    @RouteRegistration(uri = "/search/account", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/search/account/list", method = HttpMethod.GET, auth = true)
     public void search(RoutingContext ctx, @Param String text) {
         friendService.serachUsers(text, res -> {
-            ctx.response().end(new Gson().toJson(res.result()));
+            ctx.response().end(gson.toJson(res.result()));
+        });
+    }
+
+    @RouteRegistration(uri = "/search/account", method = HttpMethod.GET, auth = true)
+    public void searchAccount(RoutingContext ctx, @Param String uid) {
+        friendService.getUser(uid, res -> {
+            ctx.response().end(gson.toJson(res.result()));
         });
     }
 
