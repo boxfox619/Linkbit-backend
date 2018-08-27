@@ -4,7 +4,7 @@ import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
-import com.boxfox.cross.service.AddressService;
+import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.model.TransactionResult;
@@ -16,7 +16,7 @@ import io.vertx.ext.web.RoutingContext;
 public class RemittanceRouter extends AbstractRouter {
 
     @Service
-    private AddressService addressService;
+    private WalletDatabaseService walletDatabaseService;
 
     @RouteRegistration(uri = "/wallet/:symbol/send", method = HttpMethod.POST, auth = true)
     public void send(RoutingContext ctx,
@@ -27,7 +27,7 @@ public class RemittanceRouter extends AbstractRouter {
                      @Param String targetAddress,
                      @Param String amount) {
         WalletService service = WalletServiceManager.getService(symbol);
-        addressService.findByAddress(targetAddress, res -> {
+        walletDatabaseService.findByAddress(targetAddress, res -> {
             WalletModel wallet = res.result();
             if (wallet != null) {
                 String destAddress = targetAddress;

@@ -22,4 +22,5 @@ public class AbstractRouter {
     protected <T> void doAsync(Handler<Future<T>> handler, Handler<AsyncResult<T>> resultHandler){
         AsyncService.getInstance().doAsync("router-service-executor", handler, resultHandler);
     }
+
 }

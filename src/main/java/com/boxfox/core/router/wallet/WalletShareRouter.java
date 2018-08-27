@@ -4,8 +4,8 @@ import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
-import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.service.ShareService;
+import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.service.model.ShareContent;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
@@ -17,7 +17,7 @@ public class WalletShareRouter extends AbstractRouter{
     @Service
     private ShareService shareService;
     @Service
-    private AddressService addressService;
+    private WalletDatabaseService walletDatabaseService;
 
     @RouteRegistration(uri="/share/send", method=HttpMethod.GET)
     public void connectShareLink(RoutingContext ctx, @Param String data){
@@ -37,7 +37,7 @@ public class WalletShareRouter extends AbstractRouter{
 
     @RouteRegistration(uri="/share/qr", method=HttpMethod.GET)
     public void createQrCode(RoutingContext ctx, @Param String address, @Param int amount){
-        addressService.findByAddress(address, res->{
+        walletDatabaseService.findByAddress(address, res->{
             if(res.result() != null) {
                 String urlPrefix = ctx.request().uri().replace(ctx.currentRoute().getPath(), "");
                 String data = shareService.createTransactionData(res.result().getCoinSymbol(), address, amount);
@@ -54,7 +54,7 @@ public class WalletShareRouter extends AbstractRouter{
 
     @RouteRegistration(uri="/share/link", method = HttpMethod.POST)
     public void createLink(RoutingContext ctx, @Param String address, @Param int amount){
-        addressService.findByAddress(address, res -> {
+        walletDatabaseService.findByAddress(address, res -> {
             if(res.result() != null) {
                 String urlPrefix = ctx.request().uri().replace(ctx.currentRoute().getPath(), "");
                 String data = shareService.createTransactionData(res.result().getCoinSymbol(), address, amount);
