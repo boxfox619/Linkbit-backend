@@ -4,7 +4,6 @@ import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
-import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
@@ -12,12 +11,8 @@ import com.google.api.client.http.HttpStatusCodes;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
-import org.apache.http.HttpStatus;
 
 public class WalletManageRouter extends AbstractRouter {
-
-    @Service
-    protected AddressService addressService;
 
     @Service
     protected WalletDatabaseService walletDatabaseService;

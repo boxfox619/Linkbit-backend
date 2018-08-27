@@ -18,11 +18,11 @@ public class RemittanceRouter extends AbstractRouter {
     @Service
     private WalletDatabaseService walletDatabaseService;
 
-    @RouteRegistration(uri = "/wallet/:symbol/send", method = HttpMethod.POST, auth = true)
+    @RouteRegistration(uri = "/remittance", method = HttpMethod.POST, auth = true)
     public void send(RoutingContext ctx,
                      @Param String symbol,
-                     @Param String walletFileName,
-                     @Param String walletFileData,
+                     @Param String walletName,
+                     @Param String walletData,
                      @Param String password,
                      @Param String targetAddress,
                      @Param String amount) {
@@ -33,7 +33,7 @@ public class RemittanceRouter extends AbstractRouter {
                 String destAddress = targetAddress;
                 if (res != null)
                     destAddress = wallet.getOriginalAddress();
-                TransactionResult result = service.send(walletFileName, walletFileData, password, destAddress, amount);
+                TransactionResult result = service.send(walletName, walletData, password, destAddress, amount);
                 ctx.response().putHeader("content-type", "application/json");
                 ctx.response().setChunked(true).write(gson.toJson(result));
             } else {
