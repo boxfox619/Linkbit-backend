@@ -21,7 +21,7 @@ public class AuthRouter extends AbstractRouter {
         gson = new Gson();
     }
 
-    @RouteRegistration(uri = "/signin/", method = HttpMethod.POST)
+    @RouteRegistration(uri = "/signin/", method = HttpMethod.GET)
     public void signinFacebook(RoutingContext ctx, @Param String accessToken) {
         authService.signin(accessToken,res -> {
             if (res.succeeded()) {
@@ -34,7 +34,7 @@ public class AuthRouter extends AbstractRouter {
         });
     }
 
-    @RouteRegistration(uri = "/logout", method = HttpMethod.POST, auth = true)
+    @RouteRegistration(uri = "/logout", method = HttpMethod.GET, auth = true)
     public void logout(RoutingContext ctx) {
         ctx.removeCookie("token");
         ctx.response().setStatusCode(200).end();
