@@ -5,10 +5,9 @@ import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
-import com.boxfox.cross.service.AddressService;
+import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
-import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.one.sys.db.tables.pojos.Wallet;
@@ -21,7 +20,7 @@ import java.util.List;
 public class TransactionRouter extends AbstractRouter {
 
     @Service
-    private AddressService addressService;
+    private WalletDatabaseService walletDatabaseService;
 
     @RouteRegistration(uri = "/transaction", method = HttpMethod.GET, auth = true)
     public void lookupTransaction(RoutingContext ctx, @Param String symbol, @Param String txHash) {
@@ -32,7 +31,7 @@ public class TransactionRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/transaction/count", method = HttpMethod.GET, auth = true)
     public void wallTransactionCount(RoutingContext ctx, @Param String address) {
-        addressService.findByAddress(address, res -> {
+        walletDatabaseService.findByAddress(address, res -> {
             if (res.result() != null) {
                 WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
                 int count = service.getTransactionCount(address);
@@ -45,7 +44,7 @@ public class TransactionRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/transaction/list", method = HttpMethod.GET, auth = true)
     public void walletTransactionList(RoutingContext ctx, @Param String address, @Param int page, @Param int count) {
-        addressService.findByAddress(address, res -> {
+        walletDatabaseService.findByAddress(address, res -> {
             if (res.result() != null) {
                 WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
                 service.getTransactionList(address).setHandler(transactionStatusListResult -> {
