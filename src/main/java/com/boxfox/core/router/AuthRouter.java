@@ -1,5 +1,6 @@
 package com.boxfox.core.router;
 
+import com.boxfox.cross.common.util.LogUtil;
 import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
@@ -21,9 +22,10 @@ public class AuthRouter extends AbstractRouter {
         gson = new Gson();
     }
 
-    @RouteRegistration(uri = "/signin/", method = HttpMethod.GET)
-    public void signinFacebook(RoutingContext ctx, @Param String accessToken) {
-        authService.signin(accessToken, res -> {
+    @RouteRegistration(uri = "/signin", method = HttpMethod.GET)
+    public void signinFacebook(RoutingContext ctx, @Param String token) {
+        LogUtil.debug("signin token:%s", token);
+        authService.signin(token, res -> {
             if (res.succeeded()) {
                 UserModel result = res.result();
                 JsonObject jsonObject = new JsonObject(gson.toJson(result));
