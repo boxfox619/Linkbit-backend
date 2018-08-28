@@ -17,7 +17,11 @@ public abstract class AbstractService {
     public AbstractService(){}
     public AbstractService(Vertx vertx){this.vertx = vertx;}
 
-    public void init(){}
+    public void init(){
+        if(AsyncService.getInstance() == null){
+            AsyncService.create(this.vertx);
+        }
+    }
 
     protected void useContext(ContextJob job){
         DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
@@ -34,6 +38,6 @@ public abstract class AbstractService {
     }
 
     protected <T> void doAsync( Handler<Future<T>> handler, Handler<AsyncResult<T>> resultHandler){
-        AsyncService.getInstance().doAsync("service-worker-executor", handler,resultHandler);
+        AsyncService.getInstance().doAsync("service-worker-executor", handler, resultHandler);
     }
 }

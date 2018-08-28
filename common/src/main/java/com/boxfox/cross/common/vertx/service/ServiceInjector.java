@@ -20,17 +20,17 @@ public class ServiceInjector {
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             if (field.getAnnotation(Service.class) != null) {
-                AbstractService service = createService(field);
+                AbstractService service = createService(field.getType());
                 field.set(instance, service);
             }
         }
     }
 
-    private AbstractService createService(Field field) throws IllegalAccessException, InstantiationException {
-        AbstractService service = serviceMap.get(field.getType());
+    public AbstractService createService(Class serviceClass) throws IllegalAccessException, InstantiationException {
+        AbstractService service = serviceMap.get(serviceClass);
         if (service == null) {
-            service = (AbstractService) field.getType().newInstance();
-            injectService(field.getType(), service);
+            service = (AbstractService) serviceClass.newInstance();
+            injectService(serviceClass, service);
             try {
                 Field vertxField = service.getClass().getSuperclass().getDeclaredField("vertx");
                 if (vertxField != null) {
@@ -45,7 +45,7 @@ public class ServiceInjector {
             } catch (NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            serviceMap.put(field.getClass(), service);
+            serviceMap.put(serviceClass, service);
         }
         return service;
     }

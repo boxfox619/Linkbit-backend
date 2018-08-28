@@ -10,6 +10,7 @@ public class AsyncService {
     public static AsyncService create(Vertx vertx){
         AsyncService service = new AsyncService();
         service.vertx = vertx;
+        instance = service;
         return service;
     }
 

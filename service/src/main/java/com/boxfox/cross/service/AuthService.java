@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 public class AuthService extends AbstractService {
 
-  public void signin(String token, Handler<AsyncResult<UserModel>> hander) {
+  public void signin(String token, Handler<AsyncResult<UserModel>> handler) {
     doAsync(future -> {
       AccountDao data = new AccountDao(PostgresConfig.create());
       try {
@@ -52,7 +52,7 @@ public class AuthService extends AbstractService {
       } catch (InterruptedException | ExecutionException e) {
         future.fail(e);
       }
-    }, hander);
+    }, handler);
   }
 
   public UserModel getAccountByUid(String uid) {

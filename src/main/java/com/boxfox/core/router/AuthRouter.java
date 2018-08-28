@@ -23,7 +23,7 @@ public class AuthRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/signin/", method = HttpMethod.GET)
     public void signinFacebook(RoutingContext ctx, @Param String accessToken) {
-        authService.signin(accessToken,res -> {
+        authService.signin(accessToken, res -> {
             if (res.succeeded()) {
                 UserModel result = res.result();
                 JsonObject jsonObject = new JsonObject(gson.toJson(result));
