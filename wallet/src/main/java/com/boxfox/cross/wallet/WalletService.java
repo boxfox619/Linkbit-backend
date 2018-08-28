@@ -20,7 +20,7 @@ import java.util.List;
 
 public abstract class WalletService extends AbstractService{
   private IndexingService indexingService;
-  private String symbol;
+  protected String symbol;
 
   public WalletService(Vertx vertx, String symbol){
     super(vertx);
