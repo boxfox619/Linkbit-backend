@@ -1,6 +1,5 @@
 package com.boxfox.cross.common.vertx.router;
 
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -19,7 +18,7 @@ public class RouterMapDoc {
     Reflections routerAnnotations = new Reflections(packageName, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
     Set<Class<?>> annotatedClass = routerAnnotations.getTypesAnnotatedWith(RouteRegistration.class);
     Set<Method> annotatedMethod = routerAnnotations
-        .getMethodsAnnotatedWith(RouteRegistration.class);
+            .getMethodsAnnotatedWith(RouteRegistration.class);
     annotatedClass.forEach(c -> {
       RouteRegistration annotation = c.getAnnotation(RouteRegistration.class);
       JsonObject apiObj = new JsonObject();

@@ -13,11 +13,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class PriceService extends AbstractService {
-    private static final String COINMARKET_CAP_URL = "https://api.coinmarketcap.com/v2/ticker/";
+    private static final String COINMARKET_CAP_URL = "https://api.coinmarketcap.com/v2/";
     private Map<String, Integer> coinIdMap;
 
     @Service
-    LocaleService localeService; //@TODO Service inject to Service
+    LocaleService localeService;
 
     public PriceService() {
         this.coinIdMap = new HashMap<>();
@@ -57,7 +57,7 @@ public class PriceService extends AbstractService {
         if (coinIdMap.containsKey(symbol)) {
             try {
                 int id = coinIdMap.get(symbol);
-                String url = String.format("%s%s/?convert=%s", COINMARKET_CAP_URL, id, moneySymbol);
+                String url = String.format("%s%s/?convert=%s", COINMARKET_CAP_URL + "ticker/", id, moneySymbol);
                 JSONObject obj = Unirest
                         .get(url).asJson()
                         .getBody().getObject();
