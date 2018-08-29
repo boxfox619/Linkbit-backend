@@ -1,19 +1,15 @@
 package com.boxfox.cross.wallet;
 
 import static com.boxfox.cross.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
-import static io.one.sys.db.tables.Wallet.WALLET;
 
 import com.boxfox.cross.common.vertx.service.AbstractService;
-import com.boxfox.cross.service.AddressService;
 import com.boxfox.cross.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.wallet.indexing.IndexingService;
 import com.boxfox.cross.wallet.model.TransactionResult;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 
 import java.util.List;
@@ -28,20 +24,6 @@ public abstract class WalletService extends AbstractService{
   }
 
   public abstract double getBalance(String originalAddress);
-
-  public final void createWallet(String uid, String name, String password, String description, boolean open, boolean major, Handler<AsyncResult<WalletCreateResult>> res){
-    doAsync(future -> {
-      WalletCreateResult walletCreateResult = createWallet(password);
-      if(walletCreateResult.isSuccess()) {
-        useContext(ctx -> {
-          ctx.insertInto(WALLET).values(uid, symbol.toUpperCase(), name, description, walletCreateResult.getAddress(), AddressService.createRandomAddress(ctx), open, major).execute();
-        });
-        future.complete(walletCreateResult);
-      }else{
-        future.fail("Wallet create fail");
-      }
-    }, res);
-  }
 
   public abstract WalletCreateResult createWallet(String password);
 

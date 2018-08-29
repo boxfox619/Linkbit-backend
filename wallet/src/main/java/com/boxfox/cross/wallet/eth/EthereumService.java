@@ -10,6 +10,8 @@ import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.linkbit.android.entity.TransactionModel;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;

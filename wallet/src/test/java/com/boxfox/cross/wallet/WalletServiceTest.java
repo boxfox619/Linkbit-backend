@@ -21,10 +21,11 @@ public class WalletServiceTest {
     String password = "testpw231";
     String description = "desccas";
     CountDownLatch latch = new CountDownLatch(1);
-    WalletServiceManager.getService("eth").createWallet(uid,name,password,description, res->{
-      System.out.println(res.result());
-      latch.countDown();
-    });
+    WalletServiceManager.getService("eth")
+        .createWallet(uid, name, password, description, false, false, res -> {
+          System.out.println(res.result());
+          latch.countDown();
+        });
     latch.await();
   }
 

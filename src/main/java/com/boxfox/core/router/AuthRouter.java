@@ -23,7 +23,7 @@ public class AuthRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/signin", method = HttpMethod.GET)
-    public void signinFacebook(RoutingContext ctx, @Param String token) {
+    public void signin(RoutingContext ctx, @Param String token) {
         LogUtil.debug("signin token:%s", token);
         authService.signin(token, res -> {
             if (res.succeeded()) {

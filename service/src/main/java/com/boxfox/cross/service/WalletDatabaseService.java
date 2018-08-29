@@ -1,5 +1,10 @@
 package com.boxfox.cross.service;
 
+import static com.boxfox.cross.service.AddressService.isCrossAddress;
+import static io.one.sys.db.tables.Account.ACCOUNT;
+import static io.one.sys.db.tables.Majorwallet.MAJORWALLET;
+import static io.one.sys.db.tables.Wallet.WALLET;
+
 import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.linkbit.android.entity.WalletModel;
 import io.one.sys.db.tables.records.MajorwalletRecord;
@@ -9,12 +14,19 @@ import io.vertx.core.Handler;
 import org.jooq.Record;
 import org.jooq.Result;
 
-import static com.boxfox.cross.service.AddressService.isCrossAddress;
-import static io.one.sys.db.tables.Account.ACCOUNT;
-import static io.one.sys.db.tables.Majorwallet.MAJORWALLET;
-import static io.one.sys.db.tables.Wallet.WALLET;
-
 public class WalletDatabaseService extends AbstractService{
+
+
+    public final void createWallet(String uid, String symbol, String name, String address, String description, boolean open, boolean major, Handler<AsyncResult<Void>> res){
+        doAsync(future -> {
+            useContext(ctx -> {
+                ctx.insertInto(WALLET)
+                    .values(uid, symbol.toUpperCase(), name, description, address, AddressService.createRandomAddress(ctx), open, major)
+                    .execute();
+            });
+            future.complete();
+        }, res);
+    }
 
     public void findByAddress(String address, Handler<AsyncResult<WalletModel>> res) {
         doAsync(future -> {
