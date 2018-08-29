@@ -1,6 +1,7 @@
 package com.boxfox.core.router;
 
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.common.util.LogUtil;
 import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
@@ -15,6 +16,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CoinRouter extends AbstractRouter {
 
     @Service
@@ -25,15 +29,16 @@ public class CoinRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/coin/supported/list", method = HttpMethod.GET, auth = true)
     public void getSupportWalletList(RoutingContext ctx) {
+        LogUtil.debug("Supported Coin Load : %s", ctx.request().remoteAddress().host());
         CoinDao dao = new CoinDao(PostgresConfig.create());
-        JsonArray coins = new JsonArray();
+        List<CoinModel> coins = new ArrayList();
         dao.findAll().forEach(c -> {
           CoinModel coin = new CoinModel();
           coin.setSymbol(c.getSymbol());
           coin.setName(c.getName());
-            coins.add(gson.toJson(coin));
+            coins.add(coin);
         });
-        ctx.response().end(coins.encode());
+        ctx.response().end(gson.toJson(coins));
     }
 
     @RouteRegistration(uri = "/coin/price", method = HttpMethod.GET, auth = true)
