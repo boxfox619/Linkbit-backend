@@ -16,8 +16,8 @@ public class ServiceInjector {
         this.vertx= vertx;
     }
 
-    public void injectService(Class clazz, Object instance) throws InstantiationException, IllegalAccessException {
-        for (Field field : clazz.getDeclaredFields()) {
+    public void injectService(Object instance) throws InstantiationException, IllegalAccessException {
+        for (Field field : instance.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             if (field.getAnnotation(Service.class) != null) {
                 AbstractService service = createService(field.getType());
@@ -30,7 +30,7 @@ public class ServiceInjector {
         AbstractService service = serviceMap.get(serviceClass);
         if (service == null) {
             service = (AbstractService) serviceClass.newInstance();
-            injectService(serviceClass, service);
+            injectService(service);
             try {
                 Field vertxField = service.getClass().getSuperclass().getDeclaredField("vertx");
                 if (vertxField != null) {

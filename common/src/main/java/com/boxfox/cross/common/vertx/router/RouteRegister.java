@@ -80,7 +80,7 @@ public class RouteRegister {
         if(instance==null) {
             try {
                 instance = clazz.newInstance();
-                this.serviceInjector.injectService(clazz, instance);
+                this.serviceInjector.injectService(instance);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
