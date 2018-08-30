@@ -1,6 +1,6 @@
-package com.boxfox.cross.common.vertx.router;
+package com.boxfox.cross.common.vertx.middleware;
 
-import io.vertx.core.Handler;
+import com.boxfox.cross.common.vertx.router.Param;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -12,29 +12,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BaseHandler implements Handler<RoutingContext> {
+public class BaseHandlerImpl implements BaseHandler {
     private Object instance;
     private Method m;
 
-    public BaseHandler(Object instance, Method m) {
+    public BaseHandlerImpl(Object instance, Method m) {
         this.instance = instance;
         this.m = m;
     }
 
     private Object castingParameter(String str, Class<?> paramType) {
-        Object paramData = str;
-        if (paramType.equals(Integer.class)) {
-            paramData = Integer.valueOf(str);
-        } else if (paramType.equals(Boolean.class)) {
-            paramData = Boolean.valueOf(str);
-        } else if (paramType.equals(Double.class)) {
-            paramData = Double.valueOf(str);
-        } else if (paramType.equals(Float.class)) {
-            paramData = Float.valueOf(str);
-        } else if (paramType.equals(JsonObject.class)) {
-            paramData = new JsonObject(str);
-        } else if (paramType.equals(JsonArray.class)) {
-            paramData = new JsonArray(str);
+        Object paramData = null;
+        if (str != null) {
+            if (paramType.equals(Integer.class) || paramType.equals(int.class)) {
+                paramData = Integer.valueOf(str);
+            } else if (paramType.equals(Boolean.class) || paramType.equals(boolean.class)) {
+                paramData = Boolean.valueOf(str);
+            } else if (paramType.equals(Double.class) || paramType.equals(double.class)) {
+                paramData = Double.valueOf(str);
+            } else if (paramType.equals(Float.class) || paramType.equals(float.class)) {
+                paramData = Float.valueOf(str);
+            } else if (paramType.equals(JsonObject.class)) {
+                paramData = new JsonObject(str);
+            } else if (paramType.equals(JsonArray.class)) {
+                paramData = new JsonArray(str);
+            }
         }
         return paramData;
     }
@@ -45,13 +47,13 @@ public class BaseHandler implements Handler<RoutingContext> {
         if (ctx.request().method() == HttpMethod.POST && data != null) {
             if (paramType.equals(String.class)) {
                 paramData = data;
-            } else if (paramType.equals(Integer.class)) {
+            } else if (paramType.equals(Integer.class) || paramType.equals(int.class)) {
                 paramData = Integer.valueOf(data);
-            } else if (paramType.equals(Boolean.class)) {
+            } else if (paramType.equals(Boolean.class) || paramType.equals(boolean.class)) {
                 paramData = Boolean.valueOf(data);
-            } else if (paramType.equals(Double.class)) {
+            } else if (paramType.equals(Double.class) || paramType.equals(double.class)) {
                 paramData = Double.valueOf(data);
-            } else if (paramType.equals(Float.class)) {
+            } else if (paramType.equals(Float.class) || paramType.equals(float.class)) {
                 paramData = Float.valueOf(data);
             } else if (paramData.equals(JsonObject.class)) {
                 paramData = new JsonObject(data);

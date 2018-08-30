@@ -3,6 +3,8 @@ package com.boxfox.cross.common.vertx.router;
 import java.util.*;
 
 import com.boxfox.cross.common.vertx.middleware.AuthHandler;
+import com.boxfox.cross.common.vertx.middleware.BaseHandler;
+import com.boxfox.cross.common.vertx.middleware.BaseHandlerImpl;
 import com.boxfox.cross.common.vertx.service.ServiceInjector;
 import io.vertx.core.Vertx;
 import org.reflections.Reflections;
@@ -63,7 +65,7 @@ public class RouteRegister {
             scanner.getMethodsAnnotatedWith(RouteRegistration.class).forEach(m -> {
                 RouteRegistration annotation = m.getAnnotation(RouteRegistration.class);
                 Object instance = createRouterInstance(m.getDeclaringClass());
-                Handler handler = new BaseHandler(instance, m);
+                Handler handler = BaseHandler.create(instance, m);
                 for (HttpMethod method : annotation.method()) {
                     if (annotation.auth()) {
                         router.route(method, annotation.uri()).handler(jwtAuthHandler);

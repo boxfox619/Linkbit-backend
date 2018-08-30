@@ -9,7 +9,7 @@ public class LogUtil {
             System.out.println(message);
     }
 
-    public static void debug(String format, String... args) {
+    public static void debug(String format, Object ... args) {
         if (isDebug())
             System.out.println(String.format(format, args));
     }

@@ -30,15 +30,18 @@ public class CoinRouter extends AbstractRouter {
     @RouteRegistration(uri = "/coin/supported/list", method = HttpMethod.GET, auth = true)
     public void getSupportWalletList(RoutingContext ctx) {
         LogUtil.debug("Supported Coin Load : %s", ctx.request().remoteAddress().host());
-        CoinDao dao = new CoinDao(PostgresConfig.create());
-        List<CoinModel> coins = new ArrayList();
-        dao.findAll().forEach(c -> {
-          CoinModel coin = new CoinModel();
-          coin.setSymbol(c.getSymbol());
-          coin.setName(c.getName());
-            coins.add(coin);
+        doAsync(future -> {
+            CoinDao dao = new CoinDao(PostgresConfig.create());
+            List<CoinModel> coins = new ArrayList();
+            dao.findAll().forEach(c -> {
+                CoinModel coin = new CoinModel();
+                coin.setSymbol(c.getSymbol());
+                coin.setName(c.getName());
+                coins.add(coin);
+            });
+            ctx.response().end(gson.toJson(coins));
+            future.complete();
         });
-        ctx.response().end(gson.toJson(coins));
     }
 
     @RouteRegistration(uri = "/coin/price", method = HttpMethod.GET, auth = true)
