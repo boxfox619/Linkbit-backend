@@ -1,7 +1,8 @@
 package com.boxfox.core.router;
 
+import static com.boxfox.cross.common.util.LogUtil.getLogger;
+
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.util.LogUtil;
 import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
@@ -27,7 +28,7 @@ public class AuthRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/signin", method = HttpMethod.GET)
     public void signin(RoutingContext ctx, @Param String token) {
-        LogUtil.debug("signin token:%s", token);
+        getLogger().debug(String.format("signin token:%s", token));
         authService.signin(token, res -> {
             if (res.succeeded()) {
                 UserModel result = res.result();

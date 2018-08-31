@@ -1,6 +1,7 @@
 package com.boxfox.cross.common.vertx.middleware;
 
-import com.boxfox.cross.common.util.LogUtil;
+import static com.boxfox.cross.common.util.LogUtil.getLogger;
+
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.net.HttpHeaders;
 import com.google.firebase.FirebaseApp;
@@ -40,7 +41,7 @@ public class AuthHandlerImpl implements AuthHandler {
     @Override
     public void handle(RoutingContext ctx) {
         String token = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
-        LogUtil.debug("Auth token : %s", token);
+        getLogger().debug(String.format("Auth token : %s", token));
         if (token != null) {
             FirebaseToken decodedToken = null;
             try {

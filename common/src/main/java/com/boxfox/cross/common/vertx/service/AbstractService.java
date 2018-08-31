@@ -5,7 +5,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.WorkerExecutor;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -14,8 +13,13 @@ public abstract class AbstractService {
 
     private Vertx vertx;
 
-    public AbstractService(){}
-    public AbstractService(Vertx vertx){this.vertx = vertx;}
+    public AbstractService() {
+    }
+
+    public AbstractService(Vertx vertx) {
+        this();
+        this.vertx = vertx;
+    }
 
     public void init(){
         if(AsyncService.getInstance() == null){

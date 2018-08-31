@@ -6,6 +6,8 @@ import com.google.gson.GsonBuilder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 public class AbstractRouter {
     protected Gson gson;
