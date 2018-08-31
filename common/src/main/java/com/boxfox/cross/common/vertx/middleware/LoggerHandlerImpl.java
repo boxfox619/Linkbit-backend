@@ -1,8 +1,17 @@
 package com.boxfox.cross.common.vertx.middleware;
 
+import com.boxfox.cross.common.data.Config;
+import com.boxfox.cross.common.util.LogUtil;
+import com.google.common.net.HttpHeaders;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import java.util.concurrent.ExecutionException;
+
+import static com.boxfox.cross.common.util.LogUtil.getLogger;
 
 public class LoggerHandlerImpl implements LoggerHandler {
   private final Logger logger;
@@ -13,9 +22,25 @@ public class LoggerHandlerImpl implements LoggerHandler {
 
   @Override
   public void handle(RoutingContext ctx) {
-    Object uid = ctx.data().get("uid");
+    String uid = null;
     String url = ctx.request().uri();
-    this.logger.info(String.format("URL : %s / UID : %s", url, uid));
+    String token = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
+    if (token != null) {
+      FirebaseToken decodedToken = null;
+      try {
+        decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(token).get();
+        if (decodedToken != null) {
+          uid = decodedToken.getUid();
+        }
+      } catch (InterruptedException | ExecutionException e) {
+        LogUtil.getLogger().debug(e.getMessage());
+      }
+    }
+    String log = String.format("URL : %s / UID : %s", url, uid);
+    this.logger.info(log);
+    if(Config.getDefaultInstance().getBoolean("debug")){
+      System.out.println(log);
+    }
     ctx.next();
   }
 

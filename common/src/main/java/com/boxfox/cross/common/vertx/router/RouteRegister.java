@@ -4,7 +4,6 @@ import java.util.*;
 
 import com.boxfox.cross.common.vertx.middleware.AuthHandler;
 import com.boxfox.cross.common.vertx.middleware.BaseHandler;
-import com.boxfox.cross.common.vertx.middleware.BaseHandlerImpl;
 import com.boxfox.cross.common.vertx.service.ServiceInjector;
 import io.vertx.core.Vertx;
 import org.reflections.Reflections;

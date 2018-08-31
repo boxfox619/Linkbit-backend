@@ -26,7 +26,7 @@ public class AddressService extends AbstractService {
     do {
       int firstNum = (int) (Math.random() * 9999 + 1);
       int secondNum = (int) (Math.random() * 999999 + 1);
-      address = String.format("cross-%04d-%04d", firstNum, secondNum);
+      address = String.format("linkbit-%04d-%06d", firstNum, secondNum);
     } while (isValidAddress(ctx, address));
     return address;
   }

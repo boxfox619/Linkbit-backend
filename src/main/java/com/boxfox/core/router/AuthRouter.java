@@ -28,7 +28,7 @@ public class AuthRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/signin", method = HttpMethod.GET)
     public void signin(RoutingContext ctx, @Param String token) {
-        getLogger().debug(String.format("signin token:%s", token));
+        getLogger().debug(String.format("signin token: %s", token));
         authService.signin(token, res -> {
             if (res.succeeded()) {
                 UserModel result = res.result();

@@ -36,6 +36,8 @@ public class BaseHandlerImpl implements BaseHandler {
                 paramData = new JsonObject(str);
             } else if (paramType.equals(JsonArray.class)) {
                 paramData = new JsonArray(str);
+            } else {
+                paramData = str;
             }
         }
         return paramData;
