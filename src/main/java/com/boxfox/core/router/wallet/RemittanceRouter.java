@@ -32,7 +32,7 @@ public class RemittanceRouter extends AbstractRouter {
             if (wallet != null) {
                 String destAddress = targetAddress;
                 if (res != null)
-                    destAddress = wallet.getOriginalAddress();
+                    destAddress = wallet.getAccountAddress();
                 TransactionResult result = service.send(walletName, walletData, password, destAddress, amount);
                 ctx.response().putHeader("content-type", "application/json");
                 ctx.response().setChunked(true).write(gson.toJson(result));

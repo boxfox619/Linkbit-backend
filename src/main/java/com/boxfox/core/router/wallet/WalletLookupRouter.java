@@ -48,7 +48,7 @@ public class WalletLookupRouter extends AbstractRouter {
         walletModel.setWalletName(wallet.getName());
         walletModel.setCoinSymbol(wallet.getSymbol());
         walletModel.setDescription(wallet.getDescription());
-        walletModel.setOriginalAddress(wallet.getAddress());
+        walletModel.setAccountAddress(wallet.getAddress());
         walletModel.setLinkbitAddress(wallet.getCrossaddress());
         walletModel.setBalance(balance);
         //walletModel.setKrBalance(krBalance);
@@ -64,7 +64,7 @@ public class WalletLookupRouter extends AbstractRouter {
     walletDatabaseService.findByAddress(address, res -> {
       if (res.result() != null) {
         WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
-        double balance = service.getBalance(res.result().getOriginalAddress());
+        double balance = service.getBalance(res.result().getAccountAddress());
         if (balance < 0) {
           ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());
         } else {
@@ -82,11 +82,11 @@ public class WalletLookupRouter extends AbstractRouter {
     String locale = ctx.data().get("locale").toString();
     walletDatabaseService.findByAddress(address, res -> {
       String symbol = res.result().getCoinSymbol();
-      String originalAddress = res.result().getOriginalAddress();
+      String accountAddress = res.result().getAccountAddress();
       WalletService service = WalletServiceManager.getService(symbol);
       if (res.result() != null && service != null) {
         double price = priceService
-            .getPrice(res.result().getCoinSymbol(), locale, service.getBalance(originalAddress));
+            .getPrice(res.result().getCoinSymbol(), locale, service.getBalance(accountAddress));
         ctx.response().setStatusCode(200).setChunked(true).write(String.valueOf(price));
       } else {
         ctx.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code());

@@ -1,16 +1,10 @@
 package com.boxfox.cross.service;
 
 import static io.one.sys.db.tables.Account.ACCOUNT;
-import static io.one.sys.db.tables.Majorwallet.MAJORWALLET;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
 import com.boxfox.cross.common.vertx.service.AbstractService;
-import com.linkbit.android.entity.WalletModel;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
 
 public class AddressService extends AbstractService {
 

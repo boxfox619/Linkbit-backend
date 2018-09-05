@@ -155,7 +155,7 @@ public class WalletDatabaseService extends AbstractService{
         wallet.setWalletName(record.getValue(WALLET.NAME));
         wallet.setCoinSymbol(record.getValue(WALLET.SYMBOL));
         wallet.setDescription(record.getValue(WALLET.DESCRIPTION));
-        wallet.setOriginalAddress(record.get(WALLET.ADDRESS));
+        wallet.setAccountAddress(record.get(WALLET.ADDRESS));
         wallet.setLinkbitAddress(record.get(WALLET.CROSSADDRESS));
         return wallet;
     }

@@ -7,7 +7,7 @@ open class WalletModel {
     lateinit var  walletName: String
     lateinit var  coinSymbol: String
     lateinit var  description: String
-    lateinit var  originalAddress: String
+    lateinit var  accountAddress: String
     lateinit var  linkbitAddress: String
     var balance: Double = 0.0
 }
