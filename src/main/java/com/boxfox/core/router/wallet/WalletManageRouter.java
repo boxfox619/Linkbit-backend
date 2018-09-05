@@ -50,8 +50,9 @@ public class WalletManageRouter extends AbstractRouter {
                 }else{
                     future.fail("Failure generate wallet data");
                 }
+            }else{
+                future.fail("Illegal Argument");
             }
-            future.fail("Illegal Argument");
         }, res -> {
             if(res.succeeded()){
                 ctx.response().end(gson.toJson(res.result()));

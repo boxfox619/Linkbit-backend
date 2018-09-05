@@ -38,10 +38,7 @@ import org.web3j.crypto.TransactionEncoder;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.Transaction;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
@@ -55,7 +52,7 @@ public class EthereumService extends WalletService {
 
   public EthereumService(Vertx vertx){
     super(vertx,"ETH");
-    this.web3 =  Web3j.build(new HttpService("https://mainnet.infura.io/JjSRoXryXbE6HgXJGILz"));
+    this.web3 =  Web3j.build(new HttpService("https://mainnet.infura.io/v3/326b0d7561824e0b8c4ee1f30e257019"));
     this.cachePath = new File(Config.getDefaultInstance().getString("cachePath","wallets"));
     if(!cachePath.exists())
       cachePath.mkdirs();
@@ -69,7 +66,8 @@ public class EthereumService extends WalletService {
   @Override
   public double getBalance(String address) {
     try {
-      String wei = web3.ethGetBalance(address, DefaultBlockParameterName.LATEST).send().getBalance().toString();
+      EthGetBalance response = web3.ethGetBalance(address.replaceAll(" ",""), DefaultBlockParameterName.LATEST).send();
+      String wei = response.getBalance().toString();
       BigDecimal bigDecimal = Convert.fromWei(wei, Convert.Unit.ETHER);
       return bigDecimal.doubleValue();
     } catch (IOException e) {
