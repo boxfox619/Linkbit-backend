@@ -17,14 +17,24 @@ import org.jooq.Result;
 public class WalletDatabaseService extends AbstractService{
 
 
-    public final void createWallet(String uid, String symbol, String name, String address, String description, boolean open, boolean major, Handler<AsyncResult<Void>> res){
+    public final void createWallet(String uid, String symbol, String name, String address, String description, boolean open, boolean major, Handler<AsyncResult<WalletModel>> res){
         doAsync(future -> {
             useContext(ctx -> {
+                String linkedAddress = AddressService.createRandomAddress(ctx);
                 ctx.insertInto(WALLET)
-                    .values(uid, symbol.toUpperCase(), name, description, address, AddressService.createRandomAddress(ctx), open, major)
+                    .values(uid, symbol.toUpperCase(), name, description, address, linkedAddress, open, major)
                     .execute();
+                findByAddress(address, searchRes -> {
+                    if (searchRes.failed()) {
+                        future.fail("Wallet create fail");
+                    } else {
+                        future.complete(searchRes.result());
+                    }
+                    if (!future.isComplete()) {
+                        future.fail("");
+                    }
+                });
             });
-            future.complete();
         }, res);
     }
 

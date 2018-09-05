@@ -1,5 +1,6 @@
 package com.boxfox.core.router.wallet;
 
+import com.boxfox.core.router.model.WalletCreateNetworkObject;
 import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
 import com.boxfox.cross.common.vertx.router.RouteRegistration;
@@ -9,6 +10,7 @@ import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
 import com.google.api.client.http.HttpStatusCodes;
+import com.linkbit.android.entity.WalletModel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
@@ -26,9 +28,21 @@ public class WalletManageRouter extends AbstractRouter {
                 WalletService service = WalletServiceManager.getService(symbol);
                 WalletCreateResult result = service.createWallet(password);
                 if(result.isSuccess()){
+                    WalletCreateNetworkObject response = new WalletCreateNetworkObject();
+                    response.setWalletData(result.getWalletData().toString());
+                    response.setWalletFileName(result.getWalletName());
+                    response.setAccountAddress(result.getAddress());
                     walletDatabaseService.createWallet(uid, symbol, name, result.getAddress(), description, open, major, dbRes -> {
                         if(dbRes.succeeded()){
-                            future.complete(result);
+                            WalletModel walletModel = dbRes.result();
+                            response.setOwnerName(walletModel.getOwnerName());
+                            response.setLinkbitAddress(walletModel.getLinkbitAddress());
+                            response.setWalletName(walletModel.getWalletName());
+                            response.setDescription(walletModel.getDescription());
+                            response.setCoinSymbol(walletModel.getCoinSymbol());
+                            response.setBalance(walletModel.getBalance());
+                            response.setOwnerId(walletModel.getOwnerId());
+                            future.complete(response);
                         }else{
                             future.fail("Failure create wallet");
                         }
