@@ -11,6 +11,7 @@ import com.boxfox.cross.wallet.WalletServiceManager;
 import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.one.sys.db.tables.pojos.Wallet;
+import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
@@ -89,25 +90,31 @@ public class TransactionRouter extends AbstractRouter {
         doAsync(future -> {
             WalletDao dao = new WalletDao(PostgresConfig.create());
             List<TransactionModel> totalTxStatusList = new ArrayList<>();
+            List<Future> tasks = new ArrayList();
             for(Wallet wallet : dao.fetchByUid(uid)){
                 WalletService service = WalletServiceManager.getService(wallet.getSymbol());
                 String accountAddress = wallet.getAddress();
-                try {
-                    service.getTransactionList(accountAddress).setHandler(txStatusListResult -> {
-                        List<TransactionModel> txStatusList = txStatusListResult.result();
-                        if (txStatusList.size() == 0) {
-                            service.indexingTransactions(accountAddress);
-                        }
-                        totalTxStatusList.addAll(txStatusList);
-                    }).wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                tasks.add(service.getTransactionList(accountAddress).setHandler(txStatusListResult -> {
+                    List<TransactionModel> txStatusList = txStatusListResult.result();
+                    if (txStatusList.size() == 0) {
+                        service.indexingTransactions(accountAddress);
+                    }
+                    totalTxStatusList.addAll(txStatusList);
+                }));
                 if(totalTxStatusList.size()>= page * count){
                     break;
                 }
             }
-
+            boolean check;
+            do{
+                check = true;
+                for(Future task : tasks){
+                    if(!task.isComplete()){
+                        check = false;
+                        break;
+                    }
+                }
+            }while(!check);
             future.complete(totalTxStatusList);
         }, e -> {
             if (e.succeeded()) {

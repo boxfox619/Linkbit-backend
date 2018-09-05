@@ -45,16 +45,22 @@ public class CoinRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/coin/price", method = HttpMethod.GET, auth = true)
     public void getCoinPrice(RoutingContext ctx, @Param String symbol, @Param String locale) {
-        String unit = localeService.getLocaleMoneySymbol(locale);
-        double price = priceService.getPrice(symbol, locale);
-        if (price > 0) {
-            CoinPriceNetworkObject result = new CoinPriceNetworkObject();
-            result.setAmount(price);
-            result.setUnit(unit);
-            ctx.response().end(gson.toJson(result));
-        } else {
-            ctx.response().setStatusCode(404).end();
-        }
+        localeService.getLocaleMoneySymbol(locale, res -> {
+            if(res.succeeded()) {
+                String unit = res.result();
+                double price = priceService.getPrice(symbol, locale);
+                if (price > 0) {
+                    CoinPriceNetworkObject result = new CoinPriceNetworkObject();
+                    result.setAmount(price);
+                    result.setUnit(unit);
+                    ctx.response().end(gson.toJson(result));
+                } else {
+                    ctx.response().setStatusCode(404).end();
+                }
+            }else{
+                ctx.response().setStatusCode(500).end();
+            }
+        });
     }
 
 }
