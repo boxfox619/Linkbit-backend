@@ -23,19 +23,4 @@ public class WalletServiceTest {
     System.out.println(bigDecimal);
   }
 
-/*  @Test
-  public void createEthWallet() throws InterruptedException {
-    String uid = "vKEVPGh2r4h0dVpuONLuZ4Uwuh02";
-    String name = "테스트 지갑";
-    String password = "testpw231";
-    String description = "desccas";
-    CountDownLatch latch = new CountDownLatch(1);
-    WalletServiceManager.getService("eth")
-        .createWallet(uid, name, password, description, false, false, res -> {
-          System.out.println(res.result());
-          latch.countDown();
-        });
-    latch.await();
-  }*/
-
 }

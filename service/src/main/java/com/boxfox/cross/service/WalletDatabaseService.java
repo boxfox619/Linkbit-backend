@@ -60,6 +60,7 @@ public class WalletDatabaseService extends AbstractService{
                     WalletModel wallet = getWalletFromRecord(record);
                     future.complete(wallet);
                 } else {
+                    //@TODO un saved wallet data response
                     future.complete();
                 }
             });

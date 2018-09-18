@@ -1,18 +1,14 @@
 import groovy.xml.MarkupBuilder
 import org.jooq.util.GenerationTool
 
-import javax.xml.bind.JAXB
-
 group 'com.boxfox.cross'
 version '1.0.0'
 
 apply plugin: 'java'
-apply plugin: 'kotlin'
 
 sourceCompatibility = 1.8
 
 buildscript {
-    ext.kotlin_version = '1.2.61'
     ext {
         vertx_jooq_version = '3.1.0'
         postgresql_version = '42.1.4'
@@ -24,7 +20,6 @@ buildscript {
     dependencies {
         classpath "io.github.jklingsporn:vertx-jooq-generate:$vertx_jooq_version"
         classpath "org.postgresql:postgresql:$postgresql_version"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -45,7 +40,6 @@ dependencies {
     compile group: 'com.google.firebase', name:'firebase-admin', version:'5.9.0'
     compile group: 'log4j', name: 'log4j', version: '1.2.17'
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 task jooqGenerate {
@@ -91,19 +85,5 @@ task jooqGenerate {
         GenerationTool.generate(
                 JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
         )
-    }
-}
-
-task build{
-    jooqGenerate.execute()
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }

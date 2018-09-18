@@ -2,6 +2,7 @@ package com.boxfox.core.router;
 
 import static com.boxfox.cross.common.util.LogUtil.getLogger;
 
+import com.boxfox.core.router.model.CoinPriceNetworkObject;
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.cross.common.vertx.router.AbstractRouter;
 import com.boxfox.cross.common.vertx.router.Param;
@@ -9,7 +10,6 @@ import com.boxfox.cross.common.vertx.router.RouteRegistration;
 import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.LocaleService;
 import com.boxfox.cross.service.PriceService;
-import com.linkbit.android.data.model.coin.CoinPriceNetworkObject;
 import com.linkbit.android.entity.CoinModel;
 import io.one.sys.db.tables.daos.CoinDao;
 import io.vertx.core.http.HttpMethod;
