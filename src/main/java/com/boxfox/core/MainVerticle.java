@@ -2,11 +2,12 @@ package com.boxfox.core;
 
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
-import com.boxfox.cross.common.vertx.service.AsyncService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.eth.EthereumService;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
-import com.boxfox.cross.common.vertx.router.RouteRegister;
+import com.boxfox.vertx.util.FirebaseUtil;
+import com.boxfox.vertx.vertx.router.*;
+import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.wallet.indexing.TransactionIndexingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -17,6 +18,8 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 
+import java.io.IOException;
+
 public class MainVerticle extends AbstractVerticle {
 
     private HttpServer server;
@@ -24,6 +27,11 @@ public class MainVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) {
         AsyncService.create(vertx);
+        try {
+            FirebaseUtil.init("keystore/cross-c863f-3861d7d0cc90.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         RouteRegister routeRegister = RouteRegister.routing(vertx);
         Router router = routeRegister.getRouter();
         router.route().handler(CookieHandler.create());

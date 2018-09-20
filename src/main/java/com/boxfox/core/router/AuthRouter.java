@@ -1,12 +1,10 @@
 package com.boxfox.core.router;
 
-import static com.boxfox.cross.common.util.LogUtil.getLogger;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.router.AbstractRouter;
-import com.boxfox.cross.common.vertx.router.Param;
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.common.vertx.service.Service;
+import com.boxfox.vertx.util.LogUtil;
+import com.boxfox.vertx.vertx.router.*;
+import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.service.AuthService;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.UserModel;
@@ -28,7 +26,7 @@ public class AuthRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/signin", method = HttpMethod.GET)
     public void signin(RoutingContext ctx, @Param String token) {
-        getLogger().debug(String.format("signin token: %s", token));
+        LogUtil.getLogger().debug(String.format("signin token: %s", token));
         authService.signin(token, res -> {
             if (res.succeeded()) {
                 UserModel result = res.result();
@@ -50,8 +48,8 @@ public class AuthRouter extends AbstractRouter {
     public void info(RoutingContext ctx) {
         String uid = (String)ctx.data().get("uid");
         doAsync(future -> {
-            AccountDao accountDao = new AccountDao(PostgresConfig.create());
-            Account account = accountDao.fetchByUid(uid).get(0);
+            AccountDao accountDao = new AccountDao(PostgresConfig.create(),getVertx());
+            Account account = accountDao.findOneById(uid).result();
             UserModel userModel = new UserModel();
             userModel.setUid(account.getUid());
             userModel.setEmail(account.getEmail());

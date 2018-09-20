@@ -1,13 +1,11 @@
 package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.router.AbstractRouter;
-import com.boxfox.cross.common.vertx.router.Param;
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.common.vertx.service.Service;
 import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
+import com.boxfox.vertx.vertx.router.*;
+import com.boxfox.vertx.vertx.service.*;
 import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.one.sys.db.tables.pojos.Wallet;
@@ -16,6 +14,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TransactionRouter extends AbstractRouter {
@@ -65,8 +64,8 @@ public class TransactionRouter extends AbstractRouter {
     public void allTransactionCount(RoutingContext ctx) {
         String uid = (String) ctx.data().get("uid");
         doAsync(future -> {
-            WalletDao dao = new WalletDao(PostgresConfig.create());
-            dao.fetchByUid(uid).forEach(w -> {
+            WalletDao dao = new WalletDao(PostgresConfig.create(), getVertx());
+            dao.findManyByUid(Arrays.asList(uid)).result().forEach(w -> {
                 int count = 0;
                 WalletService service = WalletServiceManager.getService(w.getSymbol());
                 String accountAddress = w.getAddress();
@@ -88,10 +87,10 @@ public class TransactionRouter extends AbstractRouter {
     public void allTransactionList(RoutingContext ctx, @Param int page, @Param int count) {
         String uid = (String) ctx.data().get("uid");
         doAsync(future -> {
-            WalletDao dao = new WalletDao(PostgresConfig.create());
+            WalletDao dao = new WalletDao(PostgresConfig.create(), getVertx());
             List<TransactionModel> totalTxStatusList = new ArrayList<>();
             List<Future> tasks = new ArrayList();
-            for(Wallet wallet : dao.fetchByUid(uid)){
+            for(Wallet wallet : dao.findManyByUid(Arrays.asList(uid)).result()){
                 WalletService service = WalletServiceManager.getService(wallet.getSymbol());
                 String accountAddress = wallet.getAddress();
                 tasks.add(service.getTransactionList(accountAddress).setHandler(txStatusListResult -> {

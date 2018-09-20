@@ -1,13 +1,10 @@
 package com.boxfox.core.router;
 
-import static com.boxfox.cross.common.util.LogUtil.getLogger;
-
 import com.boxfox.core.router.model.CoinPriceNetworkObject;
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.router.AbstractRouter;
-import com.boxfox.cross.common.vertx.router.Param;
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.common.vertx.service.Service;
+import com.boxfox.vertx.util.LogUtil;
+import com.boxfox.vertx.vertx.router.*;
+import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.service.LocaleService;
 import com.boxfox.cross.service.PriceService;
 import com.linkbit.android.entity.CoinModel;
@@ -28,11 +25,11 @@ public class CoinRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/coin/supported/list", method = HttpMethod.GET, auth = true)
     public void getSupportWalletList(RoutingContext ctx) {
-        getLogger().debug(String.format("Supported Coin Load : %s", ctx.request().remoteAddress().host()));
+        LogUtil.getLogger().debug(String.format("Supported Coin Load : %s", ctx.request().remoteAddress().host()));
         doAsync(future -> {
-            CoinDao dao = new CoinDao(PostgresConfig.create());
+            CoinDao dao = new CoinDao(PostgresConfig.create(),getVertx());
             List<CoinModel> coins = new ArrayList();
-            dao.findAll().forEach(c -> {
+            dao.findAll().result().forEach(c -> {
                 CoinModel coin = new CoinModel();
                 coin.setSymbol(c.getSymbol());
                 coin.setName(c.getName());

@@ -1,12 +1,9 @@
 package com.boxfox.core.router;
 
-import com.boxfox.cross.common.vertx.router.AbstractRouter;
-import com.boxfox.cross.common.vertx.router.Param;
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.common.vertx.service.Service;
+import com.boxfox.vertx.vertx.router.*;
+import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.service.FriendService;
 import com.google.gson.Gson;
-import com.linkbit.android.entity.UserModel;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 

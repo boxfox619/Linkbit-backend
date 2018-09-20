@@ -3,10 +3,8 @@ package com.boxfox.core.router.wallet;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.router.AbstractRouter;
-import com.boxfox.cross.common.vertx.router.Param;
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.common.vertx.service.Service;
+import com.boxfox.vertx.vertx.router.*;
+import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;
@@ -18,6 +16,7 @@ import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WalletLookupRouter extends AbstractRouter {
@@ -33,10 +32,10 @@ public class WalletLookupRouter extends AbstractRouter {
     doAsync(future -> {
       String uid = (String) ctx.data().get("uid");
       System.out.println("Wallet list lookup : " + uid);
-      WalletDao dao = new WalletDao(PostgresConfig.create());
-      AccountDao accountDao = new AccountDao(PostgresConfig.create());
+      WalletDao dao = new WalletDao(PostgresConfig.create(), getVertx());
+      AccountDao accountDao = new AccountDao(PostgresConfig.create(), getVertx());
       List<WalletModel> wallets = new ArrayList<>();
-      List<io.one.sys.db.tables.pojos.Wallet> list = dao.fetchByUid(uid);
+      List<io.one.sys.db.tables.pojos.Wallet> list = dao.findManyByUid(Arrays.asList(uid)).result();
       for (int i = 0; i < list.size(); i++) {
         io.one.sys.db.tables.pojos.Wallet wallet = list.get(i);
         WalletService service = WalletServiceManager.getService(wallet.getSymbol());
@@ -44,7 +43,7 @@ public class WalletLookupRouter extends AbstractRouter {
         double krBalance = priceService.getPrice(wallet.getAddress(), locale, balance);
         WalletModel walletModel = new WalletModel();
         walletModel.setOwnerId(wallet.getUid());
-        walletModel.setOwnerName(accountDao.fetchByUid(uid).get(0).getName());
+        walletModel.setOwnerName(accountDao.findOneById(uid).result().getName());
         walletModel.setWalletName(wallet.getName());
         walletModel.setCoinSymbol(wallet.getSymbol());
         walletModel.setDescription(wallet.getDescription());
@@ -101,8 +100,8 @@ public class WalletLookupRouter extends AbstractRouter {
       String uid = (String) ctx.data().get("uid");
       WalletService walletService = WalletServiceManager.getService(symbol);
       if (walletService != null) {
-        WalletDao dao = new WalletDao(PostgresConfig.create());
-        List<io.one.sys.db.tables.pojos.Wallet> list = dao.fetchByUid(uid);
+        WalletDao dao = new WalletDao(PostgresConfig.create(),getVertx());
+        List<io.one.sys.db.tables.pojos.Wallet> list = dao.findManyByUid(Arrays.asList(uid)).result();
         double totlaBalance = 0;
         for (int i = 0; i < list.size(); i++) {
           totlaBalance += walletService.getBalance(list.get(i).getAddress());
@@ -123,8 +122,8 @@ public class WalletLookupRouter extends AbstractRouter {
       String uid = (String) ctx.data().get("uid");
       WalletService walletService = WalletServiceManager.getService(symbol);
       if (walletService != null) {
-        WalletDao dao = new WalletDao(PostgresConfig.create());
-        List<io.one.sys.db.tables.pojos.Wallet> list = dao.fetchByUid(uid);
+        WalletDao dao = new WalletDao(PostgresConfig.create(), getVertx());
+        List<io.one.sys.db.tables.pojos.Wallet> list = dao.findManyByUid(Arrays.asList(uid)).result();
         double totlaPrice = 0;
         for (int i = 0; i < list.size(); i++) {
           double balance = walletService.getBalance(list.get(i).getAddress());
