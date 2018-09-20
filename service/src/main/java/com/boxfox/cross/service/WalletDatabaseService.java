@@ -5,7 +5,7 @@ import static io.one.sys.db.tables.Account.ACCOUNT;
 import static io.one.sys.db.tables.Majorwallet.MAJORWALLET;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
-import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.cross.common.vertx.router.AbstractJooqService;
 import com.linkbit.android.entity.WalletModel;
 import io.one.sys.db.tables.records.MajorwalletRecord;
 import io.one.sys.db.tables.records.WalletRecord;
@@ -14,7 +14,7 @@ import io.vertx.core.Handler;
 import org.jooq.Record;
 import org.jooq.Result;
 
-public class WalletDatabaseService extends AbstractService{
+public class WalletDatabaseService extends AbstractJooqService {
 
 
     public final void createWallet(String uid, String symbol, String name, String address, String description, boolean open, boolean major, Handler<AsyncResult<WalletModel>> res){

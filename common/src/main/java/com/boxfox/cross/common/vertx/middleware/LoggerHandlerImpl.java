@@ -1,7 +1,7 @@
 package com.boxfox.cross.common.vertx.middleware;
 
-import com.boxfox.cross.common.data.Config;
-import com.boxfox.cross.common.util.LogUtil;
+import com.boxfox.vertx.data.Config;
+import com.boxfox.vertx.util.LogUtil;
 import com.google.common.net.HttpHeaders;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
@@ -10,8 +10,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.util.concurrent.ExecutionException;
-
-import static com.boxfox.cross.common.util.LogUtil.getLogger;
 
 public class LoggerHandlerImpl implements LoggerHandler {
   private final Logger logger;

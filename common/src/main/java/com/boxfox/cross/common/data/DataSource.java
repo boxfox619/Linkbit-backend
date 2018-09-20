@@ -1,5 +1,6 @@
 package com.boxfox.cross.common.data;
 
+import com.boxfox.vertx.data.Config;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.sql.Connection;

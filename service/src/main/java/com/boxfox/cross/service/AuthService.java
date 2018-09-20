@@ -3,7 +3,7 @@ package com.boxfox.cross.service;
 import static io.one.sys.db.Tables.ACCOUNT;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.cross.common.vertx.router.AbstractJooqService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.linkbit.android.entity.UserModel;
@@ -14,7 +14,7 @@ import io.vertx.core.Handler;
 import java.util.concurrent.ExecutionException;
 
 
-public class AuthService extends AbstractService {
+public class AuthService extends AbstractJooqService {
 
   public void signin(String token, Handler<AsyncResult<UserModel>> handler) {
     doAsync(future -> {

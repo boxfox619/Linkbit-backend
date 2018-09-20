@@ -2,11 +2,11 @@ package com.boxfox.cross.wallet;
 
 import static com.boxfox.cross.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 
-import com.boxfox.cross.common.vertx.service.AbstractService;
 import com.boxfox.cross.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.wallet.indexing.IndexingService;
 import com.boxfox.cross.wallet.model.TransactionResult;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
+import com.boxfox.vertx.vertx.service.AbstractService;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
 import io.vertx.core.Future;
@@ -14,7 +14,7 @@ import io.vertx.core.Vertx;
 
 import java.util.List;
 
-public abstract class WalletService extends AbstractService{
+public abstract class WalletService extends AbstractService {
   private IndexingService indexingService;
   protected String symbol;
 

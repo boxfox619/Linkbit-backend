@@ -19,11 +19,13 @@ import org.web3j.utils.Convert;
 import static com.boxfox.cross.service.network.RequestService.request;
 
 public class EthIndexingService implements IndexingService {
+    private Vertx vertx;
     private Web3j web3;
     private static final String URL = "http://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM";
 
-    protected EthIndexingService(Web3j web3) {
+    protected EthIndexingService(Web3j web3, Vertx vertx) {
         this.web3 = web3;
+        this.vertx = vertx;
     }
 
     @Override
@@ -40,11 +42,11 @@ public class EthIndexingService implements IndexingService {
                     String to = tx.getString("to");
                     String value = tx.getString("value");
                     String timeStamp = tx.getString("timeStamp");
-                    Timestamp timestamp = new Timestamp(System.currentTimeMillis()-Integer.valueOf(timeStamp));
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Integer.valueOf(timeStamp));
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
                     String dateTime = simpleDateFormat.format(timestamp);
                     BigDecimal amount = Convert.fromWei(value, Convert.Unit.ETHER);
-                    TransactionDao dao = new TransactionDao(PostgresConfig.create());
+                    TransactionDao dao = new TransactionDao(PostgresConfig.create(), this.vertx);
                     Transaction transaction = new Transaction();
                     transaction.setHash(hash);
                     transaction.setSourceaddress(from);

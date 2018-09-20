@@ -1,15 +1,13 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.cross.common.vertx.router.AbstractJooqService;
 import io.one.sys.db.tables.pojos.Locale;
 import io.one.sys.db.tables.daos.LocaleDao;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
-import java.util.List;
-
-public class LocaleService extends AbstractService {
+public class LocaleService extends AbstractJooqService {
 
     public void getLocaleMoneySymbol(String locale, Handler<AsyncResult<String>> res) {
         doAsync(future -> {
@@ -17,10 +15,10 @@ public class LocaleService extends AbstractService {
         }, res);
     }
 
-    public String getLocaleMoneySymbol(String locale){
+    public String getLocaleMoneySymbol(String localeStr){
         String currencySymbol = "KRW";
         LocaleDao localeDao = new LocaleDao(PostgresConfig.create(), getVertx());
-        Locale locale = localeDao.findOneById(locale).result();
+        Locale locale = localeDao.findOneById(localeStr).result();
         if (locale!=null) {
             currencySymbol = locale.getCurrency();
         }

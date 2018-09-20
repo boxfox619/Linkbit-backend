@@ -3,7 +3,7 @@ package com.boxfox.cross.service;
 import static io.one.sys.db.tables.Account.ACCOUNT;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
-import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.vertx.vertx.service.AbstractService;
 import org.jooq.DSLContext;
 
 public class AddressService extends AbstractService {

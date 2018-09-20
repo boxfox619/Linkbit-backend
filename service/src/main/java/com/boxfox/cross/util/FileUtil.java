@@ -1,7 +1,6 @@
 package com.boxfox.cross.util;
 
-import com.boxfox.cross.common.secure.AES256;
-import com.boxfox.cross.common.secure.SHA256;
+import com.boxfox.vertx.secure.AES256;
 import com.google.common.io.Files;
 
 import java.io.File;

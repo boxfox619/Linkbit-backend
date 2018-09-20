@@ -1,9 +1,9 @@
 package com.boxfox.cross.service;
 
-import com.boxfox.cross.common.vertx.service.AbstractService;
+import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.vertx.service.Service;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.boxfox.cross.common.vertx.service.Service;
 
 import java.util.HashMap;
 import java.util.Locale;

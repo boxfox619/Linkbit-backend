@@ -1,11 +1,11 @@
 package com.boxfox.cross.wallet.eth;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.data.Config;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceException;
 import com.boxfox.cross.wallet.model.TransactionResult;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
+import com.boxfox.vertx.data.Config;
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -21,6 +21,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -60,7 +61,7 @@ public class EthereumService extends WalletService {
 
   @Override
   public void init(){
-    setIndexingService(new EthIndexingService(web3));
+    setIndexingService(new EthIndexingService(web3, getVertx()));
   }
 
   @Override
@@ -143,12 +144,12 @@ public class EthereumService extends WalletService {
     Future<List<TransactionModel>> future = Future.future();
     new Thread(() -> {
       List<TransactionModel> txStatusList = new ArrayList<>();
-      TransactionDao transactionDao = new TransactionDao(PostgresConfig.create());
-      AccountDao accountDao  = new AccountDao(PostgresConfig.create());
-      WalletDao walletDao = new WalletDao(PostgresConfig.create());
+      TransactionDao transactionDao = new TransactionDao(PostgresConfig.create(),getVertx());
+      AccountDao accountDao  = new AccountDao(PostgresConfig.create(),getVertx());
+      WalletDao walletDao = new WalletDao(PostgresConfig.create(),getVertx());
       List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
-      transactionDao.fetchByTargetaddress(address).forEach(t -> {transactions.add(t);});
-      transactionDao.fetchBySourceaddress(address).forEach(t -> {transactions.add(t);});
+      transactionDao.findManyByTargetaddress(Arrays.asList(address)).result().forEach(t -> {transactions.add(t);});
+      transactionDao.findManyBySourceaddress(Arrays.asList(address)).result().forEach(t -> {transactions.add(t);});
       for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
         TransactionModel txStatus = new TransactionModel();
         txStatus.setTransactionHash(tx.getHash());
@@ -157,11 +158,11 @@ public class EthereumService extends WalletService {
         txStatus.setTargetAddress(tx.getTargetaddress());
         txStatus.setTransactionHash(tx.getHash());
         txStatus.setDate(tx.getDatetime());
-        List<Wallet> wallets = walletDao.fetchByAddress(tx.getTargetaddress());
-        if(wallets.size() > 0){
-          txStatus.setTargetProfile(wallets.get(0).getName());
-        }else{
-         txStatus.setTargetProfile("Unknown");
+        Wallet wallet = walletDao.findOneById(tx.getTargetaddress()).result();
+        if (wallet != null) {
+          txStatus.setTargetProfile(wallet.getName());
+        } else {
+          txStatus.setTargetProfile("Unknown");
         }
         //txStatus.setStatus();
         //txStatus.setBlockNumber();

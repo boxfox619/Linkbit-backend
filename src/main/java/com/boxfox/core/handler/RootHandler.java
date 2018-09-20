@@ -1,8 +1,8 @@
 package com.boxfox.core.handler;
 
 import com.boxfox.core.MainVerticle;
-import com.boxfox.cross.common.vertx.router.RouteRegistration;
-import com.boxfox.cross.common.vertx.router.RouterMapDoc;
+import com.boxfox.vertx.vertx.router.RouteRegistration;
+import com.boxfox.vertx.vertx.router.RouterMapDoc;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
