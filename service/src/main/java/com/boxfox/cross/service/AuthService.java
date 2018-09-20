@@ -18,7 +18,7 @@ public class AuthService extends AbstractService {
 
   public void signin(String token, Handler<AsyncResult<UserModel>> handler) {
     doAsync(future -> {
-      AccountDao data = new AccountDao(PostgresConfig.create());
+      AccountDao data = new AccountDao(PostgresConfig.create(), getVertx());
       try {
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(token).get();
         if (decodedToken != null) {
@@ -27,7 +27,7 @@ public class AuthService extends AbstractService {
           user.setName(decodedToken.getName());
           user.setEmail(decodedToken.getEmail());
           user.setProfileUrl(decodedToken.getPicture());
-          if (data.fetchByUid(decodedToken.getUid()).size() == 0) {
+          if (data.findOneById(decodedToken.getUid())!=null) {
             useContext(ctx -> {
               String address = AddressService.createRandomAddress(ctx);
               user.setLinkbitAddress(address);
@@ -42,8 +42,7 @@ public class AuthService extends AbstractService {
                         });*/
             });
           } else {
-            user.setLinkbitAddress(
-                data.fetchByUid(user.getUid()).get(0).getAddress());
+            user.setLinkbitAddress(data.findOneById(user.getUid()).result().getAddress());
           }
           future.complete(user);
         } else {
@@ -56,8 +55,8 @@ public class AuthService extends AbstractService {
   }
 
   public UserModel getAccountByUid(String uid) {
-    AccountDao dao = new AccountDao(PostgresConfig.create());
-    Account account = dao.fetchOneByUid(uid);
+    AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
+    Account account = dao.findOneById(uid).result();
     UserModel user = new UserModel();
     user.setUid(account.getUid());
     user.setEmail(account.getEmail());

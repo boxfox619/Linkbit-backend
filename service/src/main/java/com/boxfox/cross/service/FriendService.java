@@ -23,11 +23,11 @@ public class FriendService extends AbstractService {
     public void loadFriends(String uid, Handler<AsyncResult<List<UserModel>>> res) {
         doAsync(future -> {
             List<UserModel> friends = new ArrayList();
-            AccountDao dao = new AccountDao(PostgresConfig.create());
+            AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
             useContext(ctx -> {
                 ctx.selectFrom(FRIEND).where(FRIEND.UID_1.eq(uid).or(FRIEND.UID_2.eq(uid))).fetch().forEach(r -> {
                     String target = r.getUid_1().equals(uid) ? r.getUid_2() : r.getUid_1();
-                    Account acc = dao.fetchOneByUid(target);
+                    Account acc = dao.findOneById(target).result();
                     UserModel user = new UserModel();
                     user.setName(acc.getName());
                     user.setEmail(acc.getEmail());
@@ -43,7 +43,7 @@ public class FriendService extends AbstractService {
 
     public void getUser(String uid, Handler<AsyncResult<UserModel>> res) {
         doAsync(future -> {
-            AccountDao dao = new AccountDao(PostgresConfig.create());
+            AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
             useContext(ctx -> {
                 ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).fetch().forEach(r -> {
                     if (r.size() > 0) {
@@ -66,8 +66,8 @@ public class FriendService extends AbstractService {
 
     public void addFriend(String ownUid, String uid, Handler<AsyncResult<Void>> res) {
         doAsync(future -> {
-            AccountDao dao = new AccountDao(PostgresConfig.create());
-            if (dao.fetchOneByUid(uid) == null) {
+            AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
+            if (dao.findOneById(uid) == null) {
                 future.fail("Target user can not found");
             } else {
                 useContext(ctx -> {
@@ -84,8 +84,8 @@ public class FriendService extends AbstractService {
 
     public void deleteFriend(String ownUid, String uid, Handler<AsyncResult<Void>> res) {
         doAsync(future -> {
-            AccountDao dao = new AccountDao(PostgresConfig.create());
-            if (dao.fetchOneByUid(uid) == null) {
+            AccountDao dao = new AccountDao(PostgresConfig.create(),getVertx());
+            if (dao.findOneById(uid) == null) {
                 future.fail("Target user can not found");
             } else {
                 useContext(ctx -> {
