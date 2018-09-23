@@ -6,6 +6,7 @@ import com.boxfox.vertx.util.LogUtil;
 import com.boxfox.vertx.vertx.router.*;
 import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.service.AuthService;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.UserModel;
 import io.one.sys.db.tables.daos.AccountDao;
@@ -47,17 +48,12 @@ public class AuthRouter extends AbstractRouter {
     @RouteRegistration(uri = "/auth/info", method = HttpMethod.GET, auth = true)
     public void info(RoutingContext ctx) {
         String uid = (String)ctx.data().get("uid");
-        doAsync(future -> {
-            AccountDao accountDao = new AccountDao(PostgresConfig.create(),getVertx());
-            Account account = accountDao.findOneById(uid).result();
-            UserModel userModel = new UserModel();
-            userModel.setUid(account.getUid());
-            userModel.setEmail(account.getEmail());
-            userModel.setLinkbitAddress(account.getAddress());
-            userModel.setName(account.getName());
-            userModel.setProfileUrl(account.getProfile());
-            ctx.response().end(gson.toJson(userModel));
-            future.complete();
+        this.authService.getAccountByUid(uid, res -> {
+            if(res.succeeded()){
+                ctx.response().end(gson.toJson(res));
+            }else{
+                ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_NOT_FOUND).end();
+            }
         });
     }
 }

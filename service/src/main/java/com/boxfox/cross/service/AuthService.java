@@ -54,13 +54,21 @@ public class AuthService extends AbstractJooqService {
     }, handler);
   }
 
-  public UserModel getAccountByUid(String uid) {
-    AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
-    Account account = dao.findOneById(uid).result();
-    UserModel user = new UserModel();
-    user.setUid(account.getUid());
-    user.setEmail(account.getEmail());
-    user.setName(account.getName());
-    return user;
+  public void getAccountByUid(String uid, Handler<AsyncResult<UserModel>> hander){
+    doAsync(future -> {
+      AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
+      Account account = dao.findOneById(uid).result();
+      if(account==null){
+        future.fail("User not found");
+      }else {
+        UserModel user = new UserModel();
+        user.setUid(account.getUid());
+        user.setEmail(account.getEmail());
+        user.setLinkbitAddress(account.getAddress());
+        user.setName(account.getName());
+        user.setProfileUrl(account.getProfile());
+        future.complete(user);
+      }
+    }, hander);
   }
 }
