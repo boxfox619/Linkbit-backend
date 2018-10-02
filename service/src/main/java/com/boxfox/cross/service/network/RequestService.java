@@ -1,7 +1,8 @@
 package com.boxfox.cross.service.network;
 
-import io.vertx.core.Future;
-
+import com.boxfox.vertx.vertx.service.AsyncService;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,9 +11,8 @@ import java.net.URL;
 
 public class RequestService {
 
-    public static Future<String> request(String url) {
-        Future<String> future = Future.future();
-        new Thread(() -> {
+    public static void request(String url, Handler<AsyncResult<String>> resultHandler) {
+        AsyncService.getInstance().doAsync("http-request", taskFuture -> {
             try {
                 URL obj = new URL(url);
                 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -25,11 +25,10 @@ public class RequestService {
                     response.append(inputLine);
                 }
                 in.close();
-                future.complete(response.toString());
-            }catch (IOException e){
-                future.fail(e);
+                taskFuture.complete(response.toString());
+            } catch (IOException e) {
+                taskFuture.fail(e);
             }
-        }).start();
-        return future;
+        }, resultHandler);
     }
 }

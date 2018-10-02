@@ -31,7 +31,7 @@ public class EthIndexingService implements IndexingService {
     @Override
     public Future<Void> indexing(Vertx vertx, String address) {
         Future future = Future.future();
-        request(URL + "&address=" + address).setHandler(e -> {
+        request(URL + "&address=" + address,e -> {
             if (e.succeeded()) {
                 JsonObject obj = new JsonObject(e.result());
                 JsonArray transactions = obj.getJsonArray("result");

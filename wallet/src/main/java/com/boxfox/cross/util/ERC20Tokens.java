@@ -10,7 +10,7 @@ public class ERC20Tokens {
   private JsonArray tokens;
 
   private ERC20Tokens() {
-    request(TOKEN_INFO_URL).setHandler(event -> {
+    request(TOKEN_INFO_URL, event -> {
       if (event.succeeded()) {
         tokens = new JsonArray(event.result());
       }
