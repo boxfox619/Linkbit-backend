@@ -1,12 +1,14 @@
 package com.boxfox.core.router.wallet;
 
 import com.boxfox.core.router.model.WalletCreateNetworkObject;
-import com.boxfox.vertx.vertx.router.*;
-import com.boxfox.vertx.vertx.service.*;
 import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;
 import com.boxfox.cross.wallet.WalletServiceManager;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
+import com.boxfox.vertx.vertx.router.AbstractRouter;
+import com.boxfox.vertx.vertx.router.Param;
+import com.boxfox.vertx.vertx.router.RouteRegistration;
+import com.boxfox.vertx.vertx.service.Service;
 import com.google.api.client.http.HttpStatusCodes;
 import com.linkbit.android.entity.WalletModel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -18,7 +20,7 @@ public class WalletManageRouter extends AbstractRouter {
     @Service
     protected WalletDatabaseService walletDatabaseService;
 
-    @RouteRegistration(uri = "/wallet", method = HttpMethod.POST, auth = true)
+    @RouteRegistration(uri = "/wallet/new", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description, @Param boolean major, @Param boolean open) {
         String uid = (String) ctx.data().get("uid");
         doAsync(future -> {
@@ -53,6 +55,31 @@ public class WalletManageRouter extends AbstractRouter {
             }
         }, res -> {
             if(res.succeeded()){
+                ctx.response().end(gson.toJson(res.result()));
+            } else {
+                ctx.response()
+                    .setStatusMessage(res.cause().getMessage())
+                    .setStatusCode(HttpResponseStatus.BAD_REQUEST.code())
+                    .end();
+            }
+        });
+    }
+
+    @RouteRegistration(uri = "/wallet/add", method = HttpMethod.POST, auth = true)
+    public void add(RoutingContext ctx, @Param String address, @Param String symbol, @Param String name, @Param String description, @Param boolean major, @Param boolean open) {
+        String uid = (String) ctx.data().get("uid");
+        doAsync(future -> {
+            walletDatabaseService
+                .createWallet(uid, symbol, name, address, description, open, major,
+                    dbRes -> {
+                        if (dbRes.succeeded()) {
+                            future.complete(dbRes.result());
+                        } else {
+                            future.fail("Failure create wallet");
+                        }
+                    });
+        }, res -> {
+            if (res.succeeded()){
                 ctx.response().end(gson.toJson(res.result()));
             } else {
                 ctx.response()
