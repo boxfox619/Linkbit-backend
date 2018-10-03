@@ -1,7 +1,7 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.router.AbstractJooqService;
+import com.boxfox.vertx.vertx.service.AbstractService;
 import com.linkbit.android.entity.UserModel;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.pojos.Account;
@@ -13,12 +13,13 @@ import org.jooq.Result;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.boxfox.cross.util.JooqUtil.useContext;
 import static io.one.sys.db.Tables.ACCOUNT;
 import static io.one.sys.db.Tables.FRIEND;
 import static io.one.sys.db.Tables.WALLET;
 
 
-public class FriendService extends AbstractJooqService {
+public class FriendService extends AbstractService {
 
     public void loadFriends(String uid, Handler<AsyncResult<List<UserModel>>> res) {
         doAsync(future -> {

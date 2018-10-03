@@ -1,14 +1,13 @@
-package com.boxfox.cross.common.vertx.router;
+package com.boxfox.cross.util;
 
 import com.boxfox.cross.common.data.DataSource;
-import com.boxfox.vertx.vertx.service.AbstractService;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
-public class AbstractJooqService extends AbstractService {
+public class JooqUtil {
 
-    protected void useContext(ContextJob job){
+    public static void useContext(ContextJob job){
         DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
         job.execute(ctx);
         ctx.close();

@@ -1,13 +1,13 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.vertx.router.AbstractJooqService;
+import com.boxfox.vertx.vertx.service.AbstractService;
 import io.one.sys.db.tables.pojos.Locale;
 import io.one.sys.db.tables.daos.LocaleDao;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
-public class LocaleService extends AbstractJooqService {
+public class LocaleService extends AbstractService {
 
     public void getLocaleMoneySymbol(String locale, Handler<AsyncResult<String>> res) {
         doAsync(future -> {

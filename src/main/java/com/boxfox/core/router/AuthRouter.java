@@ -1,7 +1,6 @@
 package com.boxfox.core.router;
 
 
-import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.vertx.util.LogUtil;
 import com.boxfox.vertx.vertx.router.*;
 import com.boxfox.vertx.vertx.service.*;
@@ -9,8 +8,6 @@ import com.boxfox.cross.service.AuthService;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.UserModel;
-import io.one.sys.db.tables.daos.AccountDao;
-import io.one.sys.db.tables.pojos.Account;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
