@@ -3,7 +3,7 @@ package com.boxfox.cross.service;
 import com.boxfox.cross.service.model.ShareContent;
 import com.boxfox.vertx.data.Config;
 import com.boxfox.vertx.secure.AES256;
-import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AbstractService;
 import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;

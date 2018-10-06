@@ -1,7 +1,7 @@
 package com.boxfox.cross.service;
 
-import com.boxfox.vertx.vertx.service.AbstractService;
-import com.boxfox.vertx.vertx.service.Service;
+import com.boxfox.vertx.service.AbstractService;
+import com.boxfox.vertx.service.Service;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 

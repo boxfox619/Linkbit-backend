@@ -4,7 +4,7 @@ import static com.boxfox.cross.util.JooqUtil.useContext;
 import static io.one.sys.db.Tables.ACCOUNT;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AbstractService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.linkbit.android.entity.UserModel;

@@ -1,7 +1,7 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AbstractService;
 import io.one.sys.db.tables.pojos.Locale;
 import io.one.sys.db.tables.daos.LocaleDao;
 import io.vertx.core.AsyncResult;

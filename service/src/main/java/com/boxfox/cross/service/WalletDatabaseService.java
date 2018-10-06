@@ -6,7 +6,7 @@ import static io.one.sys.db.tables.Account.ACCOUNT;
 import static io.one.sys.db.tables.Majorwallet.MAJORWALLET;
 import static io.one.sys.db.tables.Wallet.WALLET;
 
-import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AbstractService;
 import com.linkbit.android.entity.WalletModel;
 import io.one.sys.db.tables.records.MajorwalletRecord;
 import io.one.sys.db.tables.records.WalletRecord;

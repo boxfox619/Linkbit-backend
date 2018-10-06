@@ -6,7 +6,7 @@ import com.boxfox.cross.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.wallet.indexing.IndexingService;
 import com.boxfox.cross.wallet.model.TransactionResult;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
-import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AbstractService;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
 import io.vertx.core.Future;

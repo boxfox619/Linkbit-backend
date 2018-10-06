@@ -1,7 +1,7 @@
 package com.boxfox.core.router;
 
-import com.boxfox.vertx.vertx.router.*;
-import com.boxfox.vertx.vertx.service.*;
+import com.boxfox.vertx.router.*;
+import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.FriendService;
 import com.google.gson.Gson;
 import io.vertx.core.http.HttpMethod;

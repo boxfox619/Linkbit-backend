@@ -2,8 +2,8 @@ package com.boxfox.core.router;
 
 
 import com.boxfox.vertx.util.LogUtil;
-import com.boxfox.vertx.vertx.router.*;
-import com.boxfox.vertx.vertx.service.*;
+import com.boxfox.vertx.router.*;
+import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.AuthService;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.gson.Gson;

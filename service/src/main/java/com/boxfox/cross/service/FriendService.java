@@ -1,7 +1,7 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.vertx.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AbstractService;
 import com.linkbit.android.entity.UserModel;
 import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.pojos.Account;

@@ -3,8 +3,8 @@ package com.boxfox.core.router.wallet;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.vertx.vertx.router.*;
-import com.boxfox.vertx.vertx.service.*;
+import com.boxfox.vertx.router.*;
+import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.PriceService;
 import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.wallet.WalletService;

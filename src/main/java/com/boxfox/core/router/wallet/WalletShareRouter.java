@@ -1,7 +1,7 @@
 package com.boxfox.core.router.wallet;
 
-import com.boxfox.vertx.vertx.router.*;
-import com.boxfox.vertx.vertx.service.*;
+import com.boxfox.vertx.router.*;
+import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.ShareService;
 import com.boxfox.cross.service.WalletDatabaseService;
 import com.boxfox.cross.service.model.ShareContent;

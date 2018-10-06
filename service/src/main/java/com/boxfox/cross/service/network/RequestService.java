@@ -1,6 +1,6 @@
 package com.boxfox.cross.service.network;
 
-import com.boxfox.vertx.vertx.service.AsyncService;
+import com.boxfox.vertx.service.AsyncService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.io.BufferedReader;
