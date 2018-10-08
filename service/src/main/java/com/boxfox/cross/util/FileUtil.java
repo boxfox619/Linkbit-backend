@@ -11,8 +11,8 @@ public class FileUtil {
 
     public static File encryptFile(File file){
         try {
-            String fileName = AES256.encrypt(file.getName());
-            String str = AES256.encrypt(Files.toString(file, Charset.defaultCharset()));
+            String fileName = AES256Util.encrypt(file.getName());
+            String str = AES256Util.encrypt(Files.toString(file, Charset.defaultCharset()));
             File newFile = new File(file.getPath()+"/"+fileName);
             Files.write(str, newFile, Charset.defaultCharset());
             file.delete();
@@ -25,7 +25,7 @@ public class FileUtil {
 
     public static String decryptFile(File file){
         try {
-            String str = AES256.decrypt(Files.toString(file, Charset.defaultCharset()));
+            String str = AES256Util.decrypt(Files.toString(file, Charset.defaultCharset()));
             return str;
         } catch (IOException e) {
             e.printStackTrace();

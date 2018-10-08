@@ -1,6 +1,7 @@
 package com.boxfox.cross.service;
 
 import com.boxfox.cross.service.model.ShareContent;
+import com.boxfox.cross.util.AES256Util;
 import com.boxfox.vertx.data.Config;
 import com.boxfox.vertx.secure.AES256;
 import com.boxfox.vertx.service.AbstractService;
@@ -31,13 +32,13 @@ public class ShareService extends AbstractService {
         content.setSymbol(symbol);
         content.setAddress(address);
         content.setAmount(amount);
-        return AES256.encrypt(gson.toJson(content));
+        return AES256Util.encrypt(gson.toJson(content));
     }
 
     public ShareContent decodeTransactionData(String data) {
         ShareContent content = null;
         if (data != null) {
-            String str = AES256.decrypt(data);
+            String str = AES256Util.decrypt(data);
             content = gson.fromJson(str, ShareContent.class);
         }
         return content;

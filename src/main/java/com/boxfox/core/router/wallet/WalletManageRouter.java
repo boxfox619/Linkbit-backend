@@ -9,6 +9,7 @@ import com.boxfox.vertx.router.AbstractRouter;
 import com.boxfox.vertx.router.Param;
 import com.boxfox.vertx.router.RouteRegistration;
 import com.boxfox.vertx.service.Service;
+import com.boxfox.vertx.util.LogUtil;
 import com.google.api.client.http.HttpStatusCodes;
 import com.linkbit.android.entity.WalletModel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -23,6 +24,7 @@ public class WalletManageRouter extends AbstractRouter {
     @RouteRegistration(uri = "/wallet/new", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description, @Param boolean major, @Param boolean open) {
         String uid = (String) ctx.data().get("uid");
+        LogUtil.getLogger().debug("Wallet create test" + uid);
         doAsync(future -> {
             if (password != null) {
                 WalletService service = WalletServiceManager.getService(symbol);
