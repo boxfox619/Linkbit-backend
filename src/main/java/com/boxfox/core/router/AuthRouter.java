@@ -1,7 +1,6 @@
 package com.boxfox.core.router;
 
 
-import com.boxfox.vertx.util.LogUtil;
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.AuthService;
@@ -11,6 +10,7 @@ import com.linkbit.android.entity.UserModel;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import static com.boxfox.cross.util.LogUtil.getLogger;
 
 public class AuthRouter extends AbstractRouter {
 
@@ -23,8 +23,8 @@ public class AuthRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/signin", method = HttpMethod.GET)
-    public void signin(RoutingContext ctx, @Param String token) {
-        LogUtil.getLogger().debug(String.format("signin token: %s", token));
+    public void signin(RoutingContext ctx, @Param(name="token") String token) {
+        getLogger().debug(String.format("signin token: %s", token));
         authService.signin(token, res -> {
             if (res.succeeded()) {
                 UserModel result = res.result();

@@ -1,7 +1,5 @@
 package com.boxfox.cross.common.vertx.middleware;
 
-import com.boxfox.vertx.data.Config;
-import com.boxfox.vertx.util.LogUtil;
 import com.google.common.net.HttpHeaders;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
@@ -31,14 +29,11 @@ public class LoggerHandlerImpl implements LoggerHandler {
           uid = decodedToken.getUid();
         }
       } catch (InterruptedException | ExecutionException e) {
-        LogUtil.getLogger().debug(e.getMessage());
+        Logger.getRootLogger().debug(e.getMessage());
       }
     }
     String log = String.format("URL : %s / UID : %s", url, uid);
     this.logger.info(log);
-    if(Config.getDefaultInstance().getBoolean("debug")){
-      System.out.println(log);
-    }
     ctx.next();
   }
 

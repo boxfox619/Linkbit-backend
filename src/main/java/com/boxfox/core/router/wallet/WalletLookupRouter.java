@@ -59,7 +59,7 @@ public class WalletLookupRouter extends AbstractRouter {
   }
 
   @RouteRegistration(uri = "/wallet/balance", method = HttpMethod.GET, auth = true)
-  public void getBalance(RoutingContext ctx, @Param String address) {
+  public void getBalance(RoutingContext ctx, @Param(name = "address") String address) {
     walletDatabaseService.findByAddress(address, res -> {
       if (res.result() != null) {
         WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
@@ -77,7 +77,7 @@ public class WalletLookupRouter extends AbstractRouter {
   }
 
   @RouteRegistration(uri = "/wallet/price", method = HttpMethod.GET, auth = true)
-  public void getPrice(RoutingContext ctx, @Param String address) {
+  public void getPrice(RoutingContext ctx, @Param(name = "address") String address) {
     String locale = ctx.data().get("locale").toString();
     walletDatabaseService.findByAddress(address, res -> {
       String symbol = res.result().getCoinSymbol();
@@ -95,7 +95,7 @@ public class WalletLookupRouter extends AbstractRouter {
   }
 
   @RouteRegistration(uri = "/wallet/balance/all", method = HttpMethod.GET, auth = true)
-  public void getTotalBalance(RoutingContext ctx, @Param String symbol) {
+  public void getTotalBalance(RoutingContext ctx, @Param(name = "symbol") String symbol) {
     doAsync(future -> {
       String uid = (String) ctx.data().get("uid");
       WalletService walletService = WalletServiceManager.getService(symbol);
@@ -116,7 +116,7 @@ public class WalletLookupRouter extends AbstractRouter {
   }
 
   @RouteRegistration(uri = "/wallet/price/all", method = HttpMethod.GET, auth = true)
-  public void getTotalPrice(RoutingContext ctx, @Param String symbol) {
+  public void getTotalPrice(RoutingContext ctx, @Param(name = "symbol") String symbol) {
     String locale = ctx.data().get("locale").toString();
     doAsync(future -> {
       String uid = (String) ctx.data().get("uid");
@@ -139,7 +139,7 @@ public class WalletLookupRouter extends AbstractRouter {
   }
 
   @RouteRegistration(uri = "/wallet", method = HttpMethod.GET, auth = true)
-  public void walletInfoLookup(RoutingContext ctx, @Param String address) {
+  public void walletInfoLookup(RoutingContext ctx, @Param(name = "address") String address) {
     walletDatabaseService.findByAddress(address, res -> {
       if (res.result() == null) {
         ctx.response().setStatusCode(NO_CONTENT.code());

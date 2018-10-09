@@ -18,12 +18,12 @@ public class RemittanceRouter extends AbstractRouter {
 
     @RouteRegistration(uri = "/remittance", method = HttpMethod.POST, auth = true)
     public void send(RoutingContext ctx,
-                     @Param String symbol,
-                     @Param String walletName,
-                     @Param String walletData,
-                     @Param String password,
-                     @Param String targetAddress,
-                     @Param String amount) {
+                     @Param(name = "symbol") String symbol,
+                     @Param(name = "walletName") String walletName,
+                     @Param(name = "walletData") String walletData,
+                     @Param(name = "password") String password,
+                     @Param(name = "targetAddress") String targetAddress,
+                     @Param(name = "amount") String amount) {
         WalletService service = WalletServiceManager.getService(symbol);
         walletDatabaseService.findByAddress(targetAddress, res -> {
             WalletModel wallet = res.result();

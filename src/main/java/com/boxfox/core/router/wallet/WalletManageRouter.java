@@ -9,12 +9,13 @@ import com.boxfox.vertx.router.AbstractRouter;
 import com.boxfox.vertx.router.Param;
 import com.boxfox.vertx.router.RouteRegistration;
 import com.boxfox.vertx.service.Service;
-import com.boxfox.vertx.util.LogUtil;
 import com.google.api.client.http.HttpStatusCodes;
 import com.linkbit.android.entity.WalletModel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
+
+import static com.boxfox.cross.util.LogUtil.getLogger;
 
 public class WalletManageRouter extends AbstractRouter {
 
@@ -22,9 +23,15 @@ public class WalletManageRouter extends AbstractRouter {
     protected WalletDatabaseService walletDatabaseService;
 
     @RouteRegistration(uri = "/wallet/new", method = HttpMethod.POST, auth = true)
-    public void create(RoutingContext ctx, @Param String symbol, @Param String name, @Param String password, @Param String description, @Param boolean major, @Param boolean open) {
+    public void create(RoutingContext ctx,
+                       @Param(name = "address") String symbol,
+                       @Param(name = "name") String name,
+                       @Param(name = "password") String password,
+                       @Param(name = "description") String description,
+                       @Param(name = "major") boolean major,
+                       @Param(name = "open") boolean open) {
         String uid = (String) ctx.data().get("uid");
-        LogUtil.getLogger().debug("Wallet create test" + uid);
+        getLogger().debug("Wallet create test" + uid);
         doAsync(future -> {
             if (password != null) {
                 WalletService service = WalletServiceManager.getService(symbol);
@@ -68,7 +75,13 @@ public class WalletManageRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/wallet/add", method = HttpMethod.POST, auth = true)
-    public void add(RoutingContext ctx, @Param String address, @Param String symbol, @Param String name, @Param String description, @Param boolean major, @Param boolean open) {
+    public void add(RoutingContext ctx,
+                    @Param(name="address") String address,
+                    @Param(name="symbol") String symbol,
+                    @Param(name="name") String name,
+                    @Param(name="description") String description,
+                    @Param(name="major") boolean major,
+                    @Param(name="open") boolean open) {
         String uid = (String) ctx.data().get("uid");
         doAsync(future -> {
             walletDatabaseService
@@ -93,7 +106,12 @@ public class WalletManageRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/wallet", method = HttpMethod.PUT, auth = true)
-    public void updateWallet(RoutingContext ctx, @Param String address, @Param String name, @Param String description, @Param boolean major, @Param boolean open) {
+    public void updateWallet(RoutingContext ctx,
+                             @Param(name = "address") String address,
+                             @Param(name = "name") String name,
+                             @Param(name = "description") String description,
+                             @Param(name = "major") boolean major,
+                             @Param(name = "open") boolean open) {
         String uid = (String) ctx.data().get("uid");
         walletDatabaseService.checkOwner(uid, address, res -> {
             if (res.succeeded()) {
@@ -119,7 +137,7 @@ public class WalletManageRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/wallet", method = HttpMethod.DELETE)
-    public void deleteWallet(RoutingContext ctx, @Param String address) {
+    public void deleteWallet(RoutingContext ctx, @Param(name = "address") String address) {
         String uid = (String) ctx.data().get("uid");
         walletDatabaseService.checkOwner(uid, address, res -> {
             if (res.succeeded()) {

@@ -19,14 +19,14 @@ public class FriendRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/search/account/list", method = HttpMethod.GET, auth = true)
-    public void search(RoutingContext ctx, @Param String text) {
+    public void search(RoutingContext ctx, @Param(name="text") String text) {
         friendService.serachUsers(text, res -> {
             ctx.response().end(gson.toJson(res.result()));
         });
     }
 
     @RouteRegistration(uri = "/search/account", method = HttpMethod.GET, auth = true)
-    public void searchAccount(RoutingContext ctx, @Param String uid) {
+    public void searchAccount(RoutingContext ctx, @Param(name="uid") String uid) {
         friendService.getUser(uid, res -> {
             ctx.response().end(gson.toJson(res.result()));
         });
@@ -42,7 +42,7 @@ public class FriendRouter extends AbstractRouter {
 
 
     @RouteRegistration(uri = "/friend", method = HttpMethod.PUT, auth = true)
-    public void addFriend(RoutingContext ctx, @Param String targetUid) {
+    public void addFriend(RoutingContext ctx, @Param(name="uid") String targetUid) {
         String ownUid = (String) ctx.data().get("uid");
         friendService.addFriend(ownUid, targetUid, res -> {
             if (res.succeeded()) {
@@ -54,7 +54,7 @@ public class FriendRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/friend", method = HttpMethod.DELETE, auth = true)
-    public void deleteFriend(RoutingContext ctx, @Param String targetUid) {
+    public void deleteFriend(RoutingContext ctx, @Param(name="uid") String targetUid) {
         String ownUid = (String) ctx.data().get("uid");
         friendService.deleteFriend(ownUid, targetUid, res -> {
             if (res.succeeded()) {

@@ -23,14 +23,16 @@ public class TransactionRouter extends AbstractRouter {
     private WalletDatabaseService walletDatabaseService;
 
     @RouteRegistration(uri = "/transaction", method = HttpMethod.GET, auth = true)
-    public void lookupTransaction(RoutingContext ctx, @Param String symbol, @Param String txHash) {
+    public void lookupTransaction(RoutingContext ctx,
+                                  @Param(name="symbol") String symbol,
+                                  @Param(name="txHash") String txHash) {
         WalletService service = WalletServiceManager.getService(symbol);
         TransactionModel transaction = service.getTransaction(txHash);
         ctx.response().setChunked(true).write(gson.toJson(transaction)).end();
     }
 
     @RouteRegistration(uri = "/transaction/count", method = HttpMethod.GET, auth = true)
-    public void wallTransactionCount(RoutingContext ctx, @Param String address) {
+    public void wallTransactionCount(RoutingContext ctx, @Param(name="symbol") String address) {
         walletDatabaseService.findByAddress(address, res -> {
             if (res.result() != null) {
                 WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
@@ -43,7 +45,11 @@ public class TransactionRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/transaction/list", method = HttpMethod.GET, auth = true)
-    public void walletTransactionList(RoutingContext ctx, @Param String address, @Param int page, @Param int count) {
+    public void walletTransactionList(RoutingContext ctx,
+                                      @Param(name="symbol") String address,
+                                      @Param(name="page") int page,
+                                      @Param(name="count") int count) {
+        //@TODO transaction list pagenation
         walletDatabaseService.findByAddress(address, res -> {
             if (res.result() != null) {
                 WalletService service = WalletServiceManager.getService(res.result().getCoinSymbol());
@@ -84,7 +90,7 @@ public class TransactionRouter extends AbstractRouter {
     }
 
     @RouteRegistration(uri = "/transaction/all/list", method = HttpMethod.GET, auth = true)
-    public void allTransactionList(RoutingContext ctx, @Param int page, @Param int count) {
+    public void allTransactionList(RoutingContext ctx, @Param(name = "page") int page, @Param(name = "count") int count) {
         String uid = (String) ctx.data().get("uid");
         doAsync(future -> {
             WalletDao dao = new WalletDao(PostgresConfig.create(), getVertx());
