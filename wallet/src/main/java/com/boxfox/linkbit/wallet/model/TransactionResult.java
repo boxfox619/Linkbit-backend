@@ -1,4 +1,4 @@
-package com.boxfox.cross.wallet.model;
+package com.boxfox.linkbit.wallet.model;
 
 public class TransactionResult {
   private boolean status = false;

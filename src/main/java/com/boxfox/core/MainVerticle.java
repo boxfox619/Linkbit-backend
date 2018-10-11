@@ -2,13 +2,13 @@ package com.boxfox.core;
 
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
-import com.boxfox.cross.wallet.WalletServiceManager;
-import com.boxfox.cross.wallet.eth.EthereumService;
+import com.boxfox.linkbit.wallet.WalletServiceManager;
+import com.boxfox.linkbit.wallet.eth.EthereumService;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.vertx.util.FirebaseUtil;
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
-import com.boxfox.cross.wallet.indexing.TransactionIndexingVerticle;
+import com.boxfox.linkbit.wallet.indexing.TransactionIndexingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -44,9 +44,6 @@ public class MainVerticle extends AbstractVerticle {
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
             System.out.println("Server started : "+ server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
-            EthereumService ethereumService = new EthereumService(vertx);
-            ethereumService.init();
-            WalletServiceManager.register("ETH", ethereumService);
         });
         future.complete();
     }

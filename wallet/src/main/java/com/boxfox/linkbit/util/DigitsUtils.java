@@ -1,4 +1,4 @@
-package com.boxfox.cross.util;
+package com.boxfox.linkbit.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

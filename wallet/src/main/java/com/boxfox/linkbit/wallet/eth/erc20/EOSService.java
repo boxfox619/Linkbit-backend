@@ -1,4 +1,4 @@
-package com.boxfox.cross.wallet.eth.erc20;
+package com.boxfox.linkbit.wallet.eth.erc20;
 
 import io.vertx.core.Vertx;
 

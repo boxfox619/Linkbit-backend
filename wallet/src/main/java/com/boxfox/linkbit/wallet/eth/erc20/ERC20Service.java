@@ -1,13 +1,13 @@
-package com.boxfox.cross.wallet.eth.erc20;
+package com.boxfox.linkbit.wallet.eth.erc20;
 
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
-import com.boxfox.cross.util.DigitsUtils;
-import com.boxfox.cross.util.ERC20Tokens;
-import com.boxfox.cross.wallet.WalletService;
-import com.boxfox.cross.wallet.WalletServiceException;
-import com.boxfox.cross.wallet.model.TransactionResult;
-import com.boxfox.cross.wallet.model.WalletCreateResult;
+import com.boxfox.linkbit.util.DigitsUtils;
+import com.boxfox.linkbit.util.ERC20Tokens;
+import com.boxfox.linkbit.wallet.WalletService;
+import com.boxfox.linkbit.wallet.WalletServiceException;
+import com.boxfox.linkbit.wallet.model.TransactionResult;
+import com.boxfox.linkbit.wallet.model.WalletCreateResult;
 import com.boxfox.vertx.data.Config;
 import com.google.common.io.Files;
 import com.google.firebase.internal.NonNull;

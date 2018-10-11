@@ -1,6 +1,6 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
-import com.boxfox.cross.wallet.part.BalancePart;
+import com.boxfox.linkbit.wallet.part.BalancePart;
 import io.vertx.core.Vertx;
 import java.io.File;
 import java.io.IOException;

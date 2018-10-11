@@ -1,4 +1,4 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
 import io.vertx.core.Vertx;
 import java.io.File;

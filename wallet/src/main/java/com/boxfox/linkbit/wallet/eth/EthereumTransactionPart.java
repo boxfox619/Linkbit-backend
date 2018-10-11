@@ -1,9 +1,9 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.wallet.WalletServiceException;
-import com.boxfox.cross.wallet.model.TransactionResult;
-import com.boxfox.cross.wallet.part.TransactionPart;
+import com.boxfox.linkbit.wallet.WalletServiceException;
+import com.boxfox.linkbit.wallet.model.TransactionResult;
+import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.google.common.io.Files;
 import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.daos.TransactionDao;

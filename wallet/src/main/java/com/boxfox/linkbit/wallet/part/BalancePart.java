@@ -1,4 +1,4 @@
-package com.boxfox.cross.wallet.part;
+package com.boxfox.linkbit.wallet.part;
 
 public interface BalancePart {
   double getBalance(String address);

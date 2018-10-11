@@ -1,7 +1,7 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
-import com.boxfox.cross.wallet.model.WalletCreateResult;
-import com.boxfox.cross.wallet.part.CreateWalletPart;
+import com.boxfox.linkbit.wallet.model.WalletCreateResult;
+import com.boxfox.linkbit.wallet.part.CreateWalletPart;
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
