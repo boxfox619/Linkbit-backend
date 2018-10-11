@@ -143,34 +143,40 @@ public class EthereumService extends WalletService {
   public Future<List<TransactionModel>> getTransactionList(String address) {
     Future<List<TransactionModel>> future = Future.future();
     new Thread(() -> {
-      List<TransactionModel> txStatusList = new ArrayList<>();
-      TransactionDao transactionDao = new TransactionDao(PostgresConfig.create(),getVertx());
-      AccountDao accountDao  = new AccountDao(PostgresConfig.create(),getVertx());
-      WalletDao walletDao = new WalletDao(PostgresConfig.create(),getVertx());
-      List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
-      transactionDao.findManyByTargetaddress(Arrays.asList(address)).result().forEach(t -> {transactions.add(t);});
-      transactionDao.findManyBySourceaddress(Arrays.asList(address)).result().forEach(t -> {transactions.add(t);});
-      for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
-        TransactionModel txStatus = new TransactionModel();
-        txStatus.setTransactionHash(tx.getHash());
-        txStatus.setAmount(tx.getAmount());
-        txStatus.setSourceAddress(tx.getSourceaddress());
-        txStatus.setTargetAddress(tx.getTargetaddress());
-        txStatus.setTransactionHash(tx.getHash());
-        txStatus.setDate(tx.getDatetime());
-        Wallet wallet = walletDao.findOneById(tx.getTargetaddress()).result();
-        if (wallet != null) {
-          txStatus.setTargetProfile(wallet.getName());
-        } else {
-          txStatus.setTargetProfile("Unknown");
+      try {
+        int totalBlockNumber = web3.ethBlockNumber().send().getBlockNumber().intValue();
+        List<TransactionModel> txStatusList = new ArrayList<>();
+        TransactionDao transactionDao = new TransactionDao(PostgresConfig.create(),getVertx());
+        WalletDao walletDao = new WalletDao(PostgresConfig.create(),getVertx());
+        List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
+        transactionDao.findManyByTargetaddress(Arrays.asList(address)).result().forEach(t -> {transactions.add(t);});
+        transactionDao.findManyBySourceaddress(Arrays.asList(address)).result().forEach(t -> {transactions.add(t);});
+        for(io.one.sys.db.tables.pojos.Transaction tx : transactions) {
+          TransactionModel txStatus = new TransactionModel();
+          txStatus.setTransactionHash(tx.getHash());
+          txStatus.setAmount(tx.getAmount());
+          txStatus.setSourceAddress(tx.getSourceaddress());
+          txStatus.setTargetAddress(tx.getTargetaddress());
+          txStatus.setTransactionHash(tx.getHash());
+          txStatus.setDate(tx.getDatetime());
+          Wallet wallet = walletDao.findOneById(tx.getTargetaddress()).result();
+          if (wallet != null) {
+            txStatus.setTargetProfile(wallet.getName());
+          } else {
+            txStatus.setTargetProfile("Unknown");
+          }
+          //@TODO blocknumber, status save to db
+            TransactionReceipt receipt = web3.ethGetTransactionReceipt(tx.getHash()).send().getTransactionReceipt().get();
+            txStatus.setStatus(receipt.getStatus().equals("0x1"));
+            txStatus.setBlockNumber(receipt.getBlockNumber().intValue());
+            txStatus.setConfirmation(totalBlockNumber - txStatus.getBlockNumber());
+          txStatusList.add(txStatus);
         }
-        //txStatus.setStatus();
-        //txStatus.setBlockNumber();
-        //txStatus.setConfirmation();
-        //@TODO more add tx status
-        txStatusList.add(txStatus);
+        future.complete(txStatusList);
+      } catch (IOException e) {
+        e.printStackTrace();
+        future.fail(e);
       }
-      future.complete(txStatusList);
     }).start();
     return future;
   }
