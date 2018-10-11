@@ -33,12 +33,12 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
-public class EthereumTransactionPart extends EthereumPart implements TransactionPart {
+public class EthereumTransactionPartService extends EthereumPart implements TransactionPart {
 
   static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
   static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
 
-  public EthereumTransactionPart(Vertx vertx, Web3j web3, File cachePath) {
+  public EthereumTransactionPartService(Vertx vertx, Web3j web3, File cachePath) {
     super(vertx, web3, cachePath);
   }
 

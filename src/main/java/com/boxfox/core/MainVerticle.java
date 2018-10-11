@@ -2,9 +2,8 @@ package com.boxfox.core;
 
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
-import com.boxfox.linkbit.wallet.WalletServiceManager;
-import com.boxfox.linkbit.wallet.eth.EthereumService;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
+import com.boxfox.linkbit.wallet.WalletServiceManager;
 import com.boxfox.vertx.util.FirebaseUtil;
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
@@ -17,6 +16,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -42,8 +42,9 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
-            System.out.println("Server started : "+ server.actualPort());
+            Logger.getRootLogger().info("Server started : "+ server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
+            WalletServiceManager.init(vertx);
         });
         future.complete();
     }

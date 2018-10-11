@@ -1,6 +1,6 @@
 package com.boxfox.linkbit.wallet;
 
-import com.boxfox.linkbit.wallet.eth.EthereumService;
+import com.boxfox.linkbit.wallet.eth.EthereumServicePackage;
 import io.vertx.core.Vertx;
 
 import java.util.HashMap;
@@ -47,6 +47,6 @@ public class WalletServiceManager {
     }
 
     public static void init(Vertx vertx) {
-        register(EthereumService.create(vertx));
+        register(EthereumServicePackage.create(vertx));
     }
 }

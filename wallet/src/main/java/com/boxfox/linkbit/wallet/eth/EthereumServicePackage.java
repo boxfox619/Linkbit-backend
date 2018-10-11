@@ -12,25 +12,25 @@ import io.vertx.core.Vertx;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
-public class EthereumService extends WalletService {
-    private EthereumBalancePart balancePart;
-    private EthereumCreateWalletPart createWalletPart;
-    private EthereumTransactionPart transactionPart;
+public class EthereumServicePackage extends WalletService {
+    private EthereumBalancePartService balancePart;
+    private EthereumCreateWalletPartService createWalletPart;
+    private EthereumTransactionPartService transactionPart;
     private EthIndexingService indexingService;
 
-    private EthereumService(Vertx vertx) {
+    private EthereumServicePackage(Vertx vertx) {
         super(vertx, "ETH");
     }
 
-    public static EthereumService create(Vertx vertx) {
-        EthereumService service = new EthereumService(vertx);
+    public static EthereumServicePackage create(Vertx vertx) {
+        EthereumServicePackage service = new EthereumServicePackage(vertx);
         Web3j web3 = Web3j.build(new HttpService("https://mainnet.infura.io/v3/326b0d7561824e0b8c4ee1f30e257019"));
         File cachePath = new File(Config.getDefaultInstance().getString("cachePath", "wallets"));
         if (!cachePath.exists())
             cachePath.mkdirs();
-        service.balancePart = new EthereumBalancePart(vertx, web3, cachePath);
-        service.createWalletPart = new EthereumCreateWalletPart(vertx, web3, cachePath);
-        service.transactionPart = new EthereumTransactionPart(vertx, web3, cachePath);
+        service.balancePart = new EthereumBalancePartService(vertx, web3, cachePath);
+        service.createWalletPart = new EthereumCreateWalletPartService(vertx, web3, cachePath);
+        service.transactionPart = new EthereumTransactionPartService(vertx, web3, cachePath);
         service.indexingService = new EthIndexingService(web3, vertx);
         service.setIndexingService(service.indexingService);
         return service;

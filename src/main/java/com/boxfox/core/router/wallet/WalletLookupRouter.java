@@ -15,6 +15,8 @@ import io.one.sys.db.tables.daos.AccountDao;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +33,7 @@ public class WalletLookupRouter extends AbstractRouter {
     String locale = ctx.data().get("locale").toString();
     doAsync(future -> {
       String uid = (String) ctx.data().get("uid");
-      System.out.println("Wallet list lookup : " + uid);
+      Logger.getRootLogger().info("Wallet list lookup : " + uid);
       WalletDao dao = new WalletDao(PostgresConfig.create(), getVertx());
       AccountDao accountDao = new AccountDao(PostgresConfig.create(), getVertx());
       List<WalletModel> wallets = new ArrayList<>();
