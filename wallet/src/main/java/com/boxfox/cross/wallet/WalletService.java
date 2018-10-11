@@ -6,15 +6,17 @@ import com.boxfox.cross.wallet.indexing.IndexingMessage;
 import com.boxfox.cross.wallet.indexing.IndexingService;
 import com.boxfox.cross.wallet.model.TransactionResult;
 import com.boxfox.cross.wallet.model.WalletCreateResult;
+import com.boxfox.cross.wallet.part.BalancePart;
+import com.boxfox.cross.wallet.part.CreateWalletPart;
+import com.boxfox.cross.wallet.part.TransactionPart;
 import com.boxfox.vertx.service.AbstractService;
 import com.google.gson.Gson;
 import com.linkbit.android.entity.TransactionModel;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-
 import java.util.List;
 
-public abstract class WalletService extends AbstractService {
+public abstract class WalletService extends AbstractService implements BalancePart, CreateWalletPart, TransactionPart {
   private IndexingService indexingService;
   protected String symbol;
 
@@ -23,17 +25,48 @@ public abstract class WalletService extends AbstractService {
     this.symbol = symbol;
   }
 
-  public abstract double getBalance(String originalAddress);
+  @Override
+  public double getBalance(String originalAddress) {
+    return getBalancePart().getBalance(originalAddress);
+  }
 
-  public abstract WalletCreateResult createWallet(String password);
+  @Override
+  public WalletCreateResult createWallet(String password) {
+    return getCreateWalletPart().createWallet(password);
+  }
 
-  public abstract TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
+  @Override
+  public TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount) {
+    return getTransactionPart().send(walletFileName, walletJsonFile, password, targetAddress, amount);
+  }
 
-  public abstract Future<List<TransactionModel>> getTransactionList(String address) throws WalletServiceException;
+  @Override
+  public Future<List<TransactionModel>> getTransactionList(String address) throws WalletServiceException {
+    this.indexingTransactions(address);
+    return getTransactionPart().getTransactionList(address);
+  }
 
-  public abstract TransactionModel getTransaction(String transactionHash) throws WalletServiceException;
+  @Override
+  public TransactionModel getTransaction(String transactionHash) throws WalletServiceException {
+    return getTransactionPart().getTransaction(transactionHash);
+  }
 
-  public abstract int getTransactionCount(String address) throws WalletServiceException;
+  @Override
+  public int getTransactionCount(String address) throws WalletServiceException {
+    return getTransactionPart().getTransactionCount(address);
+  }
+
+  public BalancePart getBalancePart() {
+    return address -> 0;
+  }
+
+  public CreateWalletPart getCreateWalletPart() {
+    return password -> null;
+  }
+
+  public TransactionPart getTransactionPart() {
+    return null;
+  }
 
   public IndexingService getIndexingService(){ return this.indexingService; }
 
@@ -47,5 +80,4 @@ public abstract class WalletService extends AbstractService {
     msg.setAddress(address);
     getVertx().eventBus().publish(EVENT_SUBJECT, new Gson().toJson(msg));
   }
-
 }
