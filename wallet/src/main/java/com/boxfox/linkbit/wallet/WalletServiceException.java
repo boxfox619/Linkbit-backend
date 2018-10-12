@@ -1,4 +1,4 @@
-package com.boxfox.cross.wallet;
+package com.boxfox.linkbit.wallet;
 
 public class WalletServiceException extends RuntimeException {
 

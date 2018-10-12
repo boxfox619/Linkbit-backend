@@ -1,7 +1,7 @@
-package com.boxfox.cross.wallet.part;
+package com.boxfox.linkbit.wallet.part;
 
-import com.boxfox.cross.wallet.WalletServiceException;
-import com.boxfox.cross.wallet.model.TransactionResult;
+import com.boxfox.linkbit.wallet.WalletServiceException;
+import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.linkbit.android.entity.TransactionModel;
 import io.vertx.core.Future;
 import java.util.List;

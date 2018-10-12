@@ -1,4 +1,7 @@
-package com.boxfox.cross.wallet;
+package com.boxfox.linkbit.wallet;
+
+import com.boxfox.linkbit.wallet.eth.EthereumServicePackage;
+import io.vertx.core.Vertx;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +21,8 @@ public class WalletServiceManager {
         return CryptoCurrencyRegisteryInstance.instance;
     }
 
-    public static void register(String name, WalletService service) {
-        getInstance().serviceMap.put(name, service);
+    public static void register(WalletService service) {
+        getInstance().serviceMap.put(service.symbol, service);
     }
 
     public static void register(String[] symbols, WalletService service) {
@@ -41,5 +44,9 @@ public class WalletServiceManager {
         if (name != null)
             return getInstance().serviceMap.get(name.toUpperCase());
         return null;
+    }
+
+    public static void init(Vertx vertx) {
+        register(EthereumServicePackage.create(vertx));
     }
 }

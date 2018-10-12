@@ -1,8 +1,8 @@
-package com.boxfox.cross.wallet.indexing;
+package com.boxfox.linkbit.wallet.indexing;
 
-import static com.boxfox.cross.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
+import static com.boxfox.linkbit.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 
-import com.boxfox.cross.wallet.WalletServiceManager;
+import com.boxfox.linkbit.wallet.WalletServiceManager;
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;

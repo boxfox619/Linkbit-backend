@@ -1,9 +1,9 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.wallet.WalletServiceException;
-import com.boxfox.cross.wallet.model.TransactionResult;
-import com.boxfox.cross.wallet.part.TransactionPart;
+import com.boxfox.linkbit.wallet.WalletServiceException;
+import com.boxfox.linkbit.wallet.model.TransactionResult;
+import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.google.common.io.Files;
 import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.daos.TransactionDao;
@@ -33,12 +33,12 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
-public class EthereumTransactionPart extends EthereumPart implements TransactionPart {
+public class EthereumTransactionPartService extends EthereumPart implements TransactionPart {
 
   static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
   static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
 
-  public EthereumTransactionPart(Vertx vertx, Web3j web3, File cachePath) {
+  public EthereumTransactionPartService(Vertx vertx, Web3j web3, File cachePath) {
     super(vertx, web3, cachePath);
   }
 

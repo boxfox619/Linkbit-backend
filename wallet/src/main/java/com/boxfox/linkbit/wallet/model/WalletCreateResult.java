@@ -1,4 +1,4 @@
-package com.boxfox.cross.wallet.model;
+package com.boxfox.linkbit.wallet.model;
 
 
 import com.google.gson.JsonObject;

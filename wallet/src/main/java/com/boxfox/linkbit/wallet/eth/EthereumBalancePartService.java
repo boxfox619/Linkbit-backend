@@ -1,6 +1,6 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
-import com.boxfox.cross.wallet.part.BalancePart;
+import com.boxfox.linkbit.wallet.part.BalancePart;
 import io.vertx.core.Vertx;
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.utils.Convert;
 
-public class EthereumBalancePart extends EthereumPart implements BalancePart {
+public class EthereumBalancePartService extends EthereumPart implements BalancePart {
 
-  public EthereumBalancePart(Vertx vertx, Web3j web3, File cachePath) {
+  public EthereumBalancePartService(Vertx vertx, Web3j web3, File cachePath) {
     super(vertx, web3, cachePath);
   }
 

@@ -1,4 +1,4 @@
-package com.boxfox.cross.util;
+package com.boxfox.linkbit.util;
 
 import static com.boxfox.cross.service.network.RequestService.request;
 

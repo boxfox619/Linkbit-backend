@@ -1,7 +1,7 @@
-package com.boxfox.cross.wallet.eth;
+package com.boxfox.linkbit.wallet.eth;
 
-import com.boxfox.cross.wallet.model.WalletCreateResult;
-import com.boxfox.cross.wallet.part.CreateWalletPart;
+import com.boxfox.linkbit.wallet.model.WalletCreateResult;
+import com.boxfox.linkbit.wallet.part.CreateWalletPart;
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -16,9 +16,9 @@ import org.web3j.crypto.CipherException;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 
-public class EthereumCreateWalletPart extends EthereumPart implements CreateWalletPart {
+public class EthereumCreateWalletPartService extends EthereumPart implements CreateWalletPart {
 
-  public EthereumCreateWalletPart(Vertx vertx, Web3j web3, File cachePath) {
+  public EthereumCreateWalletPartService(Vertx vertx, Web3j web3, File cachePath) {
     super(vertx, web3, cachePath);
   }
 
