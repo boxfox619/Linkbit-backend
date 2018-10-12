@@ -16,7 +16,7 @@ public class RemittanceRouter extends AbstractRouter {
     @Service
     private WalletDatabaseService walletDatabaseService;
 
-    @RouteRegistration(uri = "/remittance", method = HttpMethod.POST, auth = true)
+    @RouteRegistration(uri = "/remittance", method = HttpMethod.POST)
     public void send(RoutingContext ctx,
                      @Param(name = "symbol") String symbol,
                      @Param(name = "walletName") String walletName,
