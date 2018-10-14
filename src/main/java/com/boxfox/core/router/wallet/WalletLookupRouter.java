@@ -60,7 +60,7 @@ public class WalletLookupRouter extends AbstractRouter {
     });
   }
 
-  @RouteRegistration(uri = "/wallet/balance", method = HttpMethod.GET, auth = true)
+  @RouteRegistration(uri = "/wallet/balance", method = HttpMethod.GET)
   public void getBalance(RoutingContext ctx, @Param(name = "address") String address) {
     walletDatabaseService.findByAddress(address, res -> {
       if (res.result() != null) {
@@ -78,7 +78,7 @@ public class WalletLookupRouter extends AbstractRouter {
     });
   }
 
-  @RouteRegistration(uri = "/wallet/price", method = HttpMethod.GET, auth = true)
+  @RouteRegistration(uri = "/wallet/price", method = HttpMethod.GET)
   public void getPrice(RoutingContext ctx, @Param(name = "address") String address) {
     String locale = ctx.data().get("locale").toString();
     walletDatabaseService.findByAddress(address, res -> {

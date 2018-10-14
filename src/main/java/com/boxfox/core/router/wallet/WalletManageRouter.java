@@ -22,6 +22,7 @@ public class WalletManageRouter extends AbstractRouter {
     @Service
     protected WalletDatabaseService walletDatabaseService;
 
+    //@TODO Anonymous wallet create function
     @RouteRegistration(uri = "/wallet/new", method = HttpMethod.POST, auth = true)
     public void create(RoutingContext ctx,
                        @Param(name = "address") String symbol,

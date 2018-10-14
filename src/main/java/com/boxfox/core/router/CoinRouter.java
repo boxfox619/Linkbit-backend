@@ -23,7 +23,7 @@ public class CoinRouter extends AbstractRouter {
     @Service
     private LocaleService localeService;
 
-    @RouteRegistration(uri = "/coin/supported/list", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/coin/supported/list", method = HttpMethod.GET)
     public void getSupportWalletList(RoutingContext ctx) {
         getLogger().debug(String.format("Supported Coin Load : %s", ctx.request().remoteAddress().host()));
         doAsync(future -> {
@@ -40,7 +40,7 @@ public class CoinRouter extends AbstractRouter {
         });
     }
 
-    @RouteRegistration(uri = "/coin/price", method = HttpMethod.GET, auth = true)
+    @RouteRegistration(uri = "/coin/price", method = HttpMethod.GET)
     public void getCoinPrice(RoutingContext ctx, @Param(name="symbol") String symbol, @Param(name="locale") String locale) {
         localeService.getLocaleMoneySymbol(locale, res -> {
             if(res.succeeded()) {
