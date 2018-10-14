@@ -75,4 +75,12 @@ public class AuthService extends AbstractService {
             }
         }, hander);
     }
+
+    public void unRegister(String uid, Handler<AsyncResult<Boolean>> hander) {
+        doAsync(future -> {
+            AccountDao dao = new AccountDao(PostgresConfig.create(), getVertx());
+            int result = dao.deleteById(uid).result();
+            future.complete(result > 0);
+        }, hander);
+    }
 }
