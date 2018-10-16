@@ -45,7 +45,7 @@ class AuthRouter : AbstractRouter() {
     fun unRegister(ctx: RoutingContext) {
         val uid = ctx.data()["uid"].toString()
         Logger.getRootLogger().info(String.format("user delete %s", uid))
-        this.authService!!.unRegister(uid).subscribe({
+        this.authService.unRegister(uid).subscribe({
             ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_OK).end()
         }, {
             ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR).end()
