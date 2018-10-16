@@ -4,6 +4,7 @@ import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.linkbit.wallet.WalletServiceManager;
+import com.boxfox.vertx.middleware.FirebaseAuthHandler;
 import com.boxfox.vertx.util.FirebaseUtil;
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
@@ -32,7 +33,7 @@ public class MainVerticle extends AbstractVerticle {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        RouteRegister routeRegister = RouteRegister.routing(vertx);
+        RouteRegister routeRegister = RouteRegister.routing(vertx, FirebaseAuthHandler.create());
         Router router = routeRegister.getRouter();
         router.route().handler(CookieHandler.create());
         router.route().handler(BodyHandler.create());
@@ -42,16 +43,16 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
-            Logger.getRootLogger().info("Server started : "+ server.actualPort());
+            Logger.getRootLogger().info("Server started : " + server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
             WalletServiceManager.init(vertx);
         });
         future.complete();
     }
 
-    private int getPort(){
+    private int getPort() {
         int port = 8999;
-        if(System.getenv("PORT")!=null)
+        if (System.getenv("PORT") != null)
             port = Integer.valueOf(System.getenv("PORT"));
         return port;
     }
