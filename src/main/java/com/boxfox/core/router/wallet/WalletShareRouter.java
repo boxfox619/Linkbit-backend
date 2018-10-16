@@ -4,7 +4,7 @@ import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.ShareService;
 import com.boxfox.cross.service.WalletDatabaseService;
-import com.boxfox.cross.service.model.ShareContent;
+import com.boxfox.cross.entity.ShareContent;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 

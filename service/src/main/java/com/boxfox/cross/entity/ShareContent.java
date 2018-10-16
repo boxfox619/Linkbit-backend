@@ -1,4 +1,4 @@
-package com.boxfox.cross.service.model;
+package com.boxfox.cross.entity;
 
 public class ShareContent {
     private String address;
