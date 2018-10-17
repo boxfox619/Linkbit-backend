@@ -1,7 +1,7 @@
 package com.boxfox.core.router.wallet;
 
 import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.service.WalletDatabaseService;
+import com.boxfox.cross.service.wallet.WalletDatabaseService;
 import com.boxfox.linkbit.wallet.WalletService;
 import com.boxfox.linkbit.wallet.WalletServiceManager;
 import com.boxfox.vertx.router.*;

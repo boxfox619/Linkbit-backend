@@ -2,7 +2,7 @@ package com.boxfox.core.router.wallet;
 
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
-import com.boxfox.cross.service.WalletDatabaseService;
+import com.boxfox.cross.service.wallet.WalletDatabaseService;
 import com.boxfox.linkbit.wallet.WalletService;
 import com.boxfox.linkbit.wallet.WalletServiceManager;
 import com.boxfox.linkbit.wallet.model.TransactionResult;

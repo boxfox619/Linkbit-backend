@@ -6,7 +6,7 @@ import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
 import com.boxfox.cross.service.PriceService;
-import com.boxfox.cross.service.WalletDatabaseService;
+import com.boxfox.cross.service.wallet.WalletDatabaseService;
 import com.boxfox.linkbit.wallet.WalletService;
 import com.boxfox.linkbit.wallet.WalletServiceManager;
 import com.linkbit.android.entity.WalletModel;
