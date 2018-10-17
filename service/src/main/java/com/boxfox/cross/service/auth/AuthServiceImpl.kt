@@ -2,8 +2,8 @@ package com.boxfox.cross.service.auth
 
 import io.one.sys.db.Tables.ACCOUNT
 
-import com.boxfox.cross.service.address.AddressService
 import com.boxfox.cross.service.ServiceException
+import com.boxfox.cross.util.AddressUtil
 import com.google.api.client.http.HttpStatusCodes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
@@ -15,7 +15,7 @@ class AuthServiceImpl {
 
     @Throws(ServiceException::class)
     fun signin(ctx: DSLContext, token: String): UserModel {
-        var decodedToken: FirebaseToken? = null
+        var decodedToken: FirebaseToken
         try {
             decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(token).get()
             if (decodedToken != null) {
@@ -27,7 +27,7 @@ class AuthServiceImpl {
                 val result = ctx.selectFrom(ACCOUNT)
                         .where(ACCOUNT.UID.eq(user.uid)).fetch()
                 if (result.size == 0) {
-                    val address = AddressService.createRandomAddress(ctx)
+                    val address = AddressUtil.createRandomAddress(ctx)
                     user.linkbitAddress = address
                     ctx.insertInto(ACCOUNT, ACCOUNT.UID, ACCOUNT.EMAIL, ACCOUNT.NAME,
                             ACCOUNT.PROFILE, ACCOUNT.ADDRESS)
