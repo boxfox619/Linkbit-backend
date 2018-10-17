@@ -1,0 +1,56 @@
+package com.boxfox.core.router
+
+import com.boxfox.core.router.model.CoinPriceNetworkObject
+import com.boxfox.cross.service.LocaleService
+import com.boxfox.cross.service.PriceService
+import com.boxfox.cross.service.coin.CoinService
+import com.boxfox.cross.util.LogUtil.getLogger
+import com.boxfox.vertx.router.AbstractRouter
+import com.boxfox.vertx.router.Param
+import com.boxfox.vertx.router.RouteRegistration
+import com.boxfox.vertx.service.Service
+import io.vertx.core.http.HttpMethod
+import io.vertx.ext.web.RoutingContext
+
+class CoinRouter : AbstractRouter() {
+
+    @Service
+    private lateinit var priceService: PriceService
+
+    @Service
+    private lateinit var localeService: LocaleService
+
+    @Service
+    private lateinit var coinService: CoinService
+
+    @RouteRegistration(uri = "/coin/supported/list", method = arrayOf(HttpMethod.GET))
+    fun getSupportWalletList(ctx: RoutingContext) {
+        getLogger().debug(String.format("Supported Coin Load : %s", ctx.request().remoteAddress().host()))
+        this.coinService.getAllCoins().subscribe({ list ->
+            ctx.response().end(gson.toJson(list))
+        }, {
+            ctx.fail(it)
+        })
+    }
+
+    @RouteRegistration(uri = "/coin/price", method = arrayOf(HttpMethod.GET))
+    fun getCoinPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String, @Param(name = "locale") locale: String) {
+        localeService.getLocaleMoneySymbol(locale) { res ->
+            if (res.succeeded()) {
+                val unit = res.result()
+                val price = priceService.getPrice(symbol, locale)
+                if (price > 0) {
+                    val result = CoinPriceNetworkObject()
+                    result.amount = price
+                    result.unit = unit
+                    ctx.response().end(gson.toJson(result))
+                } else {
+                    ctx.response().setStatusCode(404).end()
+                }
+            } else {
+                ctx.response().setStatusCode(500).end()
+            }
+        }
+    }
+
+}
