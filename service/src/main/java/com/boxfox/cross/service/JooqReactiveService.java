@@ -1,5 +1,6 @@
 package com.boxfox.cross.service;
 
+import com.boxfox.cross.common.RoutingException;
 import com.boxfox.cross.common.data.DataSource;
 import com.boxfox.vertx.service.AbstractService;
 import io.reactivex.Completable;
@@ -17,7 +18,7 @@ public abstract class JooqReactiveService extends AbstractService {
             try {
                 T result = (T) job.job(ctx);
                 subscriber.onSuccess(result);
-            } catch (ServiceException e) {
+            } catch (RoutingException e) {
                 e.printStackTrace();
                 subscriber.onError(e);
             } finally {
@@ -32,7 +33,7 @@ public abstract class JooqReactiveService extends AbstractService {
             try {
                 job.job(ctx);
                 subscriber.onComplete();
-            } catch (ServiceException e) {
+            } catch (RoutingException e) {
                 e.printStackTrace();
                 subscriber.onError(e);
             } finally {
@@ -42,10 +43,10 @@ public abstract class JooqReactiveService extends AbstractService {
     }
 
     protected interface SingleJob {
-       Object job(DSLContext ctx) throws ServiceException;
+       Object job(DSLContext ctx) throws RoutingException;
     }
 
     protected interface CompletableJob {
-        void job(DSLContext ctx) throws ServiceException;
+        void job(DSLContext ctx) throws RoutingException;
     }
 }

@@ -58,7 +58,7 @@ class WalletShareRouter : AbstractRouter() {
             val data = shareService.createTransactionData(it.coinSymbol, address, amount.toFloat())
             ctx.response().end("$urlPrefix/$data")
         }, {
-            ctx.fail(400)
+            ctx.fail(it)
         })
     }
 

@@ -1,6 +1,5 @@
 package com.boxfox.core.router
 
-import com.boxfox.cross.service.ServiceException
 import com.boxfox.cross.service.friend.FriendService
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param

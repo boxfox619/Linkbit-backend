@@ -2,7 +2,7 @@ package com.boxfox.cross.service.auth
 
 import io.one.sys.db.Tables.ACCOUNT
 
-import com.boxfox.cross.service.ServiceException
+import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.util.AddressUtil
 import com.google.api.client.http.HttpStatusCodes
 import com.google.firebase.auth.FirebaseAuth
@@ -13,7 +13,7 @@ import org.jooq.DSLContext
 
 class AuthServiceImpl {
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun signin(ctx: DSLContext, token: String): UserModel {
         var decodedToken: FirebaseToken
         try {
@@ -43,23 +43,23 @@ class AuthServiceImpl {
                 }
                 return user
             } else {
-                throw ServiceException(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, "Not a vaild token")
+                throw RoutingException(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, "Not a vaild token")
             }
         } catch (e: InterruptedException) {
             e.printStackTrace()
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
         } catch (e: ExecutionException) {
             e.printStackTrace()
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
         }
 
     }
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun getAccountByUid(ctx: DSLContext, uid: String): UserModel {
         val account = ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).fetch().stream().findFirst().orElse(null)
         if (account == null) {
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "User not found")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "User not found")
         } else {
             val user = UserModel()
             user.uid = account.uid

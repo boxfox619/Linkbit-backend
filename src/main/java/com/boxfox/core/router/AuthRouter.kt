@@ -1,6 +1,5 @@
 package com.boxfox.core.router
 
-import com.boxfox.cross.service.ServiceException
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
 import com.boxfox.cross.service.auth.AuthService
@@ -22,7 +21,7 @@ class AuthRouter : AbstractRouter() {
         authService.signin(token).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
-            ctx.fail(401)
+            ctx.fail(it)
         })
     }
 
@@ -38,7 +37,7 @@ class AuthRouter : AbstractRouter() {
         this.authService.getAccountByUid(uid).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
-            ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_NOT_FOUND).end()
+            ctx.fail(it)
         })
     }
 
@@ -49,7 +48,7 @@ class AuthRouter : AbstractRouter() {
         this.authService.unRegister(uid).subscribe({
             ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_OK).end()
         }, {
-            ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR).end()
+            ctx.fail(it)
         })
     }
 }

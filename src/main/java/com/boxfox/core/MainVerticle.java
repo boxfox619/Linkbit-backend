@@ -1,5 +1,6 @@
 package com.boxfox.core;
 
+import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
@@ -42,6 +43,7 @@ public class MainVerticle extends AbstractVerticle {
         router.route("/*").handler(LoggerHandler.create());
         router.route("/assets/*").handler(StaticHandler.create("assets"));
         routeRegister.route(this.getClass().getPackage().getName());
+        router.route().failureHandler(ExceptionHandler.create());
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
             Logger.getRootLogger().info("Server started : " + server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));

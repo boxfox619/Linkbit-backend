@@ -1,10 +1,8 @@
 package com.boxfox.cross.service.wallet
 
-import com.boxfox.cross.service.ServiceException
+import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.util.AddressUtil
 import com.linkbit.android.entity.WalletModel
-import io.vertx.core.AsyncResult
-import io.vertx.core.Handler
 import org.jooq.Record
 import org.jooq.Result
 
@@ -45,7 +43,7 @@ class WalletServiceImpl {
             return wallet
         } else {
             //@TODO un saved wallet data response
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "wallet not found")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "wallet not found")
         }
     }
 
@@ -60,7 +58,7 @@ class WalletServiceImpl {
             val record = records[0]
             return getWalletFromRecord(record)
         }
-        throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Major wallet not found")
+        throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Major wallet not found")
     }
 
     fun setMajorWallet(ctx: DSLContext, uid: String, symbol: String, address: String) {
@@ -83,21 +81,21 @@ class WalletServiceImpl {
                 .where(WALLET.ADDRESS.eq(address).and(WALLET.UID.eq(uid)))
                 .execute()
         if (updatedRows == 0) {
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED, "Wallet update fail")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED, "Wallet update fail")
         }
     }
 
     fun deleteWallet(ctx: DSLContext, uid: String, address: String) {
         val deletedRows = ctx.delete(WALLET).where(WALLET.ADDRESS.eq(address).and(WALLET.UID.eq(uid))).execute()
         if (deletedRows == 0) {
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED, "Wallet update fail")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED, "Wallet update fail")
         }
     }
 
     fun checkOwner(ctx: DSLContext, uid: String, address: String) {
         val result = ctx.selectFrom(WALLET).where(WALLET.ADDRESS.eq(address).and(WALLET.UID.eq(uid))).fetch()
         if (result.size == 0) {
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_SEE_OTHER, "Not owner")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_SEE_OTHER, "Not owner")
         }
     }
 

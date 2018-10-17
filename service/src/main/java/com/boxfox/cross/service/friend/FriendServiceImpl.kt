@@ -4,19 +4,15 @@ import io.one.sys.db.Tables.ACCOUNT
 import io.one.sys.db.Tables.FRIEND
 import io.one.sys.db.Tables.WALLET
 
-import com.boxfox.cross.service.ServiceException
+import com.boxfox.cross.common.RoutingException
 import com.google.api.client.http.HttpStatusCodes
 import com.linkbit.android.entity.UserModel
-import io.one.sys.db.tables.records.AccountRecord
-import io.one.sys.db.tables.records.FriendRecord
 import java.util.ArrayList
 import org.jooq.DSLContext
-import org.jooq.Record
-import org.jooq.Result
 
 class FriendServiceImpl {
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun loadFriends(ctx: DSLContext, uid: String): List<UserModel> {
         val friends = ArrayList<UserModel>()
         val result = ctx.selectFrom(FRIEND).where(FRIEND.UID_1.eq(uid).or(FRIEND.UID_2.eq(uid))).fetch()
@@ -38,10 +34,10 @@ class FriendServiceImpl {
         return friends
     }
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun getUser(ctx: DSLContext, uid: String): UserModel {
         val acc = ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).fetch().stream().findFirst().orElse(null)
-                ?: throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "User not found")
+                ?: throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "User not found")
         val user = UserModel()
         user.name = acc.name
         user.email = acc.email
@@ -51,26 +47,26 @@ class FriendServiceImpl {
         return user
     }
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun addFriend(ctx: DSLContext, ownUid: String, uid: String): Boolean {
         if (ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).fetch().size == 0) {
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Target user can not found")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Target user can not found")
         } else {
             val result = ctx.insertInto(FRIEND, FRIEND.UID_1, FRIEND.UID_2).values(ownUid, uid)
                     .execute()
             return if (result == 1) {
                 true
             } else {
-                throw ServiceException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Update fail")
+                throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Update fail")
             }
         }
     }
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun deleteFriend(ctx: DSLContext, ownUid: String, uid: String): Boolean {
         val accountRecord = ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(ownUid)).fetch().stream().findFirst().orElse(null)
         if (accountRecord == null) {
-            throw ServiceException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Target user can not found")
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Target user can not found")
         } else {
             val result = ctx
                     .deleteFrom(FRIEND)
@@ -78,12 +74,12 @@ class FriendServiceImpl {
             return if (result == 1) {
                 true
             } else {
-                throw ServiceException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Update fail")
+                throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Update fail")
             }
         }
     }
 
-    @Throws(ServiceException::class)
+    @Throws(RoutingException::class)
     fun searchUser(ctx: DSLContext, text: String): List<UserModel> {
         val accounts = ArrayList<UserModel>()
         val records = ctx.selectFrom(ACCOUNT.join(WALLET).on(ACCOUNT.UID.eq(WALLET.UID)))
