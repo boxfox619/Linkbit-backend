@@ -2,7 +2,7 @@ package com.boxfox.core.router;
 
 import com.boxfox.vertx.router.*;
 import com.boxfox.vertx.service.*;
-import com.boxfox.cross.service.FriendService;
+import com.boxfox.cross.service.friend.FriendService;
 import com.google.gson.Gson;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;

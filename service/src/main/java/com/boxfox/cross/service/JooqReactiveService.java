@@ -17,9 +17,9 @@ public abstract class JooqReactiveService extends AbstractService {
             try {
                 T result = (T) job.job(ctx);
                 subscriber.onSuccess(result);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-                subscriber.onError(throwable);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                subscriber.onError(e);
             } finally {
                 ctx.close();
             }
@@ -32,9 +32,9 @@ public abstract class JooqReactiveService extends AbstractService {
             try {
                 job.job(ctx);
                 subscriber.onComplete();
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-                subscriber.onError(throwable);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                subscriber.onError(e);
             } finally {
                 ctx.close();
             }
@@ -42,10 +42,10 @@ public abstract class JooqReactiveService extends AbstractService {
     }
 
     protected interface SingleJob {
-       Object job(DSLContext ctx) throws Throwable;
+       Object job(DSLContext ctx) throws ServiceException;
     }
 
     protected interface CompletableJob {
-        void job(DSLContext ctx) throws Throwable;
+        void job(DSLContext ctx) throws ServiceException;
     }
 }
