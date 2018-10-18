@@ -2,22 +2,17 @@ package com.boxfox.core.router.wallet
 
 import com.boxfox.core.router.model.WalletCreateNetworkObject
 import com.boxfox.cross.service.wallet.WalletDatabaseService
-import com.boxfox.linkbit.wallet.WalletService
-import com.boxfox.linkbit.wallet.WalletServiceManager
-import com.boxfox.linkbit.wallet.model.WalletCreateResult
+import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
 import com.google.api.client.http.HttpStatusCodes
-import com.linkbit.android.entity.WalletModel
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 
 import com.boxfox.cross.util.LogUtil.getLogger
-import io.reactivex.Completable
-import java.util.*
 
 class WalletManageRouter : AbstractRouter() {
 
@@ -37,7 +32,7 @@ class WalletManageRouter : AbstractRouter() {
         getLogger().debug("Wallet create test$uid")
         doAsync<Any>({ future ->
             if (password != null) {
-                val service = WalletServiceManager.getService(symbol)
+                val service = WalletServiceRegistry.getService(symbol)
                 val result = service.createWallet(password)
                 if (result.isSuccess) {
                     val response = WalletCreateNetworkObject()

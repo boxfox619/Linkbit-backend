@@ -2,7 +2,7 @@ package com.boxfox.linkbit.wallet.indexing;
 
 import static com.boxfox.linkbit.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
 
-import com.boxfox.linkbit.wallet.WalletServiceManager;
+import com.boxfox.linkbit.wallet.WalletServiceRegistry;
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -16,7 +16,7 @@ public class TransactionIndexingVerticle extends AbstractVerticle {
           Gson gson = new Gson();
           IndexingMessage msg = gson.fromJson(message.body(), IndexingMessage.class);
           System.out.println("request indexing : " + msg.getSymbol());
-          IndexingService service = WalletServiceManager.getService(msg.getSymbol()).getIndexingService();
+          IndexingService service = WalletServiceRegistry.getService(msg.getSymbol()).getIndexingService();
           if (service != null) {
               System.out.println("start indexing : " + msg.getSymbol());
               service.indexing(vertx, msg.getAddress()).setHandler(e->{

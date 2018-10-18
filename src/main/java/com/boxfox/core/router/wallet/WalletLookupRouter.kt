@@ -1,14 +1,11 @@
 package com.boxfox.core.router.wallet
 
-import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
-
 import com.boxfox.cross.common.data.PostgresConfig
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
 import com.boxfox.cross.service.PriceService
 import com.boxfox.cross.service.wallet.WalletDatabaseService
-import com.boxfox.linkbit.wallet.WalletService
-import com.boxfox.linkbit.wallet.WalletServiceManager
+import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
 import com.linkbit.android.entity.WalletModel
 import io.netty.handler.codec.http.HttpResponseStatus
@@ -40,7 +37,7 @@ class WalletLookupRouter : AbstractRouter() {
             val list = dao.findManyByUid(Arrays.asList(uid)).result()
             for (i in list.indices) {
                 val wallet = list[i]
-                val service = WalletServiceManager.getService(wallet.symbol)
+                val service = WalletServiceRegistry.getService(wallet.symbol)
                 val balance = service.getBalance(wallet.address)
                 val krBalance = priceService.getPrice(wallet.address, locale, balance)
                 val walletModel = WalletModel()
@@ -63,7 +60,7 @@ class WalletLookupRouter : AbstractRouter() {
     @RouteRegistration(uri = "/wallet/balance", method = arrayOf(HttpMethod.GET))
     fun getBalance(ctx: RoutingContext, @Param(name = "address") address: String) {
         walletDatabaseService.findByAddress(address).subscribe({
-            val service = WalletServiceManager.getService(it.coinSymbol)
+            val service = WalletServiceRegistry.getService(it.coinSymbol)
             val balance = service.getBalance(it.accountAddress)
             if (balance < 0) {
                 ctx.response().statusCode = HttpResponseStatus.NOT_FOUND.code()
@@ -82,7 +79,7 @@ class WalletLookupRouter : AbstractRouter() {
         walletDatabaseService.findByAddress(address).subscribe({
             val symbol = it.coinSymbol
             val accountAddress = it.accountAddress
-            val service = WalletServiceManager.getService(symbol)
+            val service = WalletServiceRegistry.getService(symbol)
             if (service != null) {
                 val price = priceService.getPrice(symbol, locale, service.getBalance(accountAddress))
                 ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_OK).setChunked(true).write(price.toString())
@@ -99,7 +96,7 @@ class WalletLookupRouter : AbstractRouter() {
     fun getTotalBalance(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         doAsync<Any> { future ->
             val uid = ctx.data()["uid"] as String
-            val walletService = WalletServiceManager.getService(symbol)
+            val walletService = WalletServiceRegistry.getService(symbol)
             if (walletService != null) {
                 val dao = WalletDao(PostgresConfig.create(), vertx)
                 val list = dao.findManyByUid(Arrays.asList(uid)).result()
@@ -121,7 +118,7 @@ class WalletLookupRouter : AbstractRouter() {
         val locale = ctx.data()["locale"].toString()
         doAsync<Any> { future ->
             val uid = ctx.data()["uid"] as String
-            val walletService = WalletServiceManager.getService(symbol)
+            val walletService = WalletServiceRegistry.getService(symbol)
             if (walletService != null) {
                 val dao = WalletDao(PostgresConfig.create(), vertx)
                 val list = dao.findManyByUid(Arrays.asList(uid)).result()

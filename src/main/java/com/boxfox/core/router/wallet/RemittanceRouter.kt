@@ -3,11 +3,7 @@ package com.boxfox.core.router.wallet
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
 import com.boxfox.cross.service.wallet.WalletDatabaseService
-import com.boxfox.linkbit.wallet.WalletService
-import com.boxfox.linkbit.wallet.WalletServiceManager
-import com.boxfox.linkbit.wallet.model.TransactionResult
-import com.linkbit.android.entity.WalletModel
-import io.netty.handler.codec.http.HttpResponseStatus
+import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 
@@ -24,7 +20,7 @@ class RemittanceRouter : AbstractRouter() {
              @Param(name = "password") password: String,
              @Param(name = "targetAddress") targetAddress: String,
              @Param(name = "amount") amount: String) {
-        val service = WalletServiceManager.getService(symbol)
+        val service = WalletServiceRegistry.getService(symbol)
         walletDatabaseService.findByAddress(targetAddress).subscribe({
             var destAddress = it.accountAddress
             val result = service.send(walletName, walletData, password, destAddress, amount)

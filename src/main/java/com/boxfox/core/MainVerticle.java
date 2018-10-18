@@ -4,7 +4,7 @@ import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
-import com.boxfox.linkbit.wallet.WalletServiceManager;
+import com.boxfox.linkbit.wallet.WalletServiceRegistry;
 import com.boxfox.vertx.middleware.FirebaseAuthHandler;
 import com.boxfox.vertx.util.FirebaseUtil;
 import com.boxfox.vertx.router.*;
@@ -47,7 +47,7 @@ public class MainVerticle extends AbstractVerticle {
         server = vertx.createHttpServer().requestHandler(router::accept).listen(getPort(), rs -> {
             Logger.getRootLogger().info("Server started : " + server.actualPort());
             vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
-            WalletServiceManager.init(vertx);
+            WalletServiceRegistry.init(vertx);
         });
         future.complete();
     }
