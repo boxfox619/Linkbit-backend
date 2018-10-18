@@ -1,6 +1,7 @@
 package com.boxfox.core.router.wallet
 
 import com.boxfox.cross.common.data.PostgresConfig
+import com.boxfox.cross.service.transaction.TransactionService
 import com.boxfox.cross.service.wallet.WalletDatabaseService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.*
@@ -17,6 +18,9 @@ import java.util.Arrays
 class TransactionRouter : AbstractRouter() {
 
     @Service
+    private lateinit var transactionService: TransactionService
+
+    @Service
     private lateinit var walletDatabaseService: WalletDatabaseService
 
     @RouteRegistration(uri = "/transaction", method = arrayOf(HttpMethod.GET))
@@ -30,11 +34,9 @@ class TransactionRouter : AbstractRouter() {
 
     @RouteRegistration(uri = "/transaction/count", method = arrayOf(HttpMethod.GET))
     fun wallTransactionCount(ctx: RoutingContext, @Param(name = "address") address: String) {
-        walletDatabaseService.findByAddress(address).subscribe({
-            val service = WalletServiceRegistry.getService(it.coinSymbol)
-            val count = service.getTransactionCount(address)
-            ctx.response().end(count.toString() + "")
-        }, {
+        transactionService.getTransactionCount(address).subscribe({
+            ctx.response().end(gson.toJson(it))
+        },{
             ctx.fail(it)
         })
     }
@@ -45,81 +47,30 @@ class TransactionRouter : AbstractRouter() {
                               @Param(name = "page") page: Int,
                               @Param(name = "count") count: Int) {
         //@TODO transaction list pagenation
-        walletDatabaseService.findByAddress(address).subscribe({
-            val service = WalletServiceRegistry.getService(it.coinSymbol)
-            service.getTransactionList(address).setHandler { transactionStatusListResult ->
-                val transactionStatusList = transactionStatusListResult.result()
-                if (transactionStatusList.size == 0) {
-                    service.indexingTransactions(address)
-                }
-                ctx.response().setChunked(true).write(gson.toJson(transactionStatusList)).end()
-            }
-        }, {
+        transactionService.getTransactionList(address, page, count).subscribe({
+            ctx.response().end(gson.toJson(it))
+        },{
             ctx.fail(it)
         })
     }
 
     @RouteRegistration(uri = "/transaction/all/count", method = arrayOf(HttpMethod.GET), auth = true)
-    fun allTransactionCount(ctx: RoutingContext) {
+    fun allTransactionCount(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         val uid = ctx.data()["uid"] as String
-        doAsync<Any>({ future ->
-            val dao = WalletDao(PostgresConfig.create(), vertx)
-            dao.findManyByUid(Arrays.asList(uid)).result().forEach { w ->
-                var count = 0
-                val service = WalletServiceRegistry.getService(w.symbol)
-                val accountAddress = w.address
-                count += service.getTransactionCount(accountAddress)
-                future.complete(count)
-            }
-            if (!future.isComplete)
-                future.fail("Transaction Not Found")
-        }, { e ->
-            if (e.succeeded()) {
-                ctx.response().setChunked(true).write(gson.toJson(e.result())).end()
-            } else {
-                ctx.response().setStatusCode(400).end()
-            }
+        transactionService.getAllTransactionCount(uid, symbol).subscribe({
+            ctx.response().end(gson.toJson(it))
+        },{
+            ctx.fail(it)
         })
     }
 
     @RouteRegistration(uri = "/transaction/all/list", method = arrayOf(HttpMethod.GET), auth = true)
-    fun allTransactionList(ctx: RoutingContext, @Param(name = "page") page: Int, @Param(name = "count") count: Int) {
+    fun allTransactionList(ctx: RoutingContext, @Param(name = "symbol") symbol: String, @Param(name = "page") page: Int, @Param(name = "count") count: Int) {
         val uid = ctx.data()["uid"] as String
-        doAsync<Any>({ future ->
-            val dao = WalletDao(PostgresConfig.create(), vertx)
-            val totalTxStatusList = ArrayList<TransactionModel>()
-            val tasks = ArrayList<Future<List<TransactionModel>>>()
-            for (wallet in dao.findManyByUid(Arrays.asList(uid)).result()) {
-                val service = WalletServiceRegistry.getService(wallet.symbol)
-                val accountAddress = wallet.address
-                tasks.add(service.getTransactionList(accountAddress).setHandler { txStatusListResult ->
-                    val txStatusList = txStatusListResult.result()
-                    if (txStatusList.size == 0) {
-                        service.indexingTransactions(accountAddress)
-                    }
-                    totalTxStatusList.addAll(txStatusList)
-                })
-                if (totalTxStatusList.size >= page * count) {
-                    break
-                }
-            }
-            var check: Boolean
-            do {
-                check = true
-                for (task in tasks) {
-                    if (!task.isComplete()) {
-                        check = false
-                        break
-                    }
-                }
-            } while (!check)
-            future.complete(totalTxStatusList)
-        }, { e ->
-            if (e.succeeded()) {
-                ctx.response().setChunked(true).write(gson.toJson(e.result())).end()
-            } else {
-                ctx.response().setStatusCode(400).end()
-            }
+        transactionService.getAllTransactionList(uid,symbol,  page, count).subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, {
+            ctx.fail(it)
         })
     }
 
