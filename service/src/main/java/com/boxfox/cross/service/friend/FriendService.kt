@@ -6,25 +6,25 @@ import io.reactivex.Completable
 import io.reactivex.Single
 
 
-class FriendService(private val impl: FriendServiceImpl = FriendServiceImpl()) : JooqReactiveService(), FriendUsecase {
+class FriendService(private val impl: FriendServiceImpl = FriendServiceImpl()) : JooqReactiveService() {
 
-    override fun loadFriends(uid: String): Single<List<UserModel>> {
+    fun loadFriends(uid: String): Single<List<UserModel>> {
         return createSingle { ctx -> impl.loadFriends(ctx, uid) }
     }
 
-    override fun getUser(uid: String): Single<UserModel> {
+    fun getUser(uid: String): Single<UserModel> {
         return createSingle { ctx -> impl.getUser(ctx, uid) }
     }
 
-    override fun addFriend(ownUid: String, uid: String): Completable {
+    fun addFriend(ownUid: String, uid: String): Completable {
         return createCompletable { ctx -> impl.addFriend(ctx, ownUid, uid) }
     }
 
-    override fun deleteFriend(ownUid: String, uid: String): Completable {
+    fun deleteFriend(ownUid: String, uid: String): Completable {
         return createCompletable { ctx -> impl.deleteFriend(ctx, ownUid, uid) }
     }
 
-    override fun serachUsers(text: String): Single<List<UserModel>> {
+    fun serachUsers(text: String): Single<List<UserModel>> {
         return createSingle { ctx -> impl.searchUser(ctx, text) }
     }
 }

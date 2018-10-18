@@ -57,19 +57,19 @@ public abstract class WalletService extends AbstractService implements BalancePa
         return getTransactionPart().getTransactionCount(address);
     }
 
-    public BalancePart getBalancePart() {
+    protected BalancePart getBalancePart() {
         return address -> 0;
     }
 
-    public CreateWalletPart getCreateWalletPart() {
+    protected CreateWalletPart getCreateWalletPart() {
         return password -> null;
     }
 
-    public TransactionPart getTransactionPart() {
+    protected TransactionPart getTransactionPart() {
         return null;
     }
 
-    public IndexingService getIndexingService() {
+    protected IndexingService getIndexingService() {
         return this.indexingService;
     }
 

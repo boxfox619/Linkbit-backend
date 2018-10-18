@@ -6,9 +6,9 @@ import com.linkbit.android.entity.CoinModel
 import io.one.sys.db.tables.records.CoinRecord
 import org.jooq.DSLContext
 
-class CoinServiceImpl {
+class CoinServiceImpl : CoinUsecase{
 
-    fun getAllCoins(ctx: DSLContext): List<CoinModel> {
+    override fun getAllCoins(ctx: DSLContext): List<CoinModel> {
         return ctx.selectFrom<CoinRecord>(COIN).fetch().map { coinRecord ->
             val coinModel = CoinModel()
             coinModel.name = coinRecord.getName()

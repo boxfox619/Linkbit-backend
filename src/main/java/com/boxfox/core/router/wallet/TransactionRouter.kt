@@ -2,13 +2,11 @@ package com.boxfox.core.router.wallet
 
 import com.boxfox.cross.common.data.PostgresConfig
 import com.boxfox.cross.service.wallet.WalletDatabaseService
-import com.boxfox.linkbit.wallet.WalletService
-import com.boxfox.linkbit.wallet.WalletServiceManager
+import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
 import com.linkbit.android.entity.TransactionModel
 import io.one.sys.db.tables.daos.WalletDao
-import io.one.sys.db.tables.pojos.Wallet
 import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
@@ -25,7 +23,7 @@ class TransactionRouter : AbstractRouter() {
     fun lookupTransaction(ctx: RoutingContext,
                           @Param(name = "symbol") symbol: String,
                           @Param(name = "txHash") txHash: String) {
-        val service = WalletServiceManager.getService(symbol)
+        val service = WalletServiceRegistry.getService(symbol)
         val transaction = service.getTransaction(txHash)
         ctx.response().setChunked(true).write(gson.toJson(transaction)).end()
     }
@@ -33,7 +31,7 @@ class TransactionRouter : AbstractRouter() {
     @RouteRegistration(uri = "/transaction/count", method = arrayOf(HttpMethod.GET))
     fun wallTransactionCount(ctx: RoutingContext, @Param(name = "address") address: String) {
         walletDatabaseService.findByAddress(address).subscribe({
-            val service = WalletServiceManager.getService(it.coinSymbol)
+            val service = WalletServiceRegistry.getService(it.coinSymbol)
             val count = service.getTransactionCount(address)
             ctx.response().end(count.toString() + "")
         }, {
@@ -48,7 +46,7 @@ class TransactionRouter : AbstractRouter() {
                               @Param(name = "count") count: Int) {
         //@TODO transaction list pagenation
         walletDatabaseService.findByAddress(address).subscribe({
-            val service = WalletServiceManager.getService(it.coinSymbol)
+            val service = WalletServiceRegistry.getService(it.coinSymbol)
             service.getTransactionList(address).setHandler { transactionStatusListResult ->
                 val transactionStatusList = transactionStatusListResult.result()
                 if (transactionStatusList.size == 0) {
@@ -68,7 +66,7 @@ class TransactionRouter : AbstractRouter() {
             val dao = WalletDao(PostgresConfig.create(), vertx)
             dao.findManyByUid(Arrays.asList(uid)).result().forEach { w ->
                 var count = 0
-                val service = WalletServiceManager.getService(w.symbol)
+                val service = WalletServiceRegistry.getService(w.symbol)
                 val accountAddress = w.address
                 count += service.getTransactionCount(accountAddress)
                 future.complete(count)
@@ -92,7 +90,7 @@ class TransactionRouter : AbstractRouter() {
             val totalTxStatusList = ArrayList<TransactionModel>()
             val tasks = ArrayList<Future<List<TransactionModel>>>()
             for (wallet in dao.findManyByUid(Arrays.asList(uid)).result()) {
-                val service = WalletServiceManager.getService(wallet.symbol)
+                val service = WalletServiceRegistry.getService(wallet.symbol)
                 val accountAddress = wallet.address
                 tasks.add(service.getTransactionList(accountAddress).setHandler { txStatusListResult ->
                     val txStatusList = txStatusListResult.result()

@@ -3,6 +3,7 @@ package com.boxfox.cross.service;
 import com.boxfox.cross.common.RoutingException;
 import com.boxfox.cross.common.data.DataSource;
 import com.boxfox.vertx.service.AbstractService;
+import com.boxfox.vertx.service.AsyncService;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import org.jooq.DSLContext;
@@ -14,31 +15,37 @@ public abstract class JooqReactiveService extends AbstractService {
 
     protected <T> Single<T> createSingle(SingleJob job) {
         return Single.create(subscriber -> {
-            DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
-            try {
-                T result = (T) job.job(ctx);
-                subscriber.onSuccess(result);
-            } catch (RoutingException e) {
-                e.printStackTrace();
-                subscriber.onError(e);
-            } finally {
-                ctx.close();
-            }
+            AsyncService.getInstance().doAsync("service-worker-executor", future -> {
+                DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
+                try {
+                    T result = (T) job.job(ctx);
+                    subscriber.onSuccess(result);
+                } catch (RoutingException e) {
+                    e.printStackTrace();
+                    subscriber.onError(e);
+                } finally {
+                    ctx.close();
+                }
+              future.complete();
+            });
         });
     }
 
     protected Completable createCompletable(CompletableJob job) {
         return Completable.create(subscriber -> {
+          AsyncService.getInstance().doAsync("service-worker-executor", future -> {
             DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
             try {
-                job.job(ctx);
-                subscriber.onComplete();
+              job.job(ctx);
+              subscriber.onComplete();
             } catch (RoutingException e) {
-                e.printStackTrace();
-                subscriber.onError(e);
+              e.printStackTrace();
+              subscriber.onError(e);
             } finally {
-                ctx.close();
+              ctx.close();
             }
+            future.complete();
+          });
         });
     }
 

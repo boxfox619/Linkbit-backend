@@ -1,18 +1,23 @@
 package com.boxfox.cross.service.friend
 
+import com.boxfox.cross.common.RoutingException
 import com.linkbit.android.entity.UserModel
-import io.reactivex.Completable
-import io.reactivex.Single
+import org.jooq.DSLContext
 
 interface FriendUsecase {
 
-    fun loadFriends(uid: String): Single<List<UserModel>>
+    @Throws(RoutingException::class)
+    fun loadFriends(ctx: DSLContext, uid: String): List<UserModel>
 
-    fun getUser(uid: String): Single<UserModel>
+    @Throws(RoutingException::class)
+    fun getUser(ctx: DSLContext, uid: String): UserModel
 
-    fun addFriend(ownUid: String, uid: String): Completable
+    @Throws(RoutingException::class)
+    fun addFriend(ctx: DSLContext, ownUid: String, uid: String)
 
-    fun deleteFriend(ownUid: String, uid: String): Completable
+    @Throws(RoutingException::class)
+    fun deleteFriend(ctx: DSLContext, ownUid: String, uid: String)
 
-    fun serachUsers(text: String): Single<List<UserModel>>
+    @Throws(RoutingException::class)
+    fun searchUser(ctx: DSLContext, text: String): List<UserModel>
 }
