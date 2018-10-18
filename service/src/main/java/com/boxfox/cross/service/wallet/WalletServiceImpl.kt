@@ -12,9 +12,9 @@ import io.one.sys.db.tables.Majorwallet.MAJORWALLET
 import io.one.sys.db.tables.Wallet.WALLET
 import org.jooq.DSLContext
 
-class WalletServiceImpl {
+class WalletServiceImpl : WalletUsecase{
 
-    fun createWallet(ctx: DSLContext, uid: String, symbol: String, name: String, address: String, description: String, open: Boolean, major: Boolean): WalletModel {
+    override fun createWallet(ctx: DSLContext, uid: String, symbol: String, name: String, address: String, description: String, open: Boolean, major: Boolean): WalletModel {
         val linkedAddress = AddressUtil.createRandomAddress(ctx)
         ctx.insertInto(WALLET)
                 .values(uid, symbol.toUpperCase(), name, description, address, linkedAddress, open, major)
@@ -22,7 +22,7 @@ class WalletServiceImpl {
         return findByAddress(ctx, address)
     }
 
-    fun findByAddress(ctx: DSLContext, address: String): WalletModel {
+    override fun findByAddress(ctx: DSLContext, address: String): WalletModel {
         var result: Result<Record>
         if (AddressUtil.isCrossAddress(address)) {
             result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.CROSSADDRESS.eq(address)).fetch()
@@ -47,7 +47,7 @@ class WalletServiceImpl {
         }
     }
 
-    fun getMajorWallet(ctx: DSLContext, uid: String, symbol: String): WalletModel {
+    override fun getMajorWallet(ctx: DSLContext, uid: String, symbol: String): WalletModel {
         val records = ctx.selectFrom(MAJORWALLET
                 .join(WALLET).on(MAJORWALLET.ADDRESS.eq(WALLET.ADDRESS)
                         .and(MAJORWALLET.SYMBOL.eq(WALLET.SYMBOL)))
@@ -61,7 +61,7 @@ class WalletServiceImpl {
         throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "Major wallet not found")
     }
 
-    fun setMajorWallet(ctx: DSLContext, uid: String, symbol: String, address: String) {
+    override fun setMajorWallet(ctx: DSLContext, uid: String, symbol: String, address: String) {
         val record = ctx.selectFrom(MAJORWALLET)
                 .where(MAJORWALLET.UID.eq(uid).and(MAJORWALLET.SYMBOL.eq(symbol))).fetch().stream().findFirst().orElse(null)
         if (record != null) {
@@ -72,7 +72,7 @@ class WalletServiceImpl {
         }
     }
 
-    fun updateWallet(ctx: DSLContext, uid: String, address: String, name: String, description: String, open: Boolean, major: Boolean) {
+    override fun updateWallet(ctx: DSLContext, uid: String, address: String, name: String, description: String, open: Boolean, major: Boolean) {
         val updatedRows = ctx.update(WALLET)
                 .set(WALLET.NAME, name)
                 .set(WALLET.DESCRIPTION, description)
@@ -85,14 +85,14 @@ class WalletServiceImpl {
         }
     }
 
-    fun deleteWallet(ctx: DSLContext, uid: String, address: String) {
+    override fun deleteWallet(ctx: DSLContext, uid: String, address: String) {
         val deletedRows = ctx.delete(WALLET).where(WALLET.ADDRESS.eq(address).and(WALLET.UID.eq(uid))).execute()
         if (deletedRows == 0) {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED, "Wallet update fail")
         }
     }
 
-    fun checkOwner(ctx: DSLContext, uid: String, address: String) {
+    override fun checkOwner(ctx: DSLContext, uid: String, address: String) {
         val result = ctx.selectFrom(WALLET).where(WALLET.ADDRESS.eq(address).and(WALLET.UID.eq(uid))).fetch()
         if (result.size == 0) {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_SEE_OTHER, "Not owner")

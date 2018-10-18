@@ -1,8 +1,8 @@
 package com.boxfox.cross.service.coin
 
 import com.linkbit.android.entity.CoinModel
-import io.reactivex.Single
+import org.jooq.DSLContext
 
 interface CoinUsecase {
-    val allCoins: Single<List<CoinModel>>
+    fun getAllCoins(ctx: DSLContext): List<CoinModel>
 }

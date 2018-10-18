@@ -1,20 +1,19 @@
 package com.boxfox.cross.service.auth
 
-import io.one.sys.db.Tables.ACCOUNT
-
 import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.util.AddressUtil
 import com.google.api.client.http.HttpStatusCodes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
 import com.linkbit.android.entity.UserModel
-import java.util.concurrent.ExecutionException
+import io.one.sys.db.Tables.ACCOUNT
 import org.jooq.DSLContext
+import java.util.concurrent.ExecutionException
 
-class AuthServiceImpl {
+class AuthServiceImpl : AuthUsecase{
 
     @Throws(RoutingException::class)
-    fun signin(ctx: DSLContext, token: String): UserModel {
+    override fun signin(ctx: DSLContext, token: String): UserModel {
         var decodedToken: FirebaseToken
         try {
             decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(token).get()
@@ -56,7 +55,7 @@ class AuthServiceImpl {
     }
 
     @Throws(RoutingException::class)
-    fun getAccountByUid(ctx: DSLContext, uid: String): UserModel {
+    override fun getAccountByUid(ctx: DSLContext, uid: String): UserModel {
         val account = ctx.selectFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).fetch().stream().findFirst().orElse(null)
         if (account == null) {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "User not found")
@@ -71,8 +70,10 @@ class AuthServiceImpl {
         }
     }
 
-    fun unRegister(ctx: DSLContext, uid: String): Boolean {
+    override fun unRegister(ctx: DSLContext, uid: String) {
         val result = ctx.deleteFrom(ACCOUNT).where(ACCOUNT.UID.eq(uid)).execute()
-        return result > 0
+        if (result == 0) {
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED, "account delete fail")
+        }
     }
 }
