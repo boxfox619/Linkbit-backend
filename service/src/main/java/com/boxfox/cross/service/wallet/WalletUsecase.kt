@@ -13,4 +13,5 @@ interface WalletUsecase {
     fun updateWallet(ctx: DSLContext, uid: String, address: String, name: String, description: String, open: Boolean, major: Boolean)
     fun deleteWallet(ctx: DSLContext, uid: String, address: String)
     fun checkOwner(ctx: DSLContext, uid: String, address:String)
+    fun getTotalBalance(ctx:DSLContext, uid: String, symbol: String) : Double
 }

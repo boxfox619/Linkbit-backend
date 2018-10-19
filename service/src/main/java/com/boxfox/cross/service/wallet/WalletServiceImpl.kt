@@ -9,6 +9,7 @@ import com.linkbit.android.entity.WalletModel
 import io.one.sys.db.tables.Account.ACCOUNT
 import io.one.sys.db.tables.Majorwallet.MAJORWALLET
 import io.one.sys.db.tables.Wallet.WALLET
+import io.one.sys.db.tables.records.WalletRecord
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
@@ -130,6 +131,16 @@ class WalletServiceImpl : WalletUsecase{
         if (result.size == 0) {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_SEE_OTHER, "Not owner")
         }
+    }
+
+    override fun getTotalBalance(ctx: DSLContext, uid: String, symbol: String): Double {
+        val records: Result<WalletRecord> = ctx.selectFrom(WALLET).where(WALLET.UID.eq(uid).and(WALLET.SYMBOL.eq(symbol))).fetch()
+        val service = WalletServiceRegistry.getService(symbol)
+        val balance = 0.0
+        for (record in records) {
+            service.getBalance(record.address)
+        }
+        return balance
     }
 
     companion object {

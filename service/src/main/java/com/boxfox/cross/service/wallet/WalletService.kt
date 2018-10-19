@@ -30,4 +30,6 @@ class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl()) :
     fun deleteWallet(uid: String, address: String): Completable = createCompletable { impl.deleteWallet(it, uid, address) }
 
     fun checkOwner(uid: String, address: String): Completable = createCompletable { impl.checkOwner(it, uid, address) }
+
+    fun getTotalBalance(uid: String, symbol: String): Single<Double> = createSingle { impl.getTotalBalance(it, uid, symbol)}
 }
