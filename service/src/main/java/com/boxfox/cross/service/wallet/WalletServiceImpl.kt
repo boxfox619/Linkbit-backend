@@ -4,15 +4,14 @@ import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.entity.wallet.WalletCreateModel
 import com.boxfox.cross.util.AddressUtil
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
-import com.linkbit.android.entity.WalletModel
-import org.jooq.Record
-import org.jooq.Result
-
 import com.google.api.client.http.HttpStatusCodes
+import com.linkbit.android.entity.WalletModel
 import io.one.sys.db.tables.Account.ACCOUNT
 import io.one.sys.db.tables.Majorwallet.MAJORWALLET
 import io.one.sys.db.tables.Wallet.WALLET
 import org.jooq.DSLContext
+import org.jooq.Record
+import org.jooq.Result
 
 class WalletServiceImpl : WalletUsecase{
 
@@ -36,6 +35,24 @@ class WalletServiceImpl : WalletUsecase{
         result.balance = wallet.balance
         result.ownerId = wallet.ownerId
         return result
+    }
+
+    override fun getWalletList(ctx: DSLContext, uid: String): List<WalletModel> {
+        val records = ctx.selectFrom(WALLET.join(ACCOUNT).on(WALLET.UID.eq(ACCOUNT.UID))).where(WALLET.UID.eq(uid)).fetch()
+        return records.map {
+            val service = WalletServiceRegistry.getService(it.get(WALLET.SYMBOL))
+            val balance = service.getBalance(it.get(WALLET.ADDRESS))
+            val walletModel = WalletModel()
+            walletModel.ownerId = it.get(WALLET.UID)
+            walletModel.ownerName = it.get(ACCOUNT.NAME)
+            walletModel.walletName = it.get(WALLET.NAME)
+            walletModel.coinSymbol = it.get(WALLET.SYMBOL)
+            walletModel.description = it.get(WALLET.DESCRIPTION)
+            walletModel.accountAddress = it.get(WALLET.ADDRESS)
+            walletModel.linkbitAddress = it.get(WALLET.CROSSADDRESS)
+            walletModel.balance = balance
+            walletModel
+        }
     }
 
     override fun findByAddress(ctx: DSLContext, address: String): WalletModel {

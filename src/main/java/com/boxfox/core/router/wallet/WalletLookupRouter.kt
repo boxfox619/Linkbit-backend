@@ -1,22 +1,20 @@
 package com.boxfox.core.router.wallet
 
 import com.boxfox.cross.common.data.PostgresConfig
-import com.boxfox.vertx.router.*
-import com.boxfox.vertx.service.*
 import com.boxfox.cross.service.PriceService
 import com.boxfox.cross.service.wallet.WalletService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
+import com.boxfox.vertx.router.AbstractRouter
+import com.boxfox.vertx.router.Param
+import com.boxfox.vertx.router.RouteRegistration
+import com.boxfox.vertx.service.Service
 import com.google.api.client.http.HttpStatusCodes
-import com.linkbit.android.entity.WalletModel
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.one.sys.db.tables.daos.AccountDao
 import io.one.sys.db.tables.daos.WalletDao
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 import org.apache.log4j.Logger
-
-import java.util.ArrayList
-import java.util.Arrays
+import java.util.*
 
 class WalletLookupRouter : AbstractRouter() {
 
@@ -28,33 +26,13 @@ class WalletLookupRouter : AbstractRouter() {
     @RouteRegistration(uri = "/wallet/list", method = arrayOf(HttpMethod.GET), auth = true)
     fun getWallets(ctx: RoutingContext) {
         val locale = ctx.data()["locale"].toString()
-        doAsync<Any> { future ->
-            val uid = ctx.data()["uid"] as String
-            Logger.getRootLogger().info("Wallet list lookup : $uid")
-            val dao = WalletDao(PostgresConfig.create(), vertx)
-            val accountDao = AccountDao(PostgresConfig.create(), vertx)
-            val wallets = ArrayList<WalletModel>()
-            val list = dao.findManyByUid(Arrays.asList(uid)).result()
-            for (i in list.indices) {
-                val wallet = list[i]
-                val service = WalletServiceRegistry.getService(wallet.symbol)
-                val balance = service.getBalance(wallet.address)
-                val krBalance = priceService.getPrice(wallet.address, locale, balance)
-                val walletModel = WalletModel()
-                walletModel.ownerId = wallet.uid
-                walletModel.ownerName = accountDao.findOneById(uid).result().name
-                walletModel.walletName = wallet.name
-                walletModel.coinSymbol = wallet.symbol
-                walletModel.description = wallet.description
-                walletModel.accountAddress = wallet.address
-                walletModel.linkbitAddress = wallet.crossaddress
-                walletModel.balance = balance
-                //walletModel.setKrBalance(krBalance);
-                wallets.add(walletModel)
-            }
-            ctx.response().end(gson.toJson(wallets))
-            future.complete()
-        }
+        val uid = ctx.data()["uid"] as String
+        Logger.getRootLogger().info("Wallet list lookup : $uid")
+        walletService.getWalletList(uid).subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, {
+            ctx.fail(it)
+        })
     }
 
     @RouteRegistration(uri = "/wallet/balance", method = arrayOf(HttpMethod.GET))
@@ -87,7 +65,7 @@ class WalletLookupRouter : AbstractRouter() {
                 ctx.response().statusCode = HttpResponseStatus.NOT_FOUND.code()
             }
             ctx.response().end()
-        },{
+        }, {
             ctx.fail(it)
         })
     }
@@ -140,7 +118,7 @@ class WalletLookupRouter : AbstractRouter() {
     fun walletInfoLookup(ctx: RoutingContext, @Param(name = "address") address: String) {
         walletService.findByAddress(address).subscribe({
             ctx.response().setChunked(true).write(gson.toJson(it)).end()
-        },{
+        }, {
             ctx.fail(it)
         })
     }
