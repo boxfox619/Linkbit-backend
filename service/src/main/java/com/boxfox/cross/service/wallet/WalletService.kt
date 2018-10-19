@@ -1,20 +1,21 @@
 package com.boxfox.cross.service.wallet
 
 
+import com.boxfox.cross.entity.wallet.WalletCreateModel
 import com.boxfox.cross.service.JooqReactiveService
 import com.linkbit.android.entity.WalletModel
 import io.reactivex.Completable
 import io.reactivex.Single
 
-class WalletDatabaseService(private val impl: WalletServiceImpl = WalletServiceImpl()) : JooqReactiveService() {
+class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl()) : JooqReactiveService() {
 
     fun createWallet(uid: String,
                      symbol: String,
+                     password: String,
                      name: String,
-                     address: String,
                      description: String,
                      open: Boolean,
-                     major: Boolean): Single<WalletModel> = createSingle { impl.createWallet(it, uid, symbol, name, address, description, open, major) }
+                     major: Boolean): Single<WalletCreateModel> = createSingle { impl.createWallet(it, uid, symbol, password, name, description, open, major) }
 
     fun findByAddress(address: String): Single<WalletModel> = createSingle { impl.findByAddress(it, address) }
 

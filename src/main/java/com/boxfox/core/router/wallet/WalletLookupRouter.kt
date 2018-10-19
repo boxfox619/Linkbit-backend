@@ -4,7 +4,7 @@ import com.boxfox.cross.common.data.PostgresConfig
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
 import com.boxfox.cross.service.PriceService
-import com.boxfox.cross.service.wallet.WalletDatabaseService
+import com.boxfox.cross.service.wallet.WalletService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
 import com.linkbit.android.entity.WalletModel
@@ -21,7 +21,7 @@ import java.util.Arrays
 class WalletLookupRouter : AbstractRouter() {
 
     @Service
-    private lateinit var walletDatabaseService: WalletDatabaseService
+    private lateinit var walletService: WalletService
     @Service
     private lateinit var priceService: PriceService
 
@@ -59,7 +59,7 @@ class WalletLookupRouter : AbstractRouter() {
 
     @RouteRegistration(uri = "/wallet/balance", method = arrayOf(HttpMethod.GET))
     fun getBalance(ctx: RoutingContext, @Param(name = "address") address: String) {
-        walletDatabaseService.findByAddress(address).subscribe({
+        walletService.findByAddress(address).subscribe({
             val service = WalletServiceRegistry.getService(it.coinSymbol)
             val balance = service.getBalance(it.accountAddress)
             if (balance < 0) {
@@ -76,7 +76,7 @@ class WalletLookupRouter : AbstractRouter() {
     @RouteRegistration(uri = "/wallet/price", method = arrayOf(HttpMethod.GET))
     fun getPrice(ctx: RoutingContext, @Param(name = "address") address: String) {
         val locale = ctx.data()["locale"].toString()
-        walletDatabaseService.findByAddress(address).subscribe({
+        walletService.findByAddress(address).subscribe({
             val symbol = it.coinSymbol
             val accountAddress = it.accountAddress
             val service = WalletServiceRegistry.getService(symbol)
@@ -138,7 +138,7 @@ class WalletLookupRouter : AbstractRouter() {
 
     @RouteRegistration(uri = "/wallet", method = arrayOf(HttpMethod.GET), auth = true)
     fun walletInfoLookup(ctx: RoutingContext, @Param(name = "address") address: String) {
-        walletDatabaseService.findByAddress(address).subscribe({
+        walletService.findByAddress(address).subscribe({
             ctx.response().setChunked(true).write(gson.toJson(it)).end()
         },{
             ctx.fail(it)

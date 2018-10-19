@@ -1,27 +1,17 @@
 package com.boxfox.core.router.wallet
 
-import com.boxfox.cross.common.data.PostgresConfig
 import com.boxfox.cross.service.transaction.TransactionService
-import com.boxfox.cross.service.wallet.WalletDatabaseService
+import com.boxfox.cross.service.wallet.WalletService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
-import com.linkbit.android.entity.TransactionModel
-import io.one.sys.db.tables.daos.WalletDao
-import io.vertx.core.Future
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
-
-import java.util.ArrayList
-import java.util.Arrays
 
 class TransactionRouter : AbstractRouter() {
 
     @Service
     private lateinit var transactionService: TransactionService
-
-    @Service
-    private lateinit var walletDatabaseService: WalletDatabaseService
 
     @RouteRegistration(uri = "/transaction", method = arrayOf(HttpMethod.GET))
     fun lookupTransaction(ctx: RoutingContext,

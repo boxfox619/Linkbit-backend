@@ -1,7 +1,9 @@
 package com.boxfox.cross.service.wallet
 
 import com.boxfox.cross.common.RoutingException
+import com.boxfox.cross.entity.wallet.WalletCreateModel
 import com.boxfox.cross.util.AddressUtil
+import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.linkbit.android.entity.WalletModel
 import org.jooq.Record
 import org.jooq.Result
@@ -14,12 +16,26 @@ import org.jooq.DSLContext
 
 class WalletServiceImpl : WalletUsecase{
 
-    override fun createWallet(ctx: DSLContext, uid: String, symbol: String, name: String, address: String, description: String, open: Boolean, major: Boolean): WalletModel {
+    override fun createWallet(ctx: DSLContext, uid: String, symbol: String, password: String, name: String, description: String, open: Boolean, major: Boolean): WalletCreateModel {
+        val walletCreateResult = WalletServiceRegistry.getService(symbol).createWallet(password)
+        val result = WalletCreateModel()
+        result.walletData = walletCreateResult.walletData.toString()
+        result.walletFileName = walletCreateResult.walletName
+        result.accountAddress = walletCreateResult.address
+        val originalAddress = walletCreateResult.address
         val linkedAddress = AddressUtil.createRandomAddress(ctx)
         ctx.insertInto(WALLET)
-                .values(uid, symbol.toUpperCase(), name, description, address, linkedAddress, open, major)
+                .values(uid, symbol.toUpperCase(), name, description, originalAddress, linkedAddress, open, major)
                 .execute()
-        return findByAddress(ctx, address)
+        val wallet = findByAddress(ctx, originalAddress)
+        result.ownerName = wallet.ownerName
+        result.linkbitAddress = wallet.linkbitAddress
+        result.walletName = wallet.walletName
+        result.description = wallet.description
+        result.coinSymbol = wallet.coinSymbol
+        result.balance = wallet.balance
+        result.ownerId = wallet.ownerId
+        return result
     }
 
     override fun findByAddress(ctx: DSLContext, address: String): WalletModel {
