@@ -26,7 +26,7 @@ class WalletServiceImpl : WalletUsecase{
         ctx.insertInto(WALLET)
                 .values(uid, symbol.toUpperCase(), name, description, originalAddress, linkedAddress, open, major)
                 .execute()
-        val wallet = findByAddress(ctx, originalAddress)
+        val wallet = getWallet(ctx, originalAddress)
         result.ownerName = wallet.ownerName
         result.linkbitAddress = wallet.linkbitAddress
         result.walletName = wallet.walletName
@@ -55,7 +55,7 @@ class WalletServiceImpl : WalletUsecase{
         }
     }
 
-    override fun findByAddress(ctx: DSLContext, address: String): WalletModel {
+    override fun getWallet(ctx: DSLContext, address: String): WalletModel {
         var result: Result<Record>
         if (AddressUtil.isCrossAddress(address)) {
             result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.CROSSADDRESS.eq(address)).fetch()

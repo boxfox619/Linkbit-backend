@@ -1,7 +1,7 @@
 package com.boxfox.core.router.wallet
 
 import com.boxfox.cross.common.data.PostgresConfig
-import com.boxfox.cross.service.PriceService
+import com.boxfox.cross.service.price.PriceService
 import com.boxfox.cross.service.wallet.WalletService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.AbstractRouter
@@ -54,6 +54,7 @@ class WalletLookupRouter : AbstractRouter() {
     @RouteRegistration(uri = "/wallet/price", method = arrayOf(HttpMethod.GET))
     fun getPrice(ctx: RoutingContext, @Param(name = "address") address: String) {
         val locale = ctx.data()["locale"].toString()
+        priceService.getPrice(address, symbol, locale)
         walletService.findByAddress(address).subscribe({
             val symbol = it.coinSymbol
             val accountAddress = it.accountAddress

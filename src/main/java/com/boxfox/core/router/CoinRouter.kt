@@ -2,7 +2,7 @@ package com.boxfox.core.router
 
 import com.boxfox.core.router.model.CoinPriceNetworkObject
 import com.boxfox.cross.service.LocaleService
-import com.boxfox.cross.service.PriceService
+import com.boxfox.cross.service.price.PriceService
 import com.boxfox.cross.service.coin.CoinService
 import com.boxfox.cross.util.LogUtil.getLogger
 import com.boxfox.vertx.router.AbstractRouter

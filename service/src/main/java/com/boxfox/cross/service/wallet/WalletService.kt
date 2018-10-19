@@ -19,7 +19,7 @@ class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl()) :
 
     fun getWalletList(uid: String): Single<WalletModel> = createSingle{ impl.getWalletList(it, uid)  }
 
-    fun findByAddress(address: String): Single<WalletModel> = createSingle { impl.findByAddress(it, address) }
+    fun findByAddress(address: String): Single<WalletModel> = createSingle { impl.getWallet(it, address) }
 
     fun getMajorWallet(uid: String, symbol: String): Single<WalletModel> = createSingle { impl.getMajorWallet(it, uid, symbol) }
 
