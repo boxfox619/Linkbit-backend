@@ -14,7 +14,7 @@ import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
 
-class WalletServiceImpl : WalletUsecase{
+class WalletServiceImpl : WalletUsecase {
 
     override fun createWallet(ctx: DSLContext, uid: String, symbol: String, password: String, name: String, description: String, open: Boolean, major: Boolean): WalletCreateModel {
         val walletCreateResult = WalletServiceRegistry.getService(symbol).createWallet(password)
@@ -61,9 +61,8 @@ class WalletServiceImpl : WalletUsecase{
         if (AddressUtil.isCrossAddress(address)) {
             result = ctx.selectFrom(WALLET.join(ACCOUNT).on(ACCOUNT.UID.eq(WALLET.UID))).where(WALLET.CROSSADDRESS.eq(address)).fetch()
             if (result.size == 0) {
-                result = ctx.selectFrom(
-                        ACCOUNT.join(MAJORWALLET).on(MAJORWALLET.UID.eq(ACCOUNT.UID))
-                                .join(WALLET).on(WALLET.ADDRESS.eq(MAJORWALLET.ADDRESS))).where(ACCOUNT.ADDRESS.eq(address))
+                result = ctx.selectFrom(ACCOUNT.join(MAJORWALLET).on(MAJORWALLET.UID.eq(ACCOUNT.UID))
+                        .join(WALLET).on(WALLET.ADDRESS.eq(MAJORWALLET.ADDRESS))).where(ACCOUNT.ADDRESS.eq(address))
                         .fetch()
             }
         } else {
@@ -133,12 +132,29 @@ class WalletServiceImpl : WalletUsecase{
         }
     }
 
+    override fun getBalance(ctx: DSLContext, symbol: String, address: String): Double {
+        val service = WalletServiceRegistry.getService(symbol)
+        if (service == null) {
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+        } else {
+            return service.getBalance(address)
+        }
+    }
+
+    override fun getBalance(ctx: DSLContext, address: String): Double {
+        val wallet = this.getWallet(ctx, address)
+        if (wallet == null) {
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND)
+        } else {
+            return getBalance(ctx, wallet.coinSymbol, wallet.accountAddress)
+        }
+    }
+
     override fun getTotalBalance(ctx: DSLContext, uid: String, symbol: String): Double {
         val records: Result<WalletRecord> = ctx.selectFrom(WALLET).where(WALLET.UID.eq(uid).and(WALLET.SYMBOL.eq(symbol))).fetch()
-        val service = WalletServiceRegistry.getService(symbol)
-        val balance = 0.0
+        var balance = 0.0
         for (record in records) {
-            service.getBalance(record.address)
+            balance += getBalance(ctx, record.symbol, record.address)
         }
         return balance
     }

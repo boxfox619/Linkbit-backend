@@ -17,7 +17,7 @@ class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl()) :
                      open: Boolean,
                      major: Boolean): Single<WalletCreateModel> = createSingle { impl.createWallet(it, uid, symbol, password, name, description, open, major) }
 
-    fun getWalletList(uid: String): Single<WalletModel> = createSingle{ impl.getWalletList(it, uid)  }
+    fun getWalletList(uid: String): Single<WalletModel> = createSingle { impl.getWalletList(it, uid) }
 
     fun findByAddress(address: String): Single<WalletModel> = createSingle { impl.getWallet(it, address) }
 
@@ -31,5 +31,9 @@ class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl()) :
 
     fun checkOwner(uid: String, address: String): Completable = createCompletable { impl.checkOwner(it, uid, address) }
 
-    fun getTotalBalance(uid: String, symbol: String): Single<Double> = createSingle { impl.getTotalBalance(it, uid, symbol)}
+    fun getBalance(symbol:String, address: String): Single<Double> = createSingle { impl.getBalance(it, symbol, address) }
+
+    fun getBalance(address: String): Single<Double> = createSingle { impl.getBalance(it, address) }
+
+    fun getTotalBalance(uid: String, symbol: String): Single<Double> = createSingle { impl.getTotalBalance(it, uid, symbol) }
 }

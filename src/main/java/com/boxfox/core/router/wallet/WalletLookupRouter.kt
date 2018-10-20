@@ -33,15 +33,8 @@ class WalletLookupRouter : AbstractRouter() {
 
     @RouteRegistration(uri = "/wallet/balance", method = arrayOf(HttpMethod.GET))
     fun getBalance(ctx: RoutingContext, @Param(name = "address") address: String) {
-        walletService.findByAddress(address).subscribe({
-            val service = WalletServiceRegistry.getService(it.coinSymbol)
-            val balance = service.getBalance(it.accountAddress)
-            if (balance < 0) {
-                ctx.response().statusCode = HttpResponseStatus.NOT_FOUND.code()
-            } else {
-                ctx.response().setStatusCode(200).setChunked(true).write(balance.toString())
-            }
-            ctx.response().end()
+        walletService.getBalance(address).subscribe({
+            ctx.response().end(it.toString())
         }, {
             ctx.fail(it)
         })
