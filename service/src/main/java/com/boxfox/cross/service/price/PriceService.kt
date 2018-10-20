@@ -18,7 +18,7 @@ class PriceService(private val impl: PriceServiceImpl = PriceServiceImpl(),
     lateinit var walletService: WalletService
 
     fun getTotalPrice(uid: String, locale: String): Single<Double> {
-        return createSingle { impl.getTotalPrice(it, walletImpl.getWalletList(it, uid).map { it.balance }, localeService.getLocaleMoneySymbol(locale)) }
+        return createSingle { impl.getTotalPrice(it, walletImpl.getWalletList(it, uid), localeService.getLocaleMoneySymbol(locale)) }
     }
 
     fun getWalletPrice(address: String, locale: String): Single<Double> {

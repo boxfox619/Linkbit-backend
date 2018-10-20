@@ -2,6 +2,7 @@ package com.boxfox.cross.service.price
 
 import com.boxfox.cross.common.RoutingException
 import com.google.api.client.http.HttpStatusCodes
+import com.linkbit.android.entity.WalletModel
 import com.mashape.unirest.http.Unirest
 import com.mashape.unirest.http.exceptions.UnirestException
 import org.apache.log4j.Logger
@@ -28,11 +29,12 @@ class PriceServiceImpl : PriceUsecase {
     }
     //@TODO coin price to redis
 
-    override fun getTotalPrice(ctx: DSLContext, balances: List<Double>, moneySymbol: String): Double {
-    }
-
-    override fun getWalletPrice(ctx: DSLContext, address: String, moneySymbol: String): Double {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getTotalPrice(ctx: DSLContext, wallets: List<WalletModel>, moneySymbol: String): Double {
+        var totalPrice = 0.0
+        for (wallet in wallets) {
+            totalPrice += wallet.balance + this.getPrice(ctx, wallet.coinSymbol, moneySymbol)
+        }
+        return totalPrice
     }
 
     override fun getPrice(ctx: DSLContext, symbol: String, locale: String, balance: Double): Double {
