@@ -1,24 +1,32 @@
 package com.boxfox.linkbit.wallet.eth;
 
+import com.boxfox.cross.common.RoutingException;
 import com.boxfox.cross.common.data.PostgresConfig;
 import com.boxfox.linkbit.wallet.WalletServiceException;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.io.Files;
 import com.linkbit.android.entity.TransactionModel;
 import io.one.sys.db.tables.daos.TransactionDao;
 import io.one.sys.db.tables.daos.WalletDao;
 import io.one.sys.db.tables.pojos.Wallet;
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import org.apache.log4j.Logger;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
@@ -33,10 +41,13 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
+import static com.boxfox.cross.service.network.RequestService.request;
+
 public class EthereumTransactionPartService extends EthereumPart implements TransactionPart {
 
   static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
   static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
+  private static final String HTTP_API_ETHERSCAN_IO_API_TXLIST = "http://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM";
 
   public EthereumTransactionPartService(Vertx vertx, Web3j web3, File cachePath) {
     super(vertx, web3, cachePath);
@@ -76,9 +87,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
   }
 
   @Override
-  public Future<List<TransactionModel>> getTransactionList(String address) {
-    Future<List<TransactionModel>> future = Future.future();
-    new Thread(() -> {
+  public List<TransactionModel> getTransactionList(String address) throws RoutingException {
       try {
         int totalBlockNumber = web3.ethBlockNumber().send().getBlockNumber().intValue();
         List<TransactionModel> txStatusList = new ArrayList<>();
@@ -108,13 +117,11 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
           txStatus.setConfirmation(totalBlockNumber - txStatus.getBlockNumber());
           txStatusList.add(txStatus);
         }
-        future.complete(txStatusList);
+        return txStatusList;
       } catch (IOException e) {
         e.printStackTrace();
-        future.fail(e);
+        throw new RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR);
       }
-    }).start();
-    return future;
   }
 
   @Override
@@ -150,6 +157,38 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
     } catch (IOException e) {
       throw new WalletServiceException("Can not get transaction count");
     }
+  }
+
+  @Override
+  public void indexingTransaction(String address){
+    request(HTTP_API_ETHERSCAN_IO_API_TXLIST + "&address=" + address, e -> {
+      if (e.succeeded()) {
+        JsonObject obj = new JsonObject(e.result());
+        JsonArray transactions = obj.getJsonArray("result");
+        for (int i = 0; i < transactions.size(); i++) {
+          JsonObject tx = transactions.getJsonObject(i);
+          String hash = tx.getString("hash");
+          String from = tx.getString("from");
+          String to = tx.getString("to");
+          String value = tx.getString("value");
+          String timeStamp = tx.getString("timeStamp");
+          Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Integer.valueOf(timeStamp));
+          SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
+          String dateTime = simpleDateFormat.format(timestamp);
+          BigDecimal amount = Convert.fromWei(value, Convert.Unit.ETHER);
+          TransactionDao dao = new TransactionDao(PostgresConfig.create(), this.vertx);
+          io.one.sys.db.tables.pojos.Transaction transaction = new io.one.sys.db.tables.pojos.Transaction();
+          transaction.setHash(hash);
+          transaction.setSourceaddress(from);
+          transaction.setTargetaddress(to);
+          transaction.setAmount(Double.valueOf(amount.toPlainString()));
+          transaction.setDatetime(dateTime);
+          dao.insert(transaction);
+        }
+      } else {
+        Logger.getRootLogger().error(e.cause());
+      }
+    });
   }
 
 }

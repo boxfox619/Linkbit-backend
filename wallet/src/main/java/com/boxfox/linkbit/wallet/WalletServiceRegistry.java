@@ -1,6 +1,6 @@
 package com.boxfox.linkbit.wallet;
 
-import com.boxfox.linkbit.wallet.eth.EthereumServicePackage;
+import com.boxfox.linkbit.wallet.eth.EthereumServiceContext;
 import io.vertx.core.Vertx;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ public class WalletServiceRegistry {
   private Map<String, WalletService> serviceMap;
 
   public static void init(Vertx vertx) {
-    register(EthereumServicePackage.create(vertx));
+    register(EthereumServiceContext.create(vertx));
   }
 
   private WalletServiceRegistry() {
@@ -26,12 +26,13 @@ public class WalletServiceRegistry {
     return WalletServiceRegistryInstance.instance;
   }
 
-  public static void register(WalletService service) {
-    getInstance().serviceMap.put(service.symbol, service);
+  public static void register(WalletServiceContext context) {
+    getInstance().serviceMap.put(context.symbol, new WalletService(context));
   }
 
-  public static void register(String[] symbols, WalletService service) {
+  public static void register(String[] symbols, WalletServiceContext context) {
     for (String symbol : symbols) {
+      WalletService service = new WalletService(context);
       service.init();
       getInstance().serviceMap.put(symbol, service);
     }

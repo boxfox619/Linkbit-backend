@@ -1,6 +1,6 @@
 package com.boxfox.linkbit.wallet.eth;
 
-import com.boxfox.linkbit.wallet.WalletService;
+import com.boxfox.linkbit.wallet.WalletServiceContext;
 import com.boxfox.linkbit.wallet.part.BalancePart;
 import com.boxfox.linkbit.wallet.part.CreateWalletPart;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
@@ -12,18 +12,17 @@ import io.vertx.core.Vertx;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
-public class EthereumServicePackage extends WalletService {
+public class EthereumServiceContext extends WalletServiceContext {
     private EthereumBalancePartService balancePart;
     private EthereumCreateWalletPartService createWalletPart;
     private EthereumTransactionPartService transactionPart;
-    private EthIndexingService indexingService;
 
-    private EthereumServicePackage(Vertx vertx) {
-        super(vertx, "ETH");
+    private EthereumServiceContext() {
+        super("ETH");
     }
 
-    public static EthereumServicePackage create(Vertx vertx) {
-        EthereumServicePackage service = new EthereumServicePackage(vertx);
+    public static EthereumServiceContext create(Vertx vertx) {
+        EthereumServiceContext service = new EthereumServiceContext();
         Web3j web3 = Web3j.build(new HttpService("https://mainnet.infura.io/v3/326b0d7561824e0b8c4ee1f30e257019"));
         File cachePath = new File(Config.getDefaultInstance().getString("cachePath", "wallets"));
         if (!cachePath.exists())
@@ -31,8 +30,6 @@ public class EthereumServicePackage extends WalletService {
         service.balancePart = new EthereumBalancePartService(vertx, web3, cachePath);
         service.createWalletPart = new EthereumCreateWalletPartService(vertx, web3, cachePath);
         service.transactionPart = new EthereumTransactionPartService(vertx, web3, cachePath);
-        service.indexingService = new EthIndexingService(web3, vertx);
-        service.setIndexingService(service.indexingService);
         return service;
     }
 
