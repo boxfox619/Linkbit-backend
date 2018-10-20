@@ -39,7 +39,7 @@ public class WalletService extends AbstractService implements BalancePart, Creat
 
     @Override
     public List<TransactionModel> getTransactionList(String address) throws WalletServiceException, RoutingException {
-        this.doIndexingTransaction(address);
+        this.requestTransactionIndexing(address);
         return context.getTransactionPart().getTransactionList(address);
     }
 
@@ -58,7 +58,7 @@ public class WalletService extends AbstractService implements BalancePart, Creat
         context.getTransactionPart().indexingTransaction(address);
     }
 
-    private void doIndexingTransaction(String address) {
+    public void requestTransactionIndexing(String address) {
         IndexingMessage msg = new IndexingMessage();
         msg.setSymbol(context.symbol);
         msg.setAddress(address);

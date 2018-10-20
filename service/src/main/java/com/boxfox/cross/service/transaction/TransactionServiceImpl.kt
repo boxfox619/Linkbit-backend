@@ -37,7 +37,7 @@ class TransactionServiceImpl : TransactionUsecase {
         val transactionList = ArrayList<TransactionModel>()
         if (records.isEmpty()) {
             ctx.selectFrom(WALLET).where(WALLET.ADDRESS.eq(address).or(WALLET.CROSSADDRESS.eq(address))).fetch().forEach { record ->
-                WalletServiceRegistry.getService(record.symbol).indexingTransactions(record.address)
+                WalletServiceRegistry.getService(record.symbol).requestTransactionIndexing(record.address)
             }
         }
         for (record in records) {
@@ -57,7 +57,7 @@ class TransactionServiceImpl : TransactionUsecase {
         val totalTxStatusList = ArrayList<TransactionModel>()
         if (records.isEmpty()) {
             ctx.selectFrom(WALLET).where(WALLET.UID.eq(uid)).fetch().forEach { record ->
-                WalletServiceRegistry.getService(record.symbol).indexingTransactions(record.address)
+                WalletServiceRegistry.getService(record.symbol).requestTransactionIndexing(record.address)
             }
         }
         for (record in records) {

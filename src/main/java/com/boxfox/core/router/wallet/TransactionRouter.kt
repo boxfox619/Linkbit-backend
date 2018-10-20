@@ -36,7 +36,6 @@ class TransactionRouter : AbstractRouter() {
                               @Param(name = "address") address: String,
                               @Param(name = "page") page: Int,
                               @Param(name = "count") count: Int) {
-        //@TODO transaction list pagenation
         transactionService.getTransactionList(address, page, count).subscribe({
             ctx.response().end(gson.toJson(it))
         },{

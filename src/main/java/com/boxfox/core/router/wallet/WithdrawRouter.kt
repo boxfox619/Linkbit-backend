@@ -3,16 +3,17 @@ package com.boxfox.core.router.wallet
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
 import com.boxfox.cross.service.wallet.WalletService
+import com.boxfox.cross.service.withdraw.WithdrawService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 
-class RemittanceRouter : AbstractRouter() {
+class WithdrawRouter : AbstractRouter() {
 
     @Service
-    private lateinit var walletService: WalletService
+    private lateinit var withdrawService: WithdrawService
 
-    @RouteRegistration(uri = "/remittance", method = arrayOf(HttpMethod.POST))
+    @RouteRegistration(uri = "/withdraw", method = arrayOf(HttpMethod.POST))
     fun send(ctx: RoutingContext,
              @Param(name = "symbol") symbol: String,
              @Param(name = "walletName") walletName: String,
@@ -20,13 +21,8 @@ class RemittanceRouter : AbstractRouter() {
              @Param(name = "password") password: String,
              @Param(name = "targetAddress") targetAddress: String,
              @Param(name = "amount") amount: String) {
-        val service = WalletServiceRegistry.getService(symbol)
-        walletService.findByAddress(targetAddress).subscribe({
-            var destAddress = it.accountAddress
-            val result = service.send(walletName, walletData, password, destAddress, amount)
-            ctx.response().putHeader("content-type", "application/json")
-            ctx.response().setChunked(true).write(gson.toJson(result))
-            ctx.response().end()
+        withdrawService.withdraw(symbol, walletName, walletData, password, targetAddress, amount).subscribe({
+            ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
         })
