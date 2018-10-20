@@ -39,6 +39,6 @@ class PriceService(private val impl: PriceServiceImpl = PriceServiceImpl(),
 
     @JvmOverloads
     fun getPrice(symbol: String, locale: String = Locale.KOREA.toString()): Single<Double> {
-        return createSingle{impl.getPrice(it, symbol, localeService.getLocaleMoneySymbol(symbol))}
+        return impl.getPrice(symbol, locale)
     }
 }
