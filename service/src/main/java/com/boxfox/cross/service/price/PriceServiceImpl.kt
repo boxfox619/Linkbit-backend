@@ -11,23 +11,6 @@ import org.json.JSONObject
 import java.util.*
 
 class PriceServiceImpl : PriceUsecase {
-    private val coinIdMap: MutableMap<String, Int>
-
-    init {
-        this.coinIdMap = HashMap()
-        try {
-            val array = Unirest.get(COINMARKET_CAP_URL + "listings/").asJson().body.getObject().getJSONArray("data")
-            array.forEach { obj ->
-                val coin = obj as JSONObject
-                val symbol = coin.getString("symbol")
-                val id = coin.getInt("id")
-                coinIdMap[symbol] = id
-            }
-        } catch (e: UnirestException) {
-            e.printStackTrace()
-        }
-    }
-    //@TODO coin price to redis
 
     override fun getTotalPrice(ctx: DSLContext, wallets: List<WalletModel>, moneySymbol: String): Double {
         var totalPrice = 0.0
@@ -44,25 +27,8 @@ class PriceServiceImpl : PriceUsecase {
     override fun getPrice(ctx: DSLContext, symbol: String, moneySymbol: String): Double {
         var symbol = symbol
         symbol = symbol.toUpperCase()
-        if (coinIdMap.containsKey(symbol)) {
-            try {
-                val id = coinIdMap[symbol]
-                val url = String.format("%s%s/?convert=%s", COINMARKET_CAP_URL + "ticker/", id, moneySymbol)
-                val obj = Unirest
-                        .get(url).asJson()
-                        .body.getObject()
-                val krw = obj.getJSONObject("data").getJSONObject("quotes").getJSONObject(moneySymbol)
-                return krw.getDouble("price")
-            } catch (e: UnirestException) {
-                Logger.getRootLogger().error(e)
-                throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-            }
-        }
+        //@TODO Implement price getting from redis
         throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "coin price not found")
-    }
-
-    companion object {
-        private val COINMARKET_CAP_URL = "https://api.coinmarketcap.com/v2/"
     }
 
 }
