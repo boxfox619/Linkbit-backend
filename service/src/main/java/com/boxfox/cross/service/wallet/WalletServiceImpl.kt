@@ -1,7 +1,7 @@
 package com.boxfox.cross.service.wallet
 
 import com.boxfox.cross.common.RoutingException
-import com.boxfox.cross.entity.wallet.WalletCreateModel
+import com.boxfox.cross.common.entity.wallet.WalletCreateModel
 import com.boxfox.cross.util.AddressUtil
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes

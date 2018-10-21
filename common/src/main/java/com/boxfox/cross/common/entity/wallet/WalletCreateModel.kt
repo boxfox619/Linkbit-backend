@@ -1,4 +1,4 @@
-package com.boxfox.cross.entity.wallet
+package com.boxfox.cross.common.entity.wallet
 
 import com.linkbit.android.entity.WalletModel
 

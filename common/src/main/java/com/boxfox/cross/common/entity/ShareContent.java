@@ -1,4 +1,4 @@
-package com.boxfox.cross.entity;
+package com.boxfox.cross.common.entity;
 
 public class ShareContent {
     private String address;

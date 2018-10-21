@@ -1,7 +1,10 @@
 package com.boxfox.linkbit.wallet;
 
+import com.boxfox.linkbit.util.ERC20Tokens;
 import com.boxfox.linkbit.wallet.eth.EthereumServiceContext;
 import io.vertx.core.Vertx;
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +13,10 @@ public class WalletServiceRegistry {
   private Map<String, WalletService> serviceMap;
 
   public static void init(Vertx vertx) {
+    Logger.getRootLogger().info("Start wallet services initializing");
     register(EthereumServiceContext.create(vertx));
+    ERC20Tokens.init();
+    Logger.getRootLogger().info("Finish wallet services initialization");
   }
 
   private WalletServiceRegistry() {

@@ -1,4 +1,4 @@
-package com.boxfox.cross.entity.transaction
+package com.boxfox.cross.common.entity.transaction
 
 import com.linkbit.android.entity.TransactionModel
 import io.one.sys.db.Tables.TRANSACTION

@@ -1,6 +1,6 @@
 package com.boxfox.cross.service;
 
-import com.boxfox.cross.entity.ShareContent;
+import com.boxfox.cross.common.entity.ShareContent;
 import com.boxfox.cross.util.AES256Util;
 import com.boxfox.vertx.data.Config;
 import com.boxfox.vertx.service.AbstractService;

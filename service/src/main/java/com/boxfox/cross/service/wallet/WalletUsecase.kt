@@ -1,6 +1,6 @@
 package com.boxfox.cross.service.wallet
 
-import com.boxfox.cross.entity.wallet.WalletCreateModel
+import com.boxfox.cross.common.entity.wallet.WalletCreateModel
 import com.linkbit.android.entity.WalletModel
 import org.jooq.DSLContext
 

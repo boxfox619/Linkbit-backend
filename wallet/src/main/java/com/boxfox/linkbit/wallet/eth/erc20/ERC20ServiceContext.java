@@ -4,16 +4,17 @@ import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
 import com.boxfox.linkbit.util.DigitsUtils;
 import com.boxfox.linkbit.util.ERC20Tokens;
-import com.boxfox.linkbit.wallet.WalletService;
+import com.boxfox.linkbit.wallet.WalletServiceContext;
 import com.boxfox.linkbit.wallet.WalletServiceException;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.boxfox.linkbit.wallet.model.WalletCreateResult;
+import com.boxfox.linkbit.wallet.part.BalancePart;
+import com.boxfox.linkbit.wallet.part.CreateWalletPart;
+import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.boxfox.vertx.data.Config;
 import com.google.common.io.Files;
 import com.google.firebase.internal.NonNull;
 import com.linkbit.android.entity.TransactionModel;
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -32,14 +33,14 @@ import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 
-public abstract class ERC20Service extends WalletService {
+public class ERC20ServiceContext extends WalletServiceContext implements TransactionPart, BalancePart, CreateWalletPart {
     protected static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
     protected static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
 
     private Web3j web3;
 
-    public ERC20Service(Vertx vertx, String symbol) {
-        super(vertx, symbol);
+    public ERC20ServiceContext(String symbol) {
+        super(symbol);
         this.web3 = Web3j.build(new HttpService("https://mainnet.infura.io/JjSRoXryXbE6HgXJGILz"));
     }
 
@@ -124,7 +125,7 @@ public abstract class ERC20Service extends WalletService {
     }
 
     @Override
-    public Future<List<TransactionModel>> getTransactionList(String address) throws WalletServiceException {
+    public List<TransactionModel> getTransactionList(String address) throws WalletServiceException {
         return null;
     }
 
@@ -136,5 +137,25 @@ public abstract class ERC20Service extends WalletService {
     @Override
     public int getTransactionCount(String address) throws WalletServiceException {
         return 0;
+    }
+
+    @Override
+    public void indexingTransaction(String address) {
+
+    }
+
+    @Override
+    public BalancePart getBalancePart() {
+        return this;
+    }
+
+    @Override
+    public CreateWalletPart getCreateWalletPart() {
+        return this;
+    }
+
+    @Override
+    public TransactionPart getTransactionPart() {
+        return this;
     }
 }
