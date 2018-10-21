@@ -1,11 +1,9 @@
 package com.boxfox.cross.service.price
 
+import com.boxfox.cross.common.data.RedisConfig
 import com.mashape.unirest.http.Unirest
 import com.mashape.unirest.http.exceptions.UnirestException
 import io.vertx.core.AbstractVerticle
-import io.vertx.redis.RedisClient
-import io.vertx.redis.RedisOptions
-import org.apache.log4j.Logger
 import org.json.JSONObject
 import java.util.*
 
@@ -16,26 +14,25 @@ class PriceIndexingVerticle : AbstractVerticle() {
     }
 
     fun priceParsingCycle() {
-        val config = RedisOptions().setHost("127.0.0.1")
-        val redis = RedisClient.create(vertx, config)
-        try {
-            val array = Unirest.get(COINMARKET_CAP_URL + "listings/").asJson().body.getObject().getJSONArray("data")
-            array.forEach { obj ->
-                val coin = obj as JSONObject
-                val symbol = coin.getString("symbol")
-                val id = coin.getInt("id")
-                for (money in moneySymbols) {
-                    val price = parseCoinPrice(id, money)
-                    redis.hset("Currency", String.format("%s-%s", symbol, money), price.toString()) {}
+        val pool = RedisConfig.createPool()
+        pool.resource.use {jedis ->
+            try  {
+                val array = Unirest.get(COINMARKET_CAP_URL + "listings/").asJson().body.getObject().getJSONArray("data")
+                array.forEach { obj ->
+                    val coin = obj as JSONObject
+                    val symbol = coin.getString("symbol")
+                    val id = coin.getInt("id")
+                    for (money in moneySymbols) {
+                        val price = parseCoinPrice(id, money)
+                        jedis.hset("Currency", String.format("%s-%s", symbol, money), price.toString())
+                    }
                 }
+                vertx.setTimer(3000) {
+                    priceParsingCycle()
+                }
+            } catch (e: UnirestException) {
+                e.printStackTrace()
             }
-            vertx.setTimer(3000) {
-                priceParsingCycle()
-            }
-        } catch (e: UnirestException) {
-            e.printStackTrace()
-        } finally {
-            redis.close{}
         }
     }
 

@@ -1,7 +1,6 @@
 package com.boxfox.cross.service.price
 
 import com.linkbit.android.entity.WalletModel
-import io.reactivex.Single
 import org.jooq.DSLContext
 
 interface PriceUsecase {
@@ -10,5 +9,5 @@ interface PriceUsecase {
 
     fun getPrice(ctx: DSLContext, symbol: String, moneySymbol: String, balance: Double): Double
 
-    fun getPrice(symbol: String, moneySymbol: String): Single<Double>
+    fun getPrice(symbol: String, moneySymbol: String): Double
 }
