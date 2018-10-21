@@ -5,9 +5,10 @@ import com.linkbit.android.entity.WalletModel
 import org.jooq.DSLContext
 
 interface WalletUsecase {
-    fun createWallet(ctx: DSLContext, uid: String, symbol: String, name: String, address: String, description: String, open: Boolean, major: Boolean): WalletCreateModel
+    fun createWallet(ctx: DSLContext, uid: String, symbol: String, password: String, name: String, description: String, open: Boolean, major: Boolean): WalletCreateModel
     fun getWallet(ctx: DSLContext, address: String): WalletModel
     fun getWalletList(ctx: DSLContext, uid: String): List<WalletModel>
+    fun getWalletList(ctx: DSLContext, uid: String, symbol: String): List<WalletModel>
     fun getMajorWallet(ctx: DSLContext, uid: String, symbol: String): WalletModel
     fun setMajorWallet(ctx: DSLContext, uid: String, symbol: String, address: String)
     fun updateWallet(ctx: DSLContext, uid: String, address: String, name: String, description: String, open: Boolean, major: Boolean)

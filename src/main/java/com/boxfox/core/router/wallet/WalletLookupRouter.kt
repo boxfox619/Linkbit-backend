@@ -21,7 +21,6 @@ class WalletLookupRouter : AbstractRouter() {
 
     @RouteRegistration(uri = "/wallet/list", method = arrayOf(HttpMethod.GET), auth = true)
     fun getWallets(ctx: RoutingContext) {
-        val locale = ctx.data()["locale"].toString()
         val uid = ctx.data()["uid"] as String
         Logger.getRootLogger().info("Wallet list lookup : $uid")
         walletService.getWalletList(uid).subscribe({
@@ -64,7 +63,7 @@ class WalletLookupRouter : AbstractRouter() {
     fun getTotalPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         val uid = ctx.data()["uid"] as String
         val locale = ctx.data()["locale"].toString()
-        priceService.getTotalPrice(uid, locale).subscribe({
+        priceService.getTotalPrice(uid, symbol, locale).subscribe({
             ctx.response().end(it.toString())
         }, {
             ctx.fail(it)

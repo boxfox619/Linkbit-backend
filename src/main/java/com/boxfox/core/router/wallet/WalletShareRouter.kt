@@ -41,7 +41,7 @@ class WalletShareRouter : AbstractRouter() {
             val url = urlPrefix + data
             val qrFile = shareService.createQRImage(url)
             ctx.response().sendFile(qrFile.name)
-            ctx.response().closeHandler { e -> qrFile.delete() }
+            ctx.response().closeHandler { qrFile.delete() }
         }, {
             ctx.fail(it)
         })

@@ -37,18 +37,21 @@ class CoinRouter : AbstractRouter() {
     fun getCoinPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String, @Param(name = "locale") locale: String) {
         localeService.getLocaleMoneySymbol(locale) { res ->
             if (res.succeeded()) {
-                val unit = res.result()
-                val price = priceService.getPrice(symbol, locale)
-                if (price > 0) {
-                    val result = CoinPriceNetworkObject()
-                    result.amount = price
-                    result.unit = unit
-                    ctx.response().end(gson.toJson(result))
-                } else {
-                    ctx.response().setStatusCode(404).end()
-                }
+                priceService.getPrice(symbol).subscribe({ price ->
+                    val unit = res.result()
+                    if (price > 0) {
+                        val result = CoinPriceNetworkObject()
+                        result.amount = price
+                        result.unit = unit
+                        ctx.response().end(gson.toJson(result))
+                    } else {
+                        ctx.response().setStatusCode(404).end()
+                    }
+                },{
+                    ctx.fail(it)
+                })
             } else {
-                ctx.response().setStatusCode(500).end()
+                ctx.fail(res.cause())
             }
         }
     }

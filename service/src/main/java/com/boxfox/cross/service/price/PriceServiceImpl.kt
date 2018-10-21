@@ -16,15 +16,13 @@ class PriceServiceImpl : PriceUsecase {
         return totalPrice
     }
 
-    override fun getPrice(ctx: DSLContext, symbol: String, locale: String, balance: Double): Double {
-        return this.getPrice(ctx, symbol, locale, balance) * balance
+    override fun getPrice(ctx: DSLContext, symbol: String, moneySymbol: String, balance: Double): Double {
+        return this.getPrice(ctx, symbol, moneySymbol, balance) * balance
     }
 
     override fun getPrice(symbol: String, moneySymbol: String): Double {
         RedisConfig.createPool().resource.use { jedis ->
-            var symbol = symbol
-            symbol = symbol.toUpperCase()
-            val value = jedis.hget("currency", String.format("%s-%s", symbol, moneySymbol))
+            val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
             if (value!=null) {
                 return value.toDouble()
             } else {

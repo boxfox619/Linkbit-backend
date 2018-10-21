@@ -29,6 +29,13 @@ class PriceService(private val impl: PriceServiceImpl = PriceServiceImpl(),
         }
     }
 
+    fun getTotalPrice(uid: String, symbol: String, locale: String): Single<Double> {
+        return createSingle {
+            val wallets = walletImpl.getWalletList(it,uid, symbol)
+            impl.getTotalPrice(it, wallets, localeService.getLocaleMoneySymbol(locale))
+        }
+    }
+
     fun getPrice(symbol: String, balance: Double): Single<Double> {
         return createSingle { impl.getPrice(it, symbol, Locale.KOREA.toString(), balance) }
     }

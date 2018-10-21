@@ -2,6 +2,7 @@ package com.boxfox.cross.service.wallet
 
 import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.common.entity.wallet.WalletCreateModel
+import com.boxfox.cross.common.entity.wallet.WalletRecordEntityMapper
 import com.boxfox.cross.util.AddressUtil
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
@@ -43,14 +44,18 @@ class WalletServiceImpl : WalletUsecase {
         return records.map {
             val service = WalletServiceRegistry.getService(it.get(WALLET.SYMBOL))
             val balance = service.getBalance(it.get(WALLET.ADDRESS))
-            val walletModel = WalletModel()
-            walletModel.ownerId = it.get(WALLET.UID)
-            walletModel.ownerName = it.get(ACCOUNT.NAME)
-            walletModel.walletName = it.get(WALLET.NAME)
-            walletModel.coinSymbol = it.get(WALLET.SYMBOL)
-            walletModel.description = it.get(WALLET.DESCRIPTION)
-            walletModel.accountAddress = it.get(WALLET.ADDRESS)
-            walletModel.linkbitAddress = it.get(WALLET.CROSSADDRESS)
+            val walletModel = WalletRecordEntityMapper.fromRecord(it)
+            walletModel.balance = balance
+            walletModel
+        }
+    }
+
+    override fun getWalletList(ctx: DSLContext, uid: String, symbol: String): List<WalletModel> {
+        val records = ctx.selectFrom(WALLET.join(ACCOUNT).on(WALLET.UID.eq(ACCOUNT.UID))).where(WALLET.UID.eq(uid).and(WALLET.SYMBOL.eq(symbol))).fetch()
+        return records.map {
+            val service = WalletServiceRegistry.getService(it.get(WALLET.SYMBOL))
+            val balance = service.getBalance(it.get(WALLET.ADDRESS))
+            val walletModel = WalletRecordEntityMapper.fromRecord(it)
             walletModel.balance = balance
             walletModel
         }
@@ -143,11 +148,7 @@ class WalletServiceImpl : WalletUsecase {
 
     override fun getBalance(ctx: DSLContext, address: String): Double {
         val wallet = this.getWallet(ctx, address)
-        if (wallet == null) {
-            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND)
-        } else {
-            return getBalance(ctx, wallet.coinSymbol, wallet.accountAddress)
-        }
+        return getBalance(ctx, wallet.coinSymbol, wallet.accountAddress)
     }
 
     override fun getTotalBalance(ctx: DSLContext, uid: String, symbol: String): Double {
