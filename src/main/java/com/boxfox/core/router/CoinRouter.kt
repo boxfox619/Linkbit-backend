@@ -34,7 +34,8 @@ class CoinRouter : AbstractRouter() {
     }
 
     @RouteRegistration(uri = "/coin/price", method = arrayOf(HttpMethod.GET))
-    fun getCoinPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String, @Param(name = "locale") locale: String) {
+    fun getCoinPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
+        val locale = ctx.data()["locale"].toString()
         localeService.getLocaleMoneySymbol(locale) { res ->
             if (res.succeeded()) {
                 priceService.getPrice(symbol).subscribe({ price ->
