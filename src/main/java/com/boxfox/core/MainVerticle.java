@@ -1,17 +1,20 @@
 package com.boxfox.core;
 
+import static com.sun.deploy.util.BufferUtil.MB;
+
+import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
-import com.boxfox.cross.common.vertx.middleware.CORSHandler;
+import com.boxfox.cross.common.vertx.middleware.SecureHeaderHandler;
 import com.boxfox.cross.service.price.PriceIndexingVerticle;
 import com.boxfox.linkbit.wallet.WalletServiceRegistry;
+import com.boxfox.linkbit.wallet.indexing.TransactionIndexingVerticle;
 import com.boxfox.vertx.data.Config;
 import com.boxfox.vertx.middleware.FirebaseAuthHandler;
+import com.boxfox.vertx.router.RouteRegister;
+import com.boxfox.vertx.service.AsyncService;
 import com.boxfox.vertx.util.FirebaseUtil;
-import com.boxfox.vertx.router.*;
-import com.boxfox.vertx.service.*;
-import com.boxfox.linkbit.wallet.indexing.TransactionIndexingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -19,10 +22,11 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CookieHandler;
+import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.StaticHandler;
-import org.apache.log4j.Logger;
-
+import io.vertx.ext.web.sstore.LocalSessionStore;
 import java.io.IOException;
+import org.apache.log4j.Logger;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -38,8 +42,14 @@ public class MainVerticle extends AbstractVerticle {
         }
         RouteRegister routeRegister = RouteRegister.routing(vertx, FirebaseAuthHandler.create());
         Router router = routeRegister.getRouter();
+        router.route().handler(SessionHandler
+            .create(LocalSessionStore.create(vertx))
+            .setCookieHttpOnlyFlag(true)
+            .setCookieSecureFlag(true)
+        );
+        router.route().handler(SecureHeaderHandler.create());
         router.route().handler(CookieHandler.create());
-        router.route().handler(BodyHandler.create());
+        router.route().handler(BodyHandler.create().setBodyLimit(50 * MB));
         router.route("/*").handler(CORSHandler.create());
         router.route("/*").handler(LocaleHandler.create());
         router.route("/*").handler(LoggerHandler.create());
