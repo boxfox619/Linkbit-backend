@@ -12,6 +12,7 @@ import org.jooq.DSLContext
 import java.util.*
 
 class TransactionServiceImpl : TransactionUsecase {
+
     override fun getTransaction(ctx: DSLContext, symbol: String, txHash: String): TransactionModel {
         var record: TransactionRecord? = ctx.selectFrom(TRANSACTION).where(TRANSACTION.HASH.eq(txHash)).fetch().firstOrNull()
         var transaction: TransactionModel
@@ -66,8 +67,28 @@ class TransactionServiceImpl : TransactionUsecase {
         return totalTxStatusList
     }
 
+    override fun getAllTransactionList(ctx: DSLContext, uid: String, page: Int, count: Int): List<TransactionModel> {
+        var records = ctx
+                .selectFrom(TRANSACTION.join(WALLET).on(TRANSACTION.SOURCEADDRESS.eq(WALLET.ADDRESS).or(TRANSACTION.TARGETADDRESS.eq(WALLET.ADDRESS))))
+                .where(WALLET.UID.eq(uid))
+                .orderBy(TRANSACTION.DATETIME)
+                .offset(page * count)
+                .limit(count)
+                .fetch()
+        val totalTxStatusList = ArrayList<TransactionModel>()
+        if (records.isEmpty()) {
+            ctx.selectFrom(WALLET).where(WALLET.UID.eq(uid)).fetch().forEach { record ->
+                WalletServiceRegistry.getService(record.symbol).requestTransactionIndexing(record.address)
+            }
+        }
+        for (record in records) {
+            totalTxStatusList.add(TransactionRecordEntityMapper.fromRecord(record))
+        }
+        return totalTxStatusList
+    }
+
     override fun getTransactionCount(ctx: DSLContext, address: String): Int {
-        val count = ctx.selectFrom(TRANSACTION.join(WALLET).on(TRANSACTION.SOURCEADDRESS.eq(WALLET.ADDRESS).or(TRANSACTION.TARGETADDRESS.eq(WALLET.ADDRESS))))
+        val count = ctx.selectCount().from(TRANSACTION.join(WALLET).on(TRANSACTION.SOURCEADDRESS.eq(WALLET.ADDRESS).or(TRANSACTION.TARGETADDRESS.eq(WALLET.ADDRESS))))
                 .where(WALLET.ADDRESS.eq(address).or(WALLET.CROSSADDRESS.eq(address)))
                 .fetch()
                 .size
@@ -75,8 +96,15 @@ class TransactionServiceImpl : TransactionUsecase {
     }
 
     override fun getAllTransactionCount(ctx: DSLContext, symbol: String, uid: String): Int {
-        val count = ctx.selectFrom(TRANSACTION.join(WALLET).on(TRANSACTION.SOURCEADDRESS.eq(WALLET.ADDRESS).or(TRANSACTION.TARGETADDRESS.eq(WALLET.ADDRESS))))
+        val count = ctx.selectCount().from(TRANSACTION.join(WALLET).on(TRANSACTION.SOURCEADDRESS.eq(WALLET.ADDRESS).or(TRANSACTION.TARGETADDRESS.eq(WALLET.ADDRESS))))
                 .where(WALLET.UID.eq(uid).and(WALLET.SYMBOL.eq(symbol)))
+                .count()
+        return count
+    }
+
+    override fun getAllTransactionCount(ctx: DSLContext, uid: String): Int {
+        val count = ctx.selectCount().from(TRANSACTION.join(WALLET).on(TRANSACTION.SOURCEADDRESS.eq(WALLET.ADDRESS).or(TRANSACTION.TARGETADDRESS.eq(WALLET.ADDRESS))))
+                .where(WALLET.UID.eq(uid))
                 .fetch()
                 .size
         return count
