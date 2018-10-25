@@ -1,7 +1,6 @@
 package com.boxfox.core;
 
 import com.boxfox.cross.common.vertx.middleware.*;
-import static com.sun.deploy.util.BufferUtil.MB;
 
 import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
@@ -53,7 +52,7 @@ public class MainVerticle extends AbstractVerticle {
         );
         router.route().handler(SecureHeaderHandler.create());
         router.route().handler(CookieHandler.create());
-        router.route().handler(BodyHandler.create().setBodyLimit(50 * MB));
+        router.route().handler(BodyHandler.create().setBodyLimit(50 * 1048576L));
         router.route("/*").handler(CORSHandler.create());
         router.route("/*").handler(LocaleHandler.create());
         router.route("/*").handler(LoggerHandler.create());
