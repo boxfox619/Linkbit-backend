@@ -11,7 +11,7 @@ class PriceServiceImpl : PriceUsecase {
     override fun getTotalPrice(ctx: DSLContext, wallets: List<WalletModel>, moneySymbol: String): Double {
         var totalPrice = 0.0
         for (wallet in wallets) {
-            totalPrice += wallet.balance + this.getPrice(wallet.coinSymbol, moneySymbol)
+            totalPrice += wallet.balance * this.getPrice(wallet.coinSymbol, moneySymbol)
         }
         return totalPrice
     }

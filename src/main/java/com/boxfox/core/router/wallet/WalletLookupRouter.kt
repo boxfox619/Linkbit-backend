@@ -49,8 +49,8 @@ class WalletLookupRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/wallet/balance/all", method = arrayOf(HttpMethod.GET), auth = true)
-    fun getTotalBalance(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
+    @RouteRegistration(uri = "/wallet/balance/:symbol", method = arrayOf(HttpMethod.GET), auth = true)
+    fun getTotalBalanceWithSymbol(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         val uid = ctx.data()["uid"] as String
         walletService.getTotalBalance(uid, symbol).subscribe({
             ctx.response().end(it.toString())
@@ -59,11 +59,22 @@ class WalletLookupRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/wallet/price/all", method = arrayOf(HttpMethod.GET), auth = true)
-    fun getTotalPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
+    @RouteRegistration(uri = "/wallet/price/:symbol", method = arrayOf(HttpMethod.GET), auth = true)
+    fun getTotalPriceWithSymbol(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         val uid = ctx.data()["uid"] as String
         val locale = ctx.data()["locale"].toString()
         priceService.getTotalPrice(uid, symbol, locale).subscribe({
+            ctx.response().end(it.toString())
+        }, {
+            ctx.fail(it)
+        })
+    }
+
+    @RouteRegistration(uri = "/wallet/price/all", method = arrayOf(HttpMethod.GET), auth = true)
+    fun getTotalPrice(ctx: RoutingContext) {
+        val uid = ctx.data()["uid"] as String
+        val locale = ctx.data()["locale"].toString()
+        priceService.getTotalPrice(uid, locale).subscribe({
             ctx.response().end(it.toString())
         }, {
             ctx.fail(it)
