@@ -1,9 +1,6 @@
 package com.boxfox.core;
 
-import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
-import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
-import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
-import com.boxfox.cross.common.vertx.middleware.CORSHandler;
+import com.boxfox.cross.common.vertx.middleware.*;
 import com.boxfox.cross.service.price.PriceIndexingVerticle;
 import com.boxfox.linkbit.wallet.WalletServiceRegistry;
 import com.boxfox.vertx.data.Config;
@@ -15,6 +12,7 @@ import com.boxfox.linkbit.wallet.indexing.TransactionIndexingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -36,7 +34,9 @@ public class MainVerticle extends AbstractVerticle {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        RouteRegister routeRegister = RouteRegister.routing(vertx, FirebaseAuthHandler.create());
+        boolean isDebugMode = Config.getDefaultInstance().getBoolean("debug");
+        Handler authHandler = (isDebugMode) ? DebugAuthHandler.create() : FirebaseAuthHandler.create();
+        RouteRegister routeRegister = RouteRegister.routing(vertx, authHandler);
         Router router = routeRegister.getRouter();
         router.route().handler(CookieHandler.create());
         router.route().handler(BodyHandler.create());

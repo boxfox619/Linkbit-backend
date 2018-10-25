@@ -10,6 +10,7 @@ import java.util.*
 
 class PriceIndexingVerticle : AbstractVerticle() {
     override fun start() {
+        //@TODO
         priceParsingCycle()
     }
 
