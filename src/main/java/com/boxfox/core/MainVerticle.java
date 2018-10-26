@@ -2,7 +2,6 @@ package com.boxfox.core;
 
 import com.boxfox.cross.common.vertx.middleware.*;
 
-import com.boxfox.cross.common.vertx.middleware.CORSHandler;
 import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
 import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
 import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
@@ -21,12 +20,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.CookieHandler;
-import io.vertx.ext.web.handler.SessionHandler;
-import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.*;
 import io.vertx.ext.web.sstore.LocalSessionStore;
+
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 
 public class MainVerticle extends AbstractVerticle {
@@ -46,14 +44,22 @@ public class MainVerticle extends AbstractVerticle {
         RouteRegister routeRegister = RouteRegister.routing(vertx, authHandler);
         Router router = routeRegister.getRouter();
         router.route().handler(SessionHandler
-            .create(LocalSessionStore.create(vertx))
-            .setCookieHttpOnlyFlag(true)
-            .setCookieSecureFlag(true)
+                .create(LocalSessionStore.create(vertx))
+                .setCookieHttpOnlyFlag(true)
+                .setCookieSecureFlag(true)
         );
+        router.route().handler(CorsHandler.create(".*")
+                .allowedMethod(io.vertx.core.http.HttpMethod.GET)
+                .allowedMethod(io.vertx.core.http.HttpMethod.POST)
+                .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
+                .allowedHeader("Access-Control-Request-Method")
+                .allowedHeader("Access-Control-Allow-Credentials")
+                .allowedHeader("Access-Control-Allow-Origin")
+                .allowedHeader("Access-Control-Allow-Headers")
+                .allowedHeader("Content-Type"));
         router.route().handler(SecureHeaderHandler.create());
         router.route().handler(CookieHandler.create());
         router.route().handler(BodyHandler.create().setBodyLimit(50 * 1048576L));
-        router.route("/*").handler(CORSHandler.create());
         router.route("/*").handler(LocaleHandler.create());
         router.route("/*").handler(LoggerHandler.create());
         router.route("/assets/*").handler(StaticHandler.create("assets"));
