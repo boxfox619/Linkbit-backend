@@ -10,3 +10,9 @@
 - JWT
 - Firebase
 - Web3j
+- [Vertx-wetm-library](https://github.com/boxfox619/vertx-wetm-library)
+- RxJava
+
+# Language
+- Java
+- Kotlin
