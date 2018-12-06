@@ -2,12 +2,10 @@ package com.boxfox.core.router.wallet
 
 import com.boxfox.cross.service.price.PriceService
 import com.boxfox.cross.service.wallet.WalletService
-import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
-import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 import org.apache.log4j.Logger

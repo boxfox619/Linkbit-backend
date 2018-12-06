@@ -1,6 +1,5 @@
 package com.boxfox.cross.common.entity.wallet
 
-import com.linkbit.android.entity.WalletModel
 import io.one.sys.db.tables.Account
 import io.one.sys.db.tables.Wallet
 import org.jooq.Record

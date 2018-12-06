@@ -1,4 +1,4 @@
-package com.linkbit.android.entity
+package com.boxfox.cross.common.entity
 
 class CoinPriceModel {
     lateinit var symbol: String
