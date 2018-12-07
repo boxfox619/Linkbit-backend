@@ -2,11 +2,11 @@ package com.boxfox.cross.service.wallet
 
 import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.common.entity.wallet.WalletCreateModel
+import com.boxfox.cross.common.entity.wallet.WalletModel
 import com.boxfox.cross.common.entity.wallet.WalletRecordEntityMapper
 import com.boxfox.cross.util.AddressUtil
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
-import com.linkbit.android.entity.WalletModel
 import io.one.sys.db.tables.Account.ACCOUNT
 import io.one.sys.db.tables.Majorwallet.MAJORWALLET
 import io.one.sys.db.tables.Wallet.WALLET

@@ -1,7 +1,7 @@
 package com.boxfox.cross.service.friend
 
+import com.boxfox.cross.common.entity.UserModel
 import com.boxfox.cross.service.JooqReactiveService
-import com.linkbit.android.entity.UserModel
 import io.reactivex.Completable
 import io.reactivex.Single
 

@@ -26,8 +26,8 @@ class CoinRouter : AbstractRouter() {
     @RouteRegistration(uri = "/coin/supported/list", method = arrayOf(HttpMethod.GET))
     fun getSupportWalletList(ctx: RoutingContext) {
         getLogger().debug(String.format("Supported Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.allCoins.subscribe({ list ->
-            ctx.response().end(gson.toJson(list))
+        this.coinService.list.subscribe({
+            ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
         })

@@ -1,11 +1,9 @@
 package com.boxfox.linkbit.wallet.part;
 
 import com.boxfox.cross.common.RoutingException;
+import com.boxfox.cross.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.wallet.WalletServiceException;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
-import com.linkbit.android.entity.TransactionModel;
-import io.vertx.core.Future;
-
 import java.util.List;
 
 public interface TransactionPart {

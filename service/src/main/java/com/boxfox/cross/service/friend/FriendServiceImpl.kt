@@ -1,8 +1,8 @@
 package com.boxfox.cross.service.friend
 
 import com.boxfox.cross.common.RoutingException
+import com.boxfox.cross.common.entity.UserModel
 import com.google.api.client.http.HttpStatusCodes
-import com.linkbit.android.entity.UserModel
 import io.one.sys.db.Tables.*
 import org.jooq.DSLContext
 import java.util.*

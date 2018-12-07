@@ -1,6 +1,6 @@
 package com.boxfox.cross.service.price
 
-import com.linkbit.android.entity.WalletModel
+import com.boxfox.cross.common.entity.wallet.WalletModel
 import org.jooq.DSLContext
 
 interface PriceUsecase {

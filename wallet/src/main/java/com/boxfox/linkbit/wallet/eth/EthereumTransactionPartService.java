@@ -2,12 +2,12 @@ package com.boxfox.linkbit.wallet.eth;
 
 import com.boxfox.cross.common.RoutingException;
 import com.boxfox.cross.common.data.PostgresConfig;
+import com.boxfox.cross.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.wallet.WalletServiceException;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.io.Files;
-import com.linkbit.android.entity.TransactionModel;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.one.sys.db.tables.daos.TransactionDao;

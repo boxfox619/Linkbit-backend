@@ -1,7 +1,7 @@
 package com.boxfox.cross.service.transaction
 
+import com.boxfox.cross.common.entity.transaction.TransactionModel
 import com.boxfox.cross.service.JooqReactiveService
-import com.linkbit.android.entity.TransactionModel
 import io.reactivex.Single
 
 class TransactionService(private val impl: TransactionServiceImpl = TransactionServiceImpl()) : JooqReactiveService() {

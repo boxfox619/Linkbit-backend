@@ -1,9 +1,9 @@
 package com.boxfox.cross.service.coin
 
+import com.boxfox.cross.common.entity.CoinModel
 import io.one.sys.db.Tables.COIN
-
-import com.linkbit.android.entity.CoinModel
 import io.one.sys.db.tables.records.CoinRecord
+
 import org.jooq.DSLContext
 
 class CoinServiceImpl : CoinUsecase{

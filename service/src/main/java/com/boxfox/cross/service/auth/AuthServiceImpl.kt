@@ -1,11 +1,11 @@
 package com.boxfox.cross.service.auth
 
 import com.boxfox.cross.common.RoutingException
+import com.boxfox.cross.common.entity.UserModel
 import com.boxfox.cross.util.AddressUtil
 import com.google.api.client.http.HttpStatusCodes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
-import com.linkbit.android.entity.UserModel
 import io.one.sys.db.Tables.ACCOUNT
 import org.jooq.DSLContext
 import java.util.concurrent.ExecutionException

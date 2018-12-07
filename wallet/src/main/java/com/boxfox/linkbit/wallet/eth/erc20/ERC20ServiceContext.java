@@ -2,6 +2,7 @@ package com.boxfox.linkbit.wallet.eth.erc20;
 
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
+import com.boxfox.cross.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.util.DigitsUtils;
 import com.boxfox.linkbit.util.ERC20Tokens;
 import com.boxfox.linkbit.wallet.WalletServiceContext;
@@ -14,7 +15,6 @@ import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.boxfox.vertx.data.Config;
 import com.google.common.io.Files;
 import com.google.firebase.internal.NonNull;
-import com.linkbit.android.entity.TransactionModel;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;

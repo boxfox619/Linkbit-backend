@@ -1,10 +1,10 @@
 package com.boxfox.cross.service.transaction
 
 import com.boxfox.cross.common.RoutingException
+import com.boxfox.cross.common.entity.transaction.TransactionModel
 import com.boxfox.cross.common.entity.transaction.TransactionRecordEntityMapper
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
-import com.linkbit.android.entity.TransactionModel
 import io.one.sys.db.Tables.TRANSACTION
 import io.one.sys.db.Tables.WALLET
 import io.one.sys.db.tables.records.TransactionRecord

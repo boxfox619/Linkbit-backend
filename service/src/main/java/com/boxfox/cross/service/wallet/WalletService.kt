@@ -2,8 +2,8 @@ package com.boxfox.cross.service.wallet
 
 
 import com.boxfox.cross.common.entity.wallet.WalletCreateModel
+import com.boxfox.cross.common.entity.wallet.WalletModel
 import com.boxfox.cross.service.JooqReactiveService
-import com.linkbit.android.entity.WalletModel
 import io.reactivex.Completable
 import io.reactivex.Single
 

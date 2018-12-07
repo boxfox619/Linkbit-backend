@@ -1,6 +1,6 @@
 package com.boxfox.cross.service.transaction
 
-import com.linkbit.android.entity.TransactionModel
+import com.boxfox.cross.common.entity.transaction.TransactionModel
 import org.jooq.DSLContext
 
 interface TransactionUsecase {

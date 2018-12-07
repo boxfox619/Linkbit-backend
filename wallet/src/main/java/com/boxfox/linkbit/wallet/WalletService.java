@@ -1,6 +1,7 @@
 package com.boxfox.linkbit.wallet;
 
 import com.boxfox.cross.common.RoutingException;
+import com.boxfox.cross.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.wallet.indexing.IndexingMessage;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.boxfox.linkbit.wallet.model.WalletCreateResult;
@@ -9,8 +10,6 @@ import com.boxfox.linkbit.wallet.part.CreateWalletPart;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.boxfox.vertx.service.AbstractService;
 import com.google.gson.Gson;
-import com.linkbit.android.entity.TransactionModel;
-
 import java.util.List;
 
 import static com.boxfox.linkbit.wallet.indexing.IndexingMessage.EVENT_SUBJECT;

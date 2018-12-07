@@ -2,8 +2,8 @@ package com.boxfox.cross.service.price
 
 import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.common.data.RedisConfig
+import com.boxfox.cross.common.entity.wallet.WalletModel
 import com.google.api.client.http.HttpStatusCodes
-import com.linkbit.android.entity.WalletModel
 import org.jooq.DSLContext
 
 class PriceServiceImpl : PriceUsecase {

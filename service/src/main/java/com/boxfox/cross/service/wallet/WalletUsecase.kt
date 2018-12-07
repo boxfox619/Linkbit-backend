@@ -1,7 +1,7 @@
 package com.boxfox.cross.service.wallet
 
 import com.boxfox.cross.common.entity.wallet.WalletCreateModel
-import com.linkbit.android.entity.WalletModel
+import com.boxfox.cross.common.entity.wallet.WalletModel
 import org.jooq.DSLContext
 
 interface WalletUsecase {

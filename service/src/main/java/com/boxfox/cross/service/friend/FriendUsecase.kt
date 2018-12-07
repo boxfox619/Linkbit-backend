@@ -1,7 +1,7 @@
 package com.boxfox.cross.service.friend
 
 import com.boxfox.cross.common.RoutingException
-import com.linkbit.android.entity.UserModel
+import com.boxfox.cross.common.entity.UserModel
 import org.jooq.DSLContext
 
 interface FriendUsecase {

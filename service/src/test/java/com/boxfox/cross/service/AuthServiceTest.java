@@ -1,11 +1,11 @@
 package com.boxfox.cross.service;
 
-import com.boxfox.cross.service.auth.AddressService;
+import com.boxfox.cross.service.auth.AuthService;
 import org.junit.Test;
 
 public class AuthServiceTest {
 
-    private AddressService authService = new AddressService();
+    private AuthService authService = new AuthService();
 
     @Test
     public void signinTest(){

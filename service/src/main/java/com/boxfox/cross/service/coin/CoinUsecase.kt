@@ -1,6 +1,6 @@
 package com.boxfox.cross.service.coin
 
-import com.linkbit.android.entity.CoinModel
+import com.boxfox.cross.common.entity.CoinModel
 import org.jooq.DSLContext
 
 interface CoinUsecase {
