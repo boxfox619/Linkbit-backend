@@ -2,14 +2,11 @@ package com.boxfox.cross.service.address
 
 import com.boxfox.cross.common.RoutingException
 import com.boxfox.cross.common.entity.AddressModel
-import com.google.api.client.http.HttpStatusCodes
 import io.one.sys.db.Tables.ADDRESS
 import io.one.sys.db.Tables.LINKADDRESS
-import io.one.sys.db.tables.daos.AddressDao
 import org.jooq.DSLContext
 
 class AddressServiceImpl : AddressUsecase {
-
     @Throws(RoutingException::class)
     override fun getLinkAddress(ctx: DSLContext, uid: String): List<AddressModel> {
         val map = HashMap<String, AddressModel>()
@@ -47,4 +44,10 @@ class AddressServiceImpl : AddressUsecase {
         }
         return (result > 0)
     }
+
+    override fun checkAddressExist(ctx: DSLContext, address: String): Boolean {
+        val count = ctx.selectFrom(ADDRESS).where(ADDRESS.LINKADDRESS.eq(address)).count()
+        return (count > 0)
+    }
+
 }

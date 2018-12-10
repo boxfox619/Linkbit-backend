@@ -15,4 +15,8 @@ class AddressService(private val impl: AddressUsecase = AddressServiceImpl()) : 
     fun unregister(uid: String, linkAddress: String, symbol: String): Single<Boolean> {
         return createSingle{impl.unregisterAddress(it, uid, linkAddress, symbol)}
     }
+
+    fun checkAddressExist(address: String): Single<Boolean> {
+        return createSingle{impl.checkAddressExist(it, address)}
+    }
 }
