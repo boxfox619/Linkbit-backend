@@ -26,7 +26,7 @@ class AddressRouter : AbstractRouter() {
     @RouteRegistration(uri = "/address/valid", method = arrayOf(HttpMethod.GET))
     fun checkAddressValid(ctx: RoutingContext, @Param(name = "address") address: String) {
         addressService.checkAddressExist(address).subscribe({
-            ctx.response().end(JSONObject().put("result", it).toString())
+            ctx.response().end(JSONObject().put("result", !it).toString())
         },{ctx.fail(it)})
     }
 
