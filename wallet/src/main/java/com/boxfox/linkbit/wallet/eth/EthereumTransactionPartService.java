@@ -92,11 +92,11 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
         try {
             int totalBlockNumber = web3.ethBlockNumber().send().getBlockNumber().intValue();
             List<TransactionModel> txStatusList = new ArrayList<>();
-            TransactionDao transactionDao = new TransactionDao(PostgresConfig.create(), vertx);
-            WalletDao walletDao = new WalletDao(PostgresConfig.create(), vertx);
+            TransactionDao transactionDao = new TransactionDao(PostgresConfig.create());
+            WalletDao walletDao = new WalletDao(PostgresConfig.create());
             List<io.one.sys.db.tables.pojos.Transaction> transactions = new ArrayList<>();
-            transactionDao.findManyByTargetaddress(Arrays.asList(address)).result().forEach(t -> transactions.add(t));
-            transactionDao.findManyBySourceaddress(Arrays.asList(address)).result().forEach(t -> transactions.add(t));
+            transactions.addAll(transactionDao.fetchByTargetaddress());
+            transactions.addAll(transactionDao.fetchBySourceaddress());
             for (io.one.sys.db.tables.pojos.Transaction tx : transactions) {
                 TransactionModel txStatus = new TransactionModel();
                 txStatus.setTransactionHash(tx.getHash());
@@ -105,7 +105,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
                 txStatus.setTargetAddress(tx.getTargetaddress());
                 txStatus.setTransactionHash(tx.getHash());
                 txStatus.setDate(tx.getDatetime());
-                Wallet wallet = walletDao.findOneById(tx.getTargetaddress()).result();
+                Wallet wallet = walletDao.findById(tx.getTargetaddress());
                 if (wallet != null) {
                     txStatus.setTargetProfile(wallet.getName());
                 } else {
