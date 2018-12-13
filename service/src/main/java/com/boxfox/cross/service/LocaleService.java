@@ -17,8 +17,8 @@ public class LocaleService extends AbstractService {
 
     public String getLocaleMoneySymbol(String localeStr){
         String currencySymbol = "KRW";
-        LocaleDao localeDao = new LocaleDao(PostgresConfig.create(), getVertx());
-        Locale locale = localeDao.findOneById(localeStr).result();
+        LocaleDao localeDao = new LocaleDao(PostgresConfig.create());
+        Locale locale = localeDao.findById(localeStr);
         if (locale!=null) {
             currencySymbol = locale.getCurrency();
         }

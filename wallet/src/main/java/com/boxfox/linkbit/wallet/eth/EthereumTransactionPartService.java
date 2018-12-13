@@ -177,7 +177,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
                 String dateTime = simpleDateFormat.format(timestamp);
                 BigDecimal amount = Convert.fromWei(value, Convert.Unit.ETHER);
-                TransactionDao dao = new TransactionDao(PostgresConfig.create(), this.vertx);
+                TransactionDao dao = new TransactionDao(PostgresConfig.create());
                 io.one.sys.db.tables.pojos.Transaction transaction = new io.one.sys.db.tables.pojos.Transaction();
                 transaction.setHash(hash);
                 transaction.setSourceaddress(from);
