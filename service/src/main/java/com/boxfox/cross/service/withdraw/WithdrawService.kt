@@ -6,5 +6,5 @@ import io.reactivex.Single
 
 class WithdrawService(private val impl: WithdrawServiceImpl = WithdrawServiceImpl()) : JooqReactiveService() {
     fun withdraw(symbol: String, walletFileName: String, walletJsonFile: String, password: String, targetAddress: String, amount: String): Single<TransactionResult>
-    = createSingle { impl.withdraw(it, symbol, walletFileName, walletJsonFile, password, targetAddress, amount)}
+    = single { impl.withdraw(it, symbol, walletFileName, walletJsonFile, password, targetAddress, amount)}
 }

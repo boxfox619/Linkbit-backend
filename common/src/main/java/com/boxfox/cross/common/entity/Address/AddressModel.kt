@@ -1,4 +1,4 @@
-package com.boxfox.cross.common.entity
+package com.boxfox.cross.common.entity.Address
 
 class AddressModel {
     lateinit var linkAddress: String

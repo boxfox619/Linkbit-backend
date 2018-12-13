@@ -35,8 +35,8 @@ class FriendRouter : AbstractRouter() {
     @RouteRegistration(uri = "/friend", method = arrayOf(HttpMethod.GET), auth = true)
     fun loadFriends(ctx: RoutingContext) {
         val uid = ctx.data()["uid"] as String
-        friendService.loadFriends(uid).subscribe({ list ->
-            ctx.response().end(gson.toJson(list))
+        friendService.loadFriends(uid).subscribe({
+            ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
         })

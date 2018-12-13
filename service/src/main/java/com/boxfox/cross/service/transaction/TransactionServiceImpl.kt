@@ -14,8 +14,8 @@ import java.util.*
 class TransactionServiceImpl : TransactionUsecase {
 
     override fun getTransaction(ctx: DSLContext, symbol: String, txHash: String): TransactionModel {
-        var record: TransactionRecord? = ctx.selectFrom(TRANSACTION).where(TRANSACTION.HASH.eq(txHash)).fetch().firstOrNull()
-        var transaction: TransactionModel
+        val record: TransactionRecord? = ctx.selectFrom(TRANSACTION).where(TRANSACTION.HASH.eq(txHash)).fetch().firstOrNull()
+        val transaction: TransactionModel
         if (record == null) {
             transaction = WalletServiceRegistry.getService(symbol).getTransaction(txHash)
         } else {

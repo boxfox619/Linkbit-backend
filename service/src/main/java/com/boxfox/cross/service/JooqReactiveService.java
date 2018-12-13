@@ -13,7 +13,7 @@ import org.jooq.impl.DSL;
 
 public abstract class JooqReactiveService extends AbstractService {
 
-    protected <T> Single<T> createSingle(SingleJob job) {
+    protected <T> Single<T> single(SingleJob job) {
         return Single.create(subscriber -> {
             AsyncService.getInstance().doAsync("service-worker-executor", future -> {
                 DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
@@ -29,7 +29,7 @@ public abstract class JooqReactiveService extends AbstractService {
         });
     }
 
-    protected Completable createCompletable(CompletableJob job) {
+    protected Completable completable(CompletableJob job) {
         return Completable.create(subscriber -> {
             AsyncService.getInstance().doAsync("service-worker-executor", future -> {
                 DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);

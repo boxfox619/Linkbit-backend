@@ -18,11 +18,11 @@ class PriceService(private val impl: PriceServiceImpl = PriceServiceImpl(),
     lateinit var walletService: WalletService
 
     fun getTotalPrice(uid: String, locale: String): Single<Double> {
-        return createSingle { impl.getTotalPrice(it, walletImpl.getWalletList(it, uid), localeService.getLocaleMoneySymbol(locale)) }
+        return single { impl.getTotalPrice(it, walletImpl.getWalletList(it, uid), localeService.getLocaleMoneySymbol(locale)) }
     }
 
     fun getWalletPrice(address: String, locale: String): Single<Double> {
-        return createSingle {
+        return single {
             val wallet = walletImpl.getWallet(it, address)
             impl.getPrice(it, wallet.coinSymbol, localeService.getLocaleMoneySymbol(locale), wallet.balance)
 
@@ -30,22 +30,22 @@ class PriceService(private val impl: PriceServiceImpl = PriceServiceImpl(),
     }
 
     fun getTotalPrice(uid: String, symbol: String, locale: String): Single<Double> {
-        return createSingle {
+        return single {
             val wallets = walletImpl.getWalletList(it,uid, symbol)
             impl.getTotalPrice(it, wallets, localeService.getLocaleMoneySymbol(locale))
         }
     }
 
     fun getPrice(symbol: String, balance: Double): Single<Double> {
-        return createSingle { impl.getPrice(it, symbol, Locale.KOREA.toString(), balance) }
+        return single { impl.getPrice(it, symbol, Locale.KOREA.toString(), balance) }
     }
 
     fun getPrice(symbol: String, locale: String, balance: Double): Single<Double> {
-        return createSingle { impl.getPrice(it, symbol, localeService.getLocaleMoneySymbol(locale), balance) }
+        return single { impl.getPrice(it, symbol, localeService.getLocaleMoneySymbol(locale), balance) }
     }
 
     @JvmOverloads
     fun getPrice(symbol: String, locale: String = Locale.KOREA.toString()): Single<Double> {
-        return createSingle { impl.getPrice(symbol, locale) }
+        return single { impl.getPrice(symbol, locale) }
     }
 }

@@ -6,5 +6,5 @@ import io.reactivex.Single
 
 class CoinService(private val impl: CoinServiceImpl = CoinServiceImpl()) : JooqReactiveService() {
 
-    val list: Single<List<CoinModel>> = createSingle { ctx -> impl.getAllCoins(ctx) }
+    val list: Single<List<CoinModel>> = single { ctx -> impl.getAllCoins(ctx) }
 }
