@@ -13,7 +13,7 @@ import org.json.JSONObject
 class AddressRouter : AbstractRouter() {
     @Service private lateinit var addressService: AddressService
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.GET))
+    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.GET), auth = true)
     fun getAddressList(ctx: RoutingContext) {
         val uid = ctx.data()["uid"] as String
         addressService.getList(uid).subscribe({
@@ -30,7 +30,7 @@ class AddressRouter : AbstractRouter() {
         },{ctx.fail(it)})
     }
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.PUT))
+    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.PUT), auth = true)
     fun registerAddress(ctx: RoutingContext,
                         @Param(name = "linkAddress") linkAddress: String,
                         @Param(name = "symbol") symbol: String,
@@ -47,7 +47,7 @@ class AddressRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.DELETE))
+    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.DELETE), auth = true)
     fun unregisterAddress(ctx: RoutingContext,
                         @Param(name = "linkAddress") linkAddress: String,
                         @Param(name = "symbol") symbol: String) {
@@ -63,7 +63,7 @@ class AddressRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.POST))
+    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.POST), auth = true)
     fun buyAddress(ctx: RoutingContext, @Param(name = "linkAddress") linkAddress: String) {
         //@TODO Implement address buy function
     }

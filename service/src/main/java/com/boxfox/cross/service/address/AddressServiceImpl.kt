@@ -25,7 +25,7 @@ class AddressServiceImpl : AddressUsecase {
     }
 
     override fun checkAddressOwn(ctx: DSLContext, uid: String, linkAddress: String): Boolean {
-        val count = ctx.selectFrom(ADDRESS).where(ADDRESS.UID.eq(uid).and(ADDRESS.LINKADDRESS.eq(linkAddress))).fetchCount()
+        val count = ctx.selectFrom(ADDRESS).where(ADDRESS.UID.eq(uid).and(ADDRESS.LINKADDRESS.eq(linkAddress))).count()
         return (count > 0)
     }
 

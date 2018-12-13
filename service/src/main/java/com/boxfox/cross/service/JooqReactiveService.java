@@ -18,39 +18,37 @@ public abstract class JooqReactiveService extends AbstractService {
             AsyncService.getInstance().doAsync("service-worker-executor", future -> {
                 DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
                 try {
-                    T result = (T) job.job(ctx);
-                    subscriber.onSuccess(result);
-                } catch (RoutingException e) {
+                    subscriber.onSuccess((T)job.job(ctx));
+                } catch (Exception e) {
                     e.printStackTrace();
                     subscriber.onError(e);
                 } finally {
                     ctx.close();
                 }
-              future.complete();
             });
         });
     }
 
     protected Completable createCompletable(CompletableJob job) {
         return Completable.create(subscriber -> {
-          AsyncService.getInstance().doAsync("service-worker-executor", future -> {
-            DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
-            try {
-              job.job(ctx);
-              subscriber.onComplete();
-            } catch (RoutingException e) {
-              e.printStackTrace();
-              subscriber.onError(e);
-            } finally {
-              ctx.close();
-            }
-            future.complete();
-          });
+            AsyncService.getInstance().doAsync("service-worker-executor", future -> {
+                DSLContext ctx = DSL.using(DataSource.getDataSource(), SQLDialect.POSTGRES);
+                try {
+                    job.job(ctx);
+                    subscriber.onComplete();
+                } catch (RoutingException e) {
+                    e.printStackTrace();
+                    subscriber.onError(e);
+                } finally {
+                    ctx.close();
+                }
+                future.complete();
+            });
         });
     }
 
     protected interface SingleJob {
-       Object job(DSLContext ctx) throws RoutingException;
+        Object job(DSLContext ctx) throws RoutingException;
     }
 
     protected interface CompletableJob {
