@@ -1,4 +1,4 @@
-package com.boxfox.core.router.wallet
+package com.boxfox.core.router
 
 import com.boxfox.cross.service.transaction.TransactionService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
@@ -23,7 +23,7 @@ class TransactionRouter : AbstractRouter() {
     }
 
     @RouteRegistration(uri = "/transaction/count", method = arrayOf(HttpMethod.GET))
-    fun wallTransactionCount(ctx: RoutingContext, @Param(name = "address") address: String) {
+    fun transactionCount(ctx: RoutingContext, @Param(name = "address") address: String) {
         transactionService.getTransactionCount(address).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
@@ -32,7 +32,7 @@ class TransactionRouter : AbstractRouter() {
     }
 
     @RouteRegistration(uri = "/transaction/list", method = arrayOf(HttpMethod.GET))
-    fun walletTransactionList(ctx: RoutingContext,
+    fun transactionList(ctx: RoutingContext,
                               @Param(name = "address") address: String,
                               @Param(name = "page") page: Int,
                               @Param(name = "count") count: Int) {

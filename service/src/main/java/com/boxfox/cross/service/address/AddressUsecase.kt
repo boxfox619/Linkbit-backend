@@ -8,4 +8,5 @@ interface AddressUsecase {
     fun registerAddress(ctx: DSLContext, uid: String, linkAddress: String, symbol:String, accountAddress: String): Boolean
     fun unregisterAddress(ctx: DSLContext, uid: String, linkAddress: String, symbol: String): Boolean
     fun checkAddressOwn(ctx: DSLContext, uid: String, linkAddress: String): Boolean
+    fun checkAddressExist(ctx: DSLContext, address: String): Boolean
 }

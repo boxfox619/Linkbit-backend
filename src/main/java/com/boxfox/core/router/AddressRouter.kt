@@ -8,6 +8,7 @@ import com.boxfox.vertx.service.Service
 import com.google.api.client.http.HttpStatusCodes
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
+import org.json.JSONObject
 
 class AddressRouter : AbstractRouter() {
     @Service private lateinit var addressService: AddressService
@@ -20,6 +21,13 @@ class AddressRouter : AbstractRouter() {
         },{
             ctx.fail(it)
         })
+    }
+
+    @RouteRegistration(uri = "/address/valid", method = arrayOf(HttpMethod.GET))
+    fun checkAddressValid(ctx: RoutingContext, @Param(name = "address") address: String) {
+        addressService.checkAddressExist(address).subscribe({
+            ctx.response().end(JSONObject().put("result", !it).toString())
+        },{ctx.fail(it)})
     }
 
     @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.PUT))
@@ -56,9 +64,7 @@ class AddressRouter : AbstractRouter() {
     }
 
     @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.POST))
-    fun buyAddress(ctx: RoutingContext,
-                          @Param(name = "linkAddress") linkAddress: String) {
-        val uid = ctx.data()["uid"] as String
-        //@TODO Implement address buy logic
+    fun buyAddress(ctx: RoutingContext, @Param(name = "linkAddress") linkAddress: String) {
+        //@TODO Implement address buy function
     }
 }
