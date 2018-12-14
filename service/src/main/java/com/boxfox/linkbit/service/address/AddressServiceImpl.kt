@@ -17,7 +17,7 @@ class AddressServiceImpl : com.boxfox.linkbit.service.address.AddressUsecase {
     @Throws(RoutingException::class)
     override fun getLinkAddressList(uid: String): List<AddressModel> {
         return addressDao.fetchByUid(uid)
-                .map{AddressEntityMapper.toEntity(it)}
+                .map { AddressEntityMapper.toEntity(it) }
                 .map { AddressEntityMapper.toEntity(it, linkAddressDao.fetchByLinkaddress(it.linkAddress)) }
     }
 
@@ -32,8 +32,10 @@ class AddressServiceImpl : com.boxfox.linkbit.service.address.AddressUsecase {
 
     override fun registerAddress(ctx: DSLContext, uid: String, linkAddress: String, symbol: String, accountAddress: String): Boolean {
         var result = 0
-        if (checkAddressOwn(ctx, uid, linkAddress)) {
-            result = ctx.insertInto(LINKADDRESS).values(linkAddress, symbol, accountAddress).execute()
+        val own = checkAddressOwn(ctx, uid, linkAddress)
+        val canLink = !checkSymbolLinked(ctx, linkAddress, symbol.toUpperCase())
+        if (own && canLink) {
+            result = ctx.insertInto(LINKADDRESS).values(linkAddress, symbol.toUpperCase(), accountAddress).execute()
         }
         return (result > 0)
     }
@@ -41,9 +43,16 @@ class AddressServiceImpl : com.boxfox.linkbit.service.address.AddressUsecase {
     override fun unregisterAddress(ctx: DSLContext, uid: String, linkAddress: String, symbol: String): Boolean {
         var result = 0
         if (checkAddressOwn(ctx, uid, linkAddress)) {
-            result = ctx.deleteFrom(LINKADDRESS).where(LINKADDRESS.LINKADDRESS_.eq(linkAddress).and(LINKADDRESS.SYMBOL.eq(symbol))).execute()
+            result = ctx.deleteFrom(LINKADDRESS).where(LINKADDRESS.LINKADDRESS_.eq(linkAddress).and(LINKADDRESS.SYMBOL.eq(symbol.toUpperCase()))).execute()
         }
         return (result > 0)
+    }
+
+    fun checkSymbolLinked(ctx: DSLContext, linkAddress: String, symbol: String): Boolean {
+        val count = ctx.selectFrom(LINKADDRESS).where(
+                LINKADDRESS.LINKADDRESS_.eq(linkAddress).and(LINKADDRESS.SYMBOL.eq(symbol.toUpperCase())))
+                .count()
+        return (count>0)
     }
 
     override fun checkAddressExist(ctx: DSLContext, address: String): Boolean {

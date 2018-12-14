@@ -4,19 +4,22 @@ import com.boxfox.linkbit.service.address.AddressService
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
-import com.google.api.client.http.HttpStatusCodes
+import com.google.api.client.http.HttpStatusCodes.STATUS_CODE_NOT_MODIFIED
+import com.google.api.client.http.HttpStatusCodes.STATUS_CODE_OK
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 import org.json.JSONObject
 
 class AddressRouter : AbstractAuthRouter() {
-    @Service private lateinit var addressService: com.boxfox.linkbit.service.address.AddressService
+
+    @Service
+    private lateinit var addressService: AddressService
 
     @RouteRegistration(uri = "/address", method = [HttpMethod.GET], auth = true)
     fun getAddressList(ctx: RoutingContext) {
         addressService.getList(getUid(ctx)).subscribe({
             ctx.response().end(gson.toJson(it))
-        },{
+        }, {
             ctx.fail(it)
         })
     }
@@ -25,7 +28,7 @@ class AddressRouter : AbstractAuthRouter() {
     fun getLinkedAddress(ctx: RoutingContext, @Param(name = "address") address: String) {
         addressService.getAddress(address).subscribe({
             ctx.response().end(gson.toJson(it.accountAddressMap))
-        },{
+        }, {
             ctx.fail(it)
         })
     }
@@ -34,7 +37,7 @@ class AddressRouter : AbstractAuthRouter() {
     fun checkAddressValid(ctx: RoutingContext, @Param(name = "address") address: String) {
         addressService.checkAddressExist(address).subscribe({
             ctx.response().end(JSONObject().put("result", !it).toString())
-        },{ctx.fail(it)})
+        }, { ctx.fail(it) })
     }
 
     @RouteRegistration(uri = "/address/account", method = [HttpMethod.PUT], auth = true)
@@ -45,9 +48,9 @@ class AddressRouter : AbstractAuthRouter() {
         val uid = getUid(ctx)
         addressService.register(uid, linkAddress, symbol, accountAddress).subscribe({
             if (it) {
-                ctx.response().end()
+                endResponse(ctx, STATUS_CODE_OK)
             } else {
-                ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED).end()
+                endResponse(ctx, STATUS_CODE_NOT_MODIFIED)
             }
         }, {
             ctx.fail(it)
@@ -56,13 +59,13 @@ class AddressRouter : AbstractAuthRouter() {
 
     @RouteRegistration(uri = "/address/account", method = [HttpMethod.DELETE], auth = true)
     fun unregisterAddress(ctx: RoutingContext,
-                        @Param(name = "linkAddress") linkAddress: String,
-                        @Param(name = "symbol") symbol: String) {
+                          @Param(name = "linkAddress") linkAddress: String,
+                          @Param(name = "symbol") symbol: String) {
         addressService.unregister(getUid(ctx), linkAddress, symbol).subscribe({
             if (it) {
-                ctx.response().end()
+                endResponse(ctx, STATUS_CODE_OK)
             } else {
-                ctx.response().setStatusCode(HttpStatusCodes.STATUS_CODE_NOT_MODIFIED).end()
+                endResponse(ctx, STATUS_CODE_NOT_MODIFIED)
             }
         }, {
             ctx.fail(it)
