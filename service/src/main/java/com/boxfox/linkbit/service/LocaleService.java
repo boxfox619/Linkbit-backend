@@ -9,13 +9,13 @@ import io.vertx.core.Handler;
 
 public class LocaleService extends AbstractService {
 
-    public void getLocaleMoneySymbol(String locale, Handler<AsyncResult<String>> res) {
+    public void getMoneySymbol(String locale, Handler<AsyncResult<String>> res) {
         doAsync(future -> {
-            future.complete(getLocaleMoneySymbol(locale));
+            future.complete(getMoneySymbol(locale));
         }, res);
     }
 
-    public String getLocaleMoneySymbol(String localeStr){
+    public String getMoneySymbol(String localeStr){
         String currencySymbol = "KRW";
         LocaleDao localeDao = new LocaleDao(PostgresConfig.create());
         Locale locale = localeDao.findById(localeStr);

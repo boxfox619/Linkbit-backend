@@ -13,7 +13,7 @@ import com.boxfox.linkbit.util.LogUtil.getLogger
 class AuthRouter : AbstractRouter() {
 
     @Service
-    private lateinit var authService: com.boxfox.linkbit.service.auth.AuthService
+    private lateinit var authService: AuthService
 
     @RouteRegistration(uri = "/auth", method = arrayOf(HttpMethod.POST))
     fun signin(ctx: RoutingContext, @Param(name = "token") token: String) {

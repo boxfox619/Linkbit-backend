@@ -2,7 +2,6 @@ package com.boxfox.core.router
 
 import com.boxfox.core.router.model.CoinPriceNetworkObject
 import com.boxfox.linkbit.service.LocaleService
-import com.boxfox.linkbit.service.price.PriceService
 import com.boxfox.linkbit.service.coin.CoinService
 import com.boxfox.linkbit.util.LogUtil.getLogger
 import com.boxfox.vertx.router.AbstractRouter
@@ -14,36 +13,36 @@ import io.vertx.ext.web.RoutingContext
 
 class CoinRouter : AbstractRouter() {
 
-    @Service
-    private lateinit var priceService: PriceService
 
     @Service
-    private lateinit var localeService: com.boxfox.linkbit.service.LocaleService
+    private lateinit var localeService: LocaleService
 
     @Service
-    private lateinit var coinService: com.boxfox.linkbit.service.coin.CoinService
+    private lateinit var coinService: CoinService
 
-    @RouteRegistration(uri = "/coin/supported/list", method = arrayOf(HttpMethod.GET))
+    @RouteRegistration(uri = "/coins", method = [HttpMethod.GET])
     fun getSupportWalletList(ctx: RoutingContext) {
-        getLogger().debug(String.format("Supported Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.list.subscribe({
+        getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
+        this.coinService.list().subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
         })
     }
 
-    @RouteRegistration(uri = "/coin/price", method = arrayOf(HttpMethod.GET))
+    @RouteRegistration(uri = "/coins/:symbol/price", method = [HttpMethod.GET])
     fun getCoinPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         val locale = ctx.data()["locale"].toString()
-        localeService.getLocaleMoneySymbol(locale) { res ->
+        localeService.getMoneySymbol(locale) { res ->
             if (res.succeeded()) {
-                priceService.getPrice(symbol).subscribe({ price ->
+                coinService.getPrice(symbol).subscribe({ price ->
                     val unit = res.result()
                     if (price > 0) {
-                        val result = CoinPriceNetworkObject()
-                        result.amount = price
-                        result.unit = unit
+                        val result = CoinPriceNetworkObject().apply {
+                            this.symbol = symbol
+                            this.amount = price
+                            this.unit = unit
+                        }
                         ctx.response().end(gson.toJson(result))
                     } else {
                         ctx.response().setStatusCode(404).end()

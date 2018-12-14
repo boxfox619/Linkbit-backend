@@ -1,4 +1,4 @@
-package com.boxfox.linkbit.service.price
+package com.boxfox.linkbit.service.coin
 
 import com.boxfox.linkbit.common.data.RedisConfig
 import com.mashape.unirest.http.Unirest

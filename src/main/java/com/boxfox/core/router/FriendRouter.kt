@@ -12,7 +12,7 @@ import io.vertx.ext.web.RoutingContext
 class FriendRouter : AbstractRouter() {
 
     @Service
-    private lateinit var friendService: com.boxfox.linkbit.service.friend.FriendService
+    private lateinit var friendService: FriendService
 
     @RouteRegistration(uri = "/search/account/list", method = arrayOf(HttpMethod.GET), auth = true)
     fun search(ctx: RoutingContext, @Param(name = "text") text: String) {
