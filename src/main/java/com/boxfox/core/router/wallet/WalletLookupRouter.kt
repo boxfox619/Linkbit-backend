@@ -1,6 +1,6 @@
 package com.boxfox.core.router.wallet
 
-import com.boxfox.linkbit.service.price.PriceService
+import com.boxfox.linkbit.service.coin.CoinService
 import com.boxfox.linkbit.service.wallet.WalletService
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param
@@ -14,8 +14,6 @@ class WalletLookupRouter : AbstractRouter() {
 
     @Service
     private lateinit var walletService: WalletService
-    @Service
-    private lateinit var priceService: PriceService
 
     @RouteRegistration(uri = "/wallet/list", method = arrayOf(HttpMethod.GET), auth = true)
     fun getWallets(ctx: RoutingContext) {
@@ -31,48 +29,6 @@ class WalletLookupRouter : AbstractRouter() {
     @RouteRegistration(uri = "/wallet/balance", method = arrayOf(HttpMethod.GET))
     fun getBalance(ctx: RoutingContext, @Param(name = "address") address: String) {
         walletService.getBalance(address).subscribe({
-            ctx.response().end(it.toString())
-        }, {
-            ctx.fail(it)
-        })
-    }
-
-    @RouteRegistration(uri = "/wallet/price", method = arrayOf(HttpMethod.GET))
-    fun getPrice(ctx: RoutingContext, @Param(name = "address") address: String) {
-        val locale = ctx.data()["locale"].toString()
-        priceService.getWalletPrice(address, locale).subscribe({
-            ctx.response().end(it.toString())
-        }, {
-            ctx.fail(it)
-        })
-    }
-
-    @RouteRegistration(uri = "/wallet/balance/:symbol", method = arrayOf(HttpMethod.GET), auth = true)
-    fun getTotalBalanceWithSymbol(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
-        val uid = ctx.data()["uid"] as String
-        walletService.getTotalBalance(uid, symbol).subscribe({
-            ctx.response().end(it.toString())
-        }, {
-            ctx.fail(it)
-        })
-    }
-
-    @RouteRegistration(uri = "/wallet/price/:symbol", method = arrayOf(HttpMethod.GET), auth = true)
-    fun getTotalPriceWithSymbol(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
-        val uid = ctx.data()["uid"] as String
-        val locale = ctx.data()["locale"].toString()
-        priceService.getTotalPrice(uid, symbol, locale).subscribe({
-            ctx.response().end(it.toString())
-        }, {
-            ctx.fail(it)
-        })
-    }
-
-    @RouteRegistration(uri = "/wallet/price/all", method = arrayOf(HttpMethod.GET), auth = true)
-    fun getTotalPrice(ctx: RoutingContext) {
-        val uid = ctx.data()["uid"] as String
-        val locale = ctx.data()["locale"].toString()
-        priceService.getTotalPrice(uid, locale).subscribe({
             ctx.response().end(it.toString())
         }, {
             ctx.fail(it)
