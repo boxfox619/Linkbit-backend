@@ -59,14 +59,21 @@ dependencies {
 }
 
 jooq {
+    def props = new Properties()
+    file("../config.properties").withInputStream { props.load(it) }
+    def dbHost = props.getProperty("dbHost")
+    def dbPort = props.getProperty("dbPort")
+    def dbName = props.getProperty("dbName")
+    def dbUser = props.getProperty("dbUser")
+    def dbPassword = props.getProperty("dbPassword")
     version = jooq_version
     edition = 'OSS'
     sample(sourceSets.main) {
         jdbc {
             driver = 'org.postgresql.Driver'
-            url = 'jdbc:postgresql://ec2-107-21-255-2.compute-1.amazonaws.com:5432/d6sjfeu5ic4jhk?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory'
-            user = 'hurojggpgmusfv'
-            password = '575fedb89cab2b647bca345ea128e30e70188a52f9a230a2dbd0da4157d793bd'
+            url = "jdbc:postgresql://$dbHost:$dbPort/$dbName?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory"
+            user = dbUser
+            password = dbPassword
         }
         generator {
             name = 'org.jooq.codegen.DefaultGenerator'
@@ -76,14 +83,6 @@ jooq {
             database {
                 name = 'org.jooq.meta.postgres.PostgresDatabase'
                 inputSchema = 'public'
-/*                include = '.*'
-                excludes = 'schema_version'
-                inputSchema = 'public'
-                includeTables = true
-                includeRoutines = true
-                includePackages = false
-                includeUDTs = true
-                includeSequences = true*/
             }
             generate {
                 deprecated = false
