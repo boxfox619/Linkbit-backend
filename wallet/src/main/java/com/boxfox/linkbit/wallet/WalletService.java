@@ -1,7 +1,7 @@
 package com.boxfox.linkbit.wallet;
 
-import com.boxfox.cross.common.RoutingException;
-import com.boxfox.cross.common.entity.transaction.TransactionModel;
+import com.boxfox.linkbit.common.RoutingException;
+import com.boxfox.linkbit.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.wallet.indexing.IndexingMessage;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.boxfox.linkbit.wallet.model.WalletCreateResult;

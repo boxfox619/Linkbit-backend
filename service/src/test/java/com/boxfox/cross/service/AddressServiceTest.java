@@ -1,4 +1,4 @@
-package com.boxfox.cross.service;
+package com.boxfox.linkbit.service;
 
 import org.junit.Test;
 

@@ -2,7 +2,7 @@ package com.boxfox.linkbit.wallet.eth.erc20;
 
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
-import com.boxfox.cross.common.entity.transaction.TransactionModel;
+import com.boxfox.linkbit.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.util.DigitsUtils;
 import com.boxfox.linkbit.util.ERC20Tokens;
 import com.boxfox.linkbit.wallet.WalletServiceContext;

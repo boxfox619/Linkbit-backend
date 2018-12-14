@@ -1,7 +1,7 @@
 package com.boxfox.core.router.wallet
 
-import com.boxfox.cross.service.price.PriceService
-import com.boxfox.cross.service.wallet.WalletService
+import com.boxfox.linkbit.service.price.PriceService
+import com.boxfox.linkbit.service.wallet.WalletService
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration

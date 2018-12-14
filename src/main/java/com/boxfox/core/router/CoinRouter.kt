@@ -1,10 +1,10 @@
 package com.boxfox.core.router
 
 import com.boxfox.core.router.model.CoinPriceNetworkObject
-import com.boxfox.cross.service.LocaleService
-import com.boxfox.cross.service.price.PriceService
-import com.boxfox.cross.service.coin.CoinService
-import com.boxfox.cross.util.LogUtil.getLogger
+import com.boxfox.linkbit.service.LocaleService
+import com.boxfox.linkbit.service.price.PriceService
+import com.boxfox.linkbit.service.coin.CoinService
+import com.boxfox.linkbit.util.LogUtil.getLogger
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
@@ -18,10 +18,10 @@ class CoinRouter : AbstractRouter() {
     private lateinit var priceService: PriceService
 
     @Service
-    private lateinit var localeService: LocaleService
+    private lateinit var localeService: com.boxfox.linkbit.service.LocaleService
 
     @Service
-    private lateinit var coinService: CoinService
+    private lateinit var coinService: com.boxfox.linkbit.service.coin.CoinService
 
     @RouteRegistration(uri = "/coin/supported/list", method = arrayOf(HttpMethod.GET))
     fun getSupportWalletList(ctx: RoutingContext) {

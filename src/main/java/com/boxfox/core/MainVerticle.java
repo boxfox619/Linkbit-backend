@@ -1,12 +1,11 @@
 package com.boxfox.core;
 
-import com.boxfox.cross.common.vertx.middleware.*;
-
-import com.boxfox.cross.common.vertx.middleware.ExceptionHandler;
-import com.boxfox.cross.common.vertx.middleware.LocaleHandler;
-import com.boxfox.cross.common.vertx.middleware.LoggerHandler;
-import com.boxfox.cross.common.vertx.middleware.SecureHeaderHandler;
-import com.boxfox.cross.service.price.PriceIndexingVerticle;
+import com.boxfox.linkbit.common.vertx.middleware.DebugAuthHandler;
+import com.boxfox.linkbit.common.vertx.middleware.ExceptionHandler;
+import com.boxfox.linkbit.common.vertx.middleware.LocaleHandler;
+import com.boxfox.linkbit.common.vertx.middleware.LoggerHandler;
+import com.boxfox.linkbit.common.vertx.middleware.SecureHeaderHandler;
+import com.boxfox.linkbit.service.price.PriceIndexingVerticle;
 import com.boxfox.linkbit.wallet.WalletServiceRegistry;
 import com.boxfox.linkbit.wallet.indexing.TransactionIndexingVerticle;
 import com.boxfox.vertx.data.Config;

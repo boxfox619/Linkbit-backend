@@ -1,6 +1,6 @@
 package com.boxfox.core.router
 
-import com.boxfox.cross.service.transaction.TransactionService
+import com.boxfox.linkbit.service.transaction.TransactionService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param

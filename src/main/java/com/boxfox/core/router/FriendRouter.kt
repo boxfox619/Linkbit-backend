@@ -1,6 +1,6 @@
 package com.boxfox.core.router
 
-import com.boxfox.cross.service.friend.FriendService
+import com.boxfox.linkbit.service.friend.FriendService
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
@@ -12,7 +12,7 @@ import io.vertx.ext.web.RoutingContext
 class FriendRouter : AbstractRouter() {
 
     @Service
-    private lateinit var friendService: FriendService
+    private lateinit var friendService: com.boxfox.linkbit.service.friend.FriendService
 
     @RouteRegistration(uri = "/search/account/list", method = arrayOf(HttpMethod.GET), auth = true)
     fun search(ctx: RoutingContext, @Param(name = "text") text: String) {

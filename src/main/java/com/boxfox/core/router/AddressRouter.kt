@@ -1,7 +1,6 @@
 package com.boxfox.core.router
 
-import com.boxfox.cross.service.address.AddressService
-import com.boxfox.vertx.router.AbstractRouter
+import com.boxfox.linkbit.service.address.AddressService
 import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
@@ -10,32 +9,40 @@ import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 import org.json.JSONObject
 
-class AddressRouter : AbstractRouter() {
-    @Service private lateinit var addressService: AddressService
+class AddressRouter : AbstractAuthRouter() {
+    @Service private lateinit var addressService: com.boxfox.linkbit.service.address.AddressService
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.GET), auth = true)
+    @RouteRegistration(uri = "/address", method = [HttpMethod.GET], auth = true)
     fun getAddressList(ctx: RoutingContext) {
-        val uid = ctx.data()["uid"] as String
-        addressService.getList(uid).subscribe({
+        addressService.getList(getUid(ctx)).subscribe({
             ctx.response().end(gson.toJson(it))
         },{
             ctx.fail(it)
         })
     }
 
-    @RouteRegistration(uri = "/address/valid", method = arrayOf(HttpMethod.GET))
+    @RouteRegistration(uri = "/address/accounts", method = [HttpMethod.GET], auth = true)
+    fun getLinkedAddress(ctx: RoutingContext, @Param(name = "address") address: String) {
+        addressService.getAddress(address).subscribe({
+            ctx.response().end(gson.toJson(it.accountAddressMap))
+        },{
+            ctx.fail(it)
+        })
+    }
+
+    @RouteRegistration(uri = "/address/valid", method = [HttpMethod.GET])
     fun checkAddressValid(ctx: RoutingContext, @Param(name = "address") address: String) {
         addressService.checkAddressExist(address).subscribe({
             ctx.response().end(JSONObject().put("result", !it).toString())
         },{ctx.fail(it)})
     }
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.PUT), auth = true)
+    @RouteRegistration(uri = "/address/account", method = [HttpMethod.PUT], auth = true)
     fun registerAddress(ctx: RoutingContext,
                         @Param(name = "linkAddress") linkAddress: String,
                         @Param(name = "symbol") symbol: String,
                         @Param(name = "accountAddress") accountAddress: String) {
-        val uid = ctx.data()["uid"] as String
+        val uid = getUid(ctx)
         addressService.register(uid, linkAddress, symbol, accountAddress).subscribe({
             if (it) {
                 ctx.response().end()
@@ -47,12 +54,11 @@ class AddressRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.DELETE), auth = true)
+    @RouteRegistration(uri = "/address/account", method = [HttpMethod.DELETE], auth = true)
     fun unregisterAddress(ctx: RoutingContext,
                         @Param(name = "linkAddress") linkAddress: String,
                         @Param(name = "symbol") symbol: String) {
-        val uid = ctx.data()["uid"] as String
-        addressService.unregister(uid, linkAddress, symbol).subscribe({
+        addressService.unregister(getUid(ctx), linkAddress, symbol).subscribe({
             if (it) {
                 ctx.response().end()
             } else {
@@ -63,7 +69,7 @@ class AddressRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/address", method = arrayOf(HttpMethod.POST), auth = true)
+    @RouteRegistration(uri = "/address", method = [HttpMethod.POST], auth = true)
     fun buyAddress(ctx: RoutingContext, @Param(name = "linkAddress") linkAddress: String) {
         //@TODO Implement address buy function
     }

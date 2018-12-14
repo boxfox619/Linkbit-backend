@@ -1,8 +1,8 @@
 package com.boxfox.linkbit.wallet.eth;
 
-import com.boxfox.cross.common.RoutingException;
-import com.boxfox.cross.common.data.PostgresConfig;
-import com.boxfox.cross.common.entity.transaction.TransactionModel;
+import com.boxfox.linkbit.common.RoutingException;
+import com.boxfox.linkbit.common.data.PostgresConfig;
+import com.boxfox.linkbit.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.wallet.WalletServiceException;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

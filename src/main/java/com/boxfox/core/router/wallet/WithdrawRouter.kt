@@ -2,8 +2,8 @@ package com.boxfox.core.router.wallet
 
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
-import com.boxfox.cross.service.wallet.WalletService
-import com.boxfox.cross.service.withdraw.WithdrawService
+import com.boxfox.linkbit.service.wallet.WalletService
+import com.boxfox.linkbit.service.withdraw.WithdrawService
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext

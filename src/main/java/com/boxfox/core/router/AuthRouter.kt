@@ -2,18 +2,18 @@ package com.boxfox.core.router
 
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*
-import com.boxfox.cross.service.auth.AuthService
+import com.boxfox.linkbit.service.auth.AuthService
 import com.google.api.client.http.HttpStatusCodes
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 import org.apache.log4j.Logger
 
-import com.boxfox.cross.util.LogUtil.getLogger
+import com.boxfox.linkbit.util.LogUtil.getLogger
 
 class AuthRouter : AbstractRouter() {
 
     @Service
-    private lateinit var authService: AuthService
+    private lateinit var authService: com.boxfox.linkbit.service.auth.AuthService
 
     @RouteRegistration(uri = "/auth", method = arrayOf(HttpMethod.POST))
     fun signin(ctx: RoutingContext, @Param(name = "token") token: String) {
