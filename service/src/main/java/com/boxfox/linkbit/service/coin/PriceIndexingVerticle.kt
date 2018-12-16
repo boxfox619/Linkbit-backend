@@ -1,51 +1,31 @@
 package com.boxfox.linkbit.service.coin
 
 import com.boxfox.linkbit.common.data.RedisConfig
+import com.boxfox.vertx.data.Config
 import com.mashape.unirest.http.Unirest
 import com.mashape.unirest.http.exceptions.UnirestException
 import io.vertx.core.AbstractVerticle
+import org.apache.log4j.LogManager
+import org.apache.log4j.Logger
 import org.json.JSONObject
 import java.util.*
 
 
-class PriceIndexingVerticle : AbstractVerticle() {
+class PriceIndexingVerticle(private val logger: Logger = LogManager.getRootLogger()) : AbstractVerticle() {
     override fun start() {
         //@TODO
         priceParsingCycle()
     }
 
-    fun priceParsingCycle() {
+    private fun priceParsingCycle() {
         val pool = RedisConfig.createPool()
-        pool.resource.use {jedis ->
-            try  {
-                val array = Unirest.get(COINMARKET_CAP_URL + "listings/").asJson().body.getObject().getJSONArray("data")
-                array.forEach { obj ->
-                    val coin = obj as JSONObject
-                    val symbol = coin.getString("symbol")
-                    val id = coin.getInt("id")
-                    for (money in moneySymbols) {
-                        val price = parseCoinPrice(id, money)
-                        jedis.hset("Currency", String.format("%s-%s", symbol, money), price.toString())
-                    }
+        CoinMarketCapIndexer(this.vertx).indexing().subscribe({ priceMap ->
+            logger.debug("indexing coin price : ${priceMap.size}")
+            pool.resource.use { jedis ->
+                priceMap.keys.forEach { symbol ->
+                    jedis.hset("Currency", symbol, priceMap[symbol].toString())
                 }
-                vertx.setTimer(3000) {
-                    priceParsingCycle()
-                }
-            } catch (e: UnirestException) {
-                e.printStackTrace()
             }
-        }
-    }
-
-    fun parseCoinPrice(id: Int, moneySymbol: String): Double {
-        val url = String.format("%sticker/%d/?convert=%s", COINMARKET_CAP_URL, id, moneySymbol)
-        val obj = Unirest.get(url).asJson().body.getObject()
-        val value = obj.getJSONObject("data").getJSONObject("quotes").getJSONObject(moneySymbol)
-        return value.getDouble("price")
-    }
-
-    companion object {
-        private val COINMARKET_CAP_URL = "https://api.coinmarketcap.com/v2/"
-        private val moneySymbols: List<String> = Arrays.asList("KRW", "")
+        }, { logger.error(it.message, it) })
     }
 }

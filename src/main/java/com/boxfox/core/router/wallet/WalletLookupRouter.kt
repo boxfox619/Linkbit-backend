@@ -1,6 +1,5 @@
 package com.boxfox.core.router.wallet
 
-import com.boxfox.linkbit.service.coin.CoinService
 import com.boxfox.linkbit.service.wallet.WalletService
 import com.boxfox.vertx.router.AbstractRouter
 import com.boxfox.vertx.router.Param

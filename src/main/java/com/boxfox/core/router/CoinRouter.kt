@@ -13,7 +13,6 @@ import io.vertx.ext.web.RoutingContext
 
 class CoinRouter : AbstractRouter() {
 
-
     @Service
     private lateinit var localeService: LocaleService
 
@@ -30,7 +29,7 @@ class CoinRouter : AbstractRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/coins/:symbol/price", method = [HttpMethod.GET])
+    @RouteRegistration(uri = "/coins/:symbol", method = [HttpMethod.GET])
     fun getCoinPrice(ctx: RoutingContext, @Param(name = "symbol") symbol: String) {
         val locale = ctx.data()["locale"].toString()
         localeService.getMoneySymbol(locale) { res ->
