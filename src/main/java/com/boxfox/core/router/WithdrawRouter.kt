@@ -1,4 +1,4 @@
-package com.boxfox.core.router.wallet
+package com.boxfox.core.router
 
 import com.boxfox.vertx.router.*
 import com.boxfox.vertx.service.*

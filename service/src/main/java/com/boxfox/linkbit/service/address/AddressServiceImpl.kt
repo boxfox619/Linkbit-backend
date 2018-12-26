@@ -4,13 +4,17 @@ import com.boxfox.linkbit.common.RoutingException
 import com.boxfox.linkbit.common.data.PostgresConfig
 import com.boxfox.linkbit.common.entity.Address.AddressEntityMapper
 import com.boxfox.linkbit.common.entity.Address.AddressModel
+import com.boxfox.linkbit.util.AddressUtil
 import io.one.sys.db.Tables.ADDRESS
 import io.one.sys.db.Tables.LINKADDRESS
 import io.one.sys.db.tables.daos.AddressDao
 import io.one.sys.db.tables.daos.LinkaddressDao
+import io.one.sys.db.tables.pojos.Address
+import io.one.sys.db.tables.pojos.Linkaddress
 import org.jooq.DSLContext
 
-class AddressServiceImpl : com.boxfox.linkbit.service.address.AddressUsecase {
+class AddressServiceImpl : AddressUsecase {
+
     private val addressDao = AddressDao(PostgresConfig.create())
     private val linkAddressDao = LinkaddressDao(PostgresConfig.create())
 
@@ -19,6 +23,13 @@ class AddressServiceImpl : com.boxfox.linkbit.service.address.AddressUsecase {
         return addressDao.fetchByUid(uid)
                 .map { AddressEntityMapper.toEntity(it) }
                 .map { AddressEntityMapper.toEntity(it, linkAddressDao.fetchByLinkaddress(it.linkAddress)) }
+    }
+
+    override fun registerRandomAddress(ctx: DSLContext, uid: String, symbol: String, originalAddress: String): Boolean {
+        val linkAddress = AddressUtil.createRandomAddress(ctx)
+        addressDao.insert(Address(uid, linkAddress))
+        linkAddressDao.insert(Linkaddress(linkAddress, symbol, originalAddress))
+        return true
     }
 
     override fun getLinkAddress(address: String): AddressModel {

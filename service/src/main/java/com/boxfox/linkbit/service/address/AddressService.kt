@@ -1,9 +1,10 @@
 package com.boxfox.linkbit.service.address
 
 import com.boxfox.linkbit.common.entity.Address.AddressModel
+import com.boxfox.linkbit.service.JooqReactiveService
 import io.reactivex.Single
 
-class AddressService(private val impl: AddressUsecase = AddressServiceImpl()) : com.boxfox.linkbit.service.JooqReactiveService() {
+class AddressService(private val impl: AddressUsecase = AddressServiceImpl()) : JooqReactiveService() {
 
     fun getList(uid: String): Single<List<AddressModel>> = single { impl.getLinkAddressList(uid) }
 
