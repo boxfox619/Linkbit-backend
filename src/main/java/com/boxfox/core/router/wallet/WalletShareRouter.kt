@@ -32,7 +32,7 @@ class WalletShareRouter : AbstractRouter() {
         ctx.response().end()
     }
 
-    @RouteRegistration(uri = "/share/qr", method = arrayOf(HttpMethod.GET))
+/*    @RouteRegistration(uri = "/share/qr", method = arrayOf(HttpMethod.GET))
     fun createQrCode(ctx: RoutingContext, @Param(name = "address") address: String, @Param(name = "amount") amount: Int) {
         getLogger().debug(String.format("Create QR Code %s %s", address, amount))
         walletService.findByAddress(address).subscribe({
@@ -57,6 +57,6 @@ class WalletShareRouter : AbstractRouter() {
         }, {
             ctx.fail(it)
         })
-    }
+    }*/
 
 }

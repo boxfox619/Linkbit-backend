@@ -14,7 +14,7 @@ class WalletRouter : AbstractRouter() {
     @Service
     lateinit var walletService: WalletService
 
-    @RouteRegistration(uri = "/wallet/new", method = [HttpMethod.POST], auth = true)
+    @RouteRegistration(uri = "/wallet", method = [HttpMethod.POST], auth = true)
     fun create(ctx: RoutingContext,
                @Param(name = "password") password: String,
                @Param(name = "symbol") symbol: String) {

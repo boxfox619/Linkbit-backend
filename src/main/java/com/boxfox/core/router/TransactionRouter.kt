@@ -13,39 +13,14 @@ class TransactionRouter : AbstractRouter() {
     @Service
     private lateinit var transactionService: TransactionService
 
-    @RouteRegistration(uri = "/transactions", method = [HttpMethod.GET], auth = true)
-    fun allTransactionList(ctx: RoutingContext,
-                           @Param(name = "page") page: Int,
-                           @Param(name = "count") count: Int) {
-        val uid = ctx.data()["uid"] as String
-        transactionService.getAllTransactionList(uid, page, count).subscribe({
-            ctx.response().end(gson.toJson(it))
-        }, {
-            ctx.fail(it)
-        })
-    }
-
     @RouteRegistration(uri = "/wallet/:symbol/transactions", method = [HttpMethod.GET])
     fun transactionList(ctx: RoutingContext,
                         @Param(name = "symbol") symbol: String,
                         @Param(name = "address") address: String,
                         @Param(name = "page") page: Int,
                         @Param(name = "count") count: Int) {
-        transactionService.getTransactionList(address, page, count).subscribe({
-            ctx.response().end(gson.toJson(it))
-        }, {
-            ctx.fail(it)
-        })
-    }
-
-    @RouteRegistration(uri = "/transactions/:symbol", method = [HttpMethod.GET], auth = true)
-    fun allTransactionList(ctx: RoutingContext,
-                           @Param(name = "symbol") symbol: String,
-                           @Param(name = "page") page: Int,
-                           @Param(name = "count") count: Int) {
-        val uid = ctx.data()["uid"] as String
-        transactionService.getAllTransactionList(uid, symbol, page, count).subscribe({
-            ctx.response().end(gson.toJson(it))
+        transactionService.getTransactionList(symbol, address, page, count).subscribe({
+            ctx.response().end(gson.toJson(it)) //{transactions: [], blackNum: 111}
         }, {
             ctx.fail(it)
         })
