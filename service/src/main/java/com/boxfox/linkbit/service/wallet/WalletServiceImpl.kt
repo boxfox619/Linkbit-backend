@@ -14,7 +14,7 @@ class WalletServiceImpl : WalletUsecase {
             return WalletCreateModel().apply {
                 this.address = result.address
                 this.walletFileName = result.walletName
-                this.walletData = result.walletData.asString
+                this.walletData = result.walletData.toString()
             }
         } else {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Wallet create fail")
