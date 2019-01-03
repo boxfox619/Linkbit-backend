@@ -15,6 +15,7 @@ class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl(),
                      password: String): Single<WalletCreateModel> = single {
         val wallet = impl.createWallet(it, symbol, password)
         addressImpl.registerRandomAddress(it, uid, symbol, wallet.address)
+        wallet
     }
 
     fun getBalance(symbol:String, address: String): Single<Double> = single { impl.getBalance(it, symbol, address) }
