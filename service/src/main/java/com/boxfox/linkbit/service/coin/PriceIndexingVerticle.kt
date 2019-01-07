@@ -4,11 +4,11 @@ import com.boxfox.linkbit.common.data.RedisUtil
 import io.vertx.core.AbstractVerticle
 import org.apache.log4j.LogManager
 import org.apache.log4j.Logger
-import redis.clients.jedis.JedisCluster
+import redis.clients.jedis.JedisPool
 
 
 class PriceIndexingVerticle(private val logger: Logger = LogManager.getRootLogger(),
-                            private  val jedis: JedisCluster = RedisUtil.create()) : AbstractVerticle() {
+                            private val jedisPool: JedisPool = RedisUtil.createPool()) : AbstractVerticle() {
     override fun start() {
         //@TODO
         priceParsingCycle()
@@ -18,7 +18,9 @@ class PriceIndexingVerticle(private val logger: Logger = LogManager.getRootLogge
         CoinMarketCapIndexer(this.vertx).indexing().subscribe({ priceMap ->
             logger.debug("indexing coin price : ${priceMap.size}")
             priceMap.keys.forEach { symbol ->
-                jedis.hset("Currency", symbol, priceMap[symbol].toString())
+                jedisPool.resource.use { jedis ->
+                    jedis.hset("Currency", symbol, priceMap[symbol].toString())
+                }
             }
         }, { logger.error(it.message, it) })
     }

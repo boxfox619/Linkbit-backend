@@ -8,9 +8,9 @@ import io.one.sys.db.Tables.COIN
 import io.one.sys.db.tables.records.CoinRecord
 
 import org.jooq.DSLContext
-import redis.clients.jedis.JedisCluster
+import redis.clients.jedis.JedisPool
 
-class CoinServiceImpl(private val jedis: JedisCluster = RedisUtil.create()) : CoinUsecase {
+class CoinServiceImpl(private val jedisPool: JedisPool = RedisUtil.createPool()) : CoinUsecase {
 
     override fun getAllCoins(ctx: DSLContext, moneySymbol: String): List<CoinModel> {
         return updatePrice(getCoinModels(ctx), moneySymbol)
@@ -36,11 +36,13 @@ class CoinServiceImpl(private val jedis: JedisCluster = RedisUtil.create()) : Co
 
     override fun getPrice(symbols: List<String>, moneySymbol: String): Map<String, Double> {
         val coins = HashMap<String, Double>()
-        val priceMap = jedis.hgetAll("currency")
-        symbols.forEach {
-            val key = String.format("%s-%s", it.toUpperCase(), moneySymbol)
-            val value = priceMap.getOrDefault(key, "0")
-            coins[it] = value.toDouble()
+        jedisPool.resource.use { jedis ->
+            val priceMap = jedis.hgetAll("currency")
+            symbols.forEach {
+                val key = String.format("%s-%s", it.toUpperCase(), moneySymbol)
+                val value = priceMap.getOrDefault(key, "0")
+                coins[it] = value.toDouble()
+            }
         }
         return coins
     }
@@ -50,13 +52,13 @@ class CoinServiceImpl(private val jedis: JedisCluster = RedisUtil.create()) : Co
     }
 
     override fun getPrice(symbol: String, moneySymbol: String): Double {
-        var result = 0.toDouble()
-        val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
-        if (value != null) {
-            result = value.toDouble()
-        } else {
-            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "coin currency not found")
+        jedisPool.resource.use { jedis ->
+            val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
+            if (value != null) {
+                return value.toDouble()
+            } else {
+                throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "coin currency not found")
+            }
         }
-        return result
     }
 }
