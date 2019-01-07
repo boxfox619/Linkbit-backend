@@ -37,10 +37,9 @@ class CoinServiceImpl(private val jedisPool: JedisPool = RedisUtil.createPool())
     override fun getPrice(symbols: List<String>, moneySymbol: String): Map<String, Double> {
         val coins = HashMap<String, Double>()
         jedisPool.resource.use { jedis ->
-            val priceMap = jedis.hgetAll("currency")
+            val priceMap = jedis.hgetAll("Currency")
             symbols.forEach {
-                val key = String.format("%s-%s", it.toUpperCase(), moneySymbol)
-                val value = priceMap.getOrDefault(key, "0")
+                val value = priceMap.getOrDefault(it.toUpperCase(), "0")
                 coins[it] = value.toDouble()
             }
         }
@@ -53,7 +52,7 @@ class CoinServiceImpl(private val jedisPool: JedisPool = RedisUtil.createPool())
 
     override fun getPrice(symbol: String, moneySymbol: String): Double {
         jedisPool.resource.use { jedis ->
-            val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
+            val value = jedis.hget("Currency", symbol.toUpperCase())
             if (value != null) {
                 return value.toDouble()
             } else {

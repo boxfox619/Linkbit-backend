@@ -19,7 +19,7 @@ class PriceIndexingVerticle(private val logger: Logger = LogManager.getRootLogge
             logger.debug("indexing coin price : ${priceMap.size}")
             priceMap.keys.forEach { symbol ->
                 jedisPool.resource.use { jedis ->
-                    jedis.hset("Currency", symbol, priceMap[symbol].toString())
+                    jedis.hset("Currency", symbol.toUpperCase(), priceMap[symbol].toString())
                 }
             }
         }, { logger.error(it.message, it) })
