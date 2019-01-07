@@ -9,6 +9,7 @@ import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonArray
 import io.vertx.ext.web.RoutingContext
 
 class CoinRouter : AbstractRouter() {
@@ -23,6 +24,16 @@ class CoinRouter : AbstractRouter() {
     fun getSupportWalletList(ctx: RoutingContext) {
         getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
         this.coinService.list().subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, {
+            ctx.fail(it)
+        })
+    }
+
+    @RouteRegistration(uri = "/coins", method = [HttpMethod.POST])
+    fun getSupportWalletList(ctx: RoutingContext, @Param(name = "symbols") symbols: JsonArray) {
+        getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
+        this.coinService.list(symbols.map { it -> it.toString() }).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)

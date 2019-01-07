@@ -13,7 +13,11 @@ class CoinService(private val impl: CoinUsecase = CoinServiceImpl()) : JooqReact
     internal lateinit var localeService: LocaleService
 
     fun list(locale: String = Locale.KOREA.toString()): Single<List<CoinModel>> {
-        return single { impl.getAllCoins(it,localeService.getMoneySymbol(locale)) }
+        return single { impl.getAllCoins(it, localeService.getMoneySymbol(locale)) }
+    }
+
+    fun list(symbols: List<String>, locale: String = Locale.KOREA.toString()): Single<List<CoinModel>> {
+        return single { impl.getCoins(it, symbols, localeService.getMoneySymbol(locale)) }
     }
 
     fun getPrice(symbol: String, balance: Double, locale: String = Locale.KOREA.toString()): Single<Double> {

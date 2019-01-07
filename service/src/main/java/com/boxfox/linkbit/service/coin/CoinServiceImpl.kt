@@ -12,12 +12,23 @@ import org.jooq.DSLContext
 class CoinServiceImpl : CoinUsecase {
 
     override fun getAllCoins(ctx: DSLContext, moneySymbol: String): List<CoinModel> {
-        val coins = ctx.selectFrom<CoinRecord>(COIN).fetch().map { record ->
+        return updatePrice(getCoinModels(ctx), moneySymbol)
+    }
+
+    override fun getCoins(ctx: DSLContext, symbols: List<String>, moneySymbol: String): List<CoinModel> {
+        return updatePrice(getCoinModels(ctx).filter { symbols.contains(it.symbol) }, moneySymbol)
+    }
+
+    private fun getCoinModels(ctx: DSLContext): List<CoinModel>{
+        return ctx.selectFrom<CoinRecord>(COIN).fetch().map { record ->
             CoinModel().apply {
                 this.name = record.name
                 this.symbol = record.symbol
             }
         }
+    }
+
+    private fun updatePrice(coins : List<CoinModel>, moneySymbol: String): List<CoinModel> {
         val priceMap = getPrice(coins.map { it.symbol }, moneySymbol)
         return coins.map { it.apply { this.price = priceMap.getOrDefault(it.symbol.toUpperCase(), 0.toDouble()) } }
     }
@@ -42,7 +53,7 @@ class CoinServiceImpl : CoinUsecase {
     override fun getPrice(symbol: String, moneySymbol: String): Double {
         RedisConfig.createPool().resource.use { jedis ->
             val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
-            if (value!=null) {
+            if (value != null) {
                 return value.toDouble()
             } else {
                 throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "coin currency not found")
