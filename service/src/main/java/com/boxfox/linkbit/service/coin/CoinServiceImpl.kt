@@ -1,15 +1,16 @@
 package com.boxfox.linkbit.service.coin
 
 import com.boxfox.linkbit.common.RoutingException
-import com.boxfox.linkbit.common.data.RedisConfig
+import com.boxfox.linkbit.common.data.RedisUtil
 import com.boxfox.linkbit.common.entity.CoinModel
 import com.google.api.client.http.HttpStatusCodes
 import io.one.sys.db.Tables.COIN
 import io.one.sys.db.tables.records.CoinRecord
 
 import org.jooq.DSLContext
+import redis.clients.jedis.JedisCluster
 
-class CoinServiceImpl : CoinUsecase {
+class CoinServiceImpl(private val jedis: JedisCluster = RedisUtil.create()) : CoinUsecase {
 
     override fun getAllCoins(ctx: DSLContext, moneySymbol: String): List<CoinModel> {
         return updatePrice(getCoinModels(ctx), moneySymbol)
@@ -19,7 +20,7 @@ class CoinServiceImpl : CoinUsecase {
         return updatePrice(getCoinModels(ctx).filter { symbols.contains(it.symbol) }, moneySymbol)
     }
 
-    private fun getCoinModels(ctx: DSLContext): List<CoinModel>{
+    private fun getCoinModels(ctx: DSLContext): List<CoinModel> {
         return ctx.selectFrom<CoinRecord>(COIN).fetch().map { record ->
             CoinModel().apply {
                 this.name = record.name
@@ -28,20 +29,18 @@ class CoinServiceImpl : CoinUsecase {
         }
     }
 
-    private fun updatePrice(coins : List<CoinModel>, moneySymbol: String): List<CoinModel> {
+    private fun updatePrice(coins: List<CoinModel>, moneySymbol: String): List<CoinModel> {
         val priceMap = getPrice(coins.map { it.symbol }, moneySymbol)
         return coins.map { it.apply { this.price = priceMap.getOrDefault(it.symbol.toUpperCase(), 0.toDouble()) } }
     }
 
     override fun getPrice(symbols: List<String>, moneySymbol: String): Map<String, Double> {
         val coins = HashMap<String, Double>()
-        RedisConfig.createPool().resource.use { jedis ->
-            val priceMap = jedis.hgetAll("currency")
-            symbols.forEach {
-                val key = String.format("%s-%s", it.toUpperCase(), moneySymbol)
-                val value = priceMap.getOrDefault(key, "0")
-                coins[it] = value.toDouble()
-            }
+        val priceMap = jedis.hgetAll("currency")
+        symbols.forEach {
+            val key = String.format("%s-%s", it.toUpperCase(), moneySymbol)
+            val value = priceMap.getOrDefault(key, "0")
+            coins[it] = value.toDouble()
         }
         return coins
     }
@@ -51,13 +50,13 @@ class CoinServiceImpl : CoinUsecase {
     }
 
     override fun getPrice(symbol: String, moneySymbol: String): Double {
-        RedisConfig.createPool().resource.use { jedis ->
-            val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
-            if (value != null) {
-                return value.toDouble()
-            } else {
-                throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "coin currency not found")
-            }
+        var result = 0.toDouble()
+        val value = jedis.hget("currency", String.format("%s-%s", symbol.toUpperCase(), moneySymbol))
+        if (value != null) {
+            result = value.toDouble()
+        } else {
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "coin currency not found")
         }
+        return result
     }
 }
