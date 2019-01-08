@@ -26,15 +26,14 @@ class CoinServiceImpl(private val jedisPool: JedisPool = RedisUtil.createPool())
             CoinPriceModel().apply {
                 this.name = record.name
                 this.symbol = record.symbol
+                this.themeColor = record.color
             }
         }
     }
 
     private fun updatePrice(coins: List<CoinModel>, moneySymbol: String): List<CoinPriceModel> {
         val priceMap = getPrice(coins.map { it.symbol }, moneySymbol)
-        return coins.map { CoinPriceModel().apply {
-            this.symbol = it.symbol
-            this.name = it.name
+        return coins.map { CoinPriceModel(it).apply {
             this.price = priceMap.getOrDefault(it.symbol.toUpperCase(), 0.toDouble())
         } }
     }
