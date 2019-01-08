@@ -12,7 +12,7 @@ import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonArray
 import io.vertx.ext.web.RoutingContext
 
-class CoinRouter : AbstractRouter() {
+class CoinRouter() : AbstractRouter() {
 
     @Service
     private lateinit var localeService: LocaleService
@@ -21,19 +21,29 @@ class CoinRouter : AbstractRouter() {
     private lateinit var coinService: CoinService
 
     @RouteRegistration(uri = "/coins", method = [HttpMethod.GET])
-    fun getSupportWalletList(ctx: RoutingContext) {
+    fun getSimpleCoinList(ctx: RoutingContext) {
         getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.list().subscribe({
+        this.coinService.getCoins().subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
         })
     }
 
-    @RouteRegistration(uri = "/coins", method = [HttpMethod.POST])
-    fun getSupportWalletList(ctx: RoutingContext, @Param(name = "symbols") symbols: JsonArray) {
+    @RouteRegistration(uri = "/coins/price", method = [HttpMethod.GET])
+    fun getCoinPriceList(ctx: RoutingContext) {
         getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.list(symbols.map { it -> it.toString() }).subscribe({
+        this.coinService.getPrices().subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, {
+            ctx.fail(it)
+        })
+    }
+
+    @RouteRegistration(uri = "/coins/price", method = [HttpMethod.POST])
+    fun getCoinPriceList(ctx: RoutingContext, @Param(name = "symbols") symbols: JsonArray) {
+        getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
+        this.coinService.getPrices(symbols.map { it -> it.toString() }).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)

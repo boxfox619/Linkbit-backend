@@ -2,7 +2,8 @@ package com.boxfox.linkbit.service.coin
 
 import com.boxfox.linkbit.common.RoutingException
 import com.boxfox.linkbit.common.data.RedisUtil
-import com.boxfox.linkbit.common.entity.CoinModel
+import com.boxfox.linkbit.common.entity.coin.CoinModel
+import com.boxfox.linkbit.common.entity.coin.CoinPriceModel
 import com.google.api.client.http.HttpStatusCodes
 import io.one.sys.db.Tables.COIN
 import io.one.sys.db.tables.records.CoinRecord
@@ -12,26 +13,30 @@ import redis.clients.jedis.JedisPool
 
 class CoinServiceImpl(private val jedisPool: JedisPool = RedisUtil.createPool()) : CoinUsecase {
 
-    override fun getAllCoins(ctx: DSLContext, moneySymbol: String): List<CoinModel> {
-        return updatePrice(getCoinModels(ctx), moneySymbol)
+    override fun getAllPrices(ctx: DSLContext, moneySymbol: String): List<CoinPriceModel> {
+        return updatePrice(getCoins(ctx), moneySymbol)
     }
 
-    override fun getCoins(ctx: DSLContext, symbols: List<String>, moneySymbol: String): List<CoinModel> {
-        return updatePrice(getCoinModels(ctx).filter { symbols.contains(it.symbol) }, moneySymbol)
+    override fun getPrices(ctx: DSLContext, symbols: List<String>, moneySymbol: String): List<CoinPriceModel> {
+        return updatePrice(getCoins(ctx).filter { symbols.contains(it.symbol) }, moneySymbol)
     }
 
-    private fun getCoinModels(ctx: DSLContext): List<CoinModel> {
+    private fun getCoins(ctx: DSLContext): List<CoinModel> {
         return ctx.selectFrom<CoinRecord>(COIN).fetch().map { record ->
-            CoinModel().apply {
+            CoinPriceModel().apply {
                 this.name = record.name
                 this.symbol = record.symbol
             }
         }
     }
 
-    private fun updatePrice(coins: List<CoinModel>, moneySymbol: String): List<CoinModel> {
+    private fun updatePrice(coins: List<CoinModel>, moneySymbol: String): List<CoinPriceModel> {
         val priceMap = getPrice(coins.map { it.symbol }, moneySymbol)
-        return coins.map { it.apply { this.price = priceMap.getOrDefault(it.symbol.toUpperCase(), 0.toDouble()) } }
+        return coins.map { CoinPriceModel().apply {
+            this.symbol = it.symbol
+            this.name = it.name
+            this.price = priceMap.getOrDefault(it.symbol.toUpperCase(), 0.toDouble())
+        } }
     }
 
     override fun getPrice(symbols: List<String>, moneySymbol: String): Map<String, Double> {
