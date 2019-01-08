@@ -14,7 +14,6 @@ import io.one.sys.db.tables.pojos.Linkaddress
 import org.jooq.DSLContext
 
 class AddressServiceImpl : AddressUsecase {
-
     private val addressDao = AddressDao(PostgresConfig.create())
     private val linkAddressDao = LinkaddressDao(PostgresConfig.create())
 
@@ -39,6 +38,11 @@ class AddressServiceImpl : AddressUsecase {
     override fun checkAddressOwn(ctx: DSLContext, uid: String, linkAddress: String): Boolean {
         val count = ctx.selectFrom(ADDRESS).where(ADDRESS.UID.eq(uid).and(ADDRESS.LINKADDRESS.eq(linkAddress))).count()
         return (count > 0)
+    }
+
+    override fun createLinkAddress(uid: String, linkAddress: String): AddressModel {
+        addressDao.insert(Address(uid, linkAddress))
+        return getLinkAddress(linkAddress)
     }
 
     override fun registerAddress(ctx: DSLContext, uid: String, linkAddress: String, symbol: String, accountAddress: String): Boolean {

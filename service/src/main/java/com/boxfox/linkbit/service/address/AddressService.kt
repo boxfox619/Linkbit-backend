@@ -6,6 +6,8 @@ import io.reactivex.Single
 
 class AddressService(private val impl: AddressUsecase = AddressServiceImpl()) : JooqReactiveService() {
 
+    fun newAddress(uid: String, address: String): Single<AddressModel> = single { impl.createLinkAddress(uid, address)}
+
     fun getList(uid: String): Single<List<AddressModel>> = single { impl.getLinkAddressList(uid) }
 
     fun getAddress(linkAddress: String): Single<AddressModel> = single { impl.getLinkAddress(linkAddress)}

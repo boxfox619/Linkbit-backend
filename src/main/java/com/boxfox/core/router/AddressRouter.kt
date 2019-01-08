@@ -74,6 +74,11 @@ class AddressRouter : AbstractAuthRouter() {
 
     @RouteRegistration(uri = "/address", method = [HttpMethod.POST], auth = true)
     fun buyAddress(ctx: RoutingContext, @Param(name = "linkAddress") linkAddress: String) {
-        //@TODO Implement address buy function
+        val uid = getUid(ctx)
+        addressService.newAddress(uid, linkAddress).subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, {
+            ctx.fail(it)
+        })
     }
 }
