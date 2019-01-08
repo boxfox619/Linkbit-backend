@@ -21,7 +21,7 @@ class CoinServiceImpl(private val jedisPool: JedisPool = RedisUtil.createPool())
         return updatePrice(getCoins(ctx).filter { symbols.contains(it.symbol) }, moneySymbol)
     }
 
-    private fun getCoins(ctx: DSLContext): List<CoinModel> {
+    override fun getCoins(ctx: DSLContext): List<CoinModel> {
         return ctx.selectFrom<CoinRecord>(COIN).fetch().map { record ->
             CoinPriceModel().apply {
                 this.name = record.name
