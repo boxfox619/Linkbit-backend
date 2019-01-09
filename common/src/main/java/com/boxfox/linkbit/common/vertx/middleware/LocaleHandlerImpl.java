@@ -7,7 +7,7 @@ import java.util.Locale;
 public class LocaleHandlerImpl implements LocaleHandler {
     @Override
     public void handle(RoutingContext ctx) {
-        ctx.data().put("locale", Locale.US.getCountry());
+        ctx.data().put("locale", Locale.US.getLanguage());
         ctx.next();
     }
 }

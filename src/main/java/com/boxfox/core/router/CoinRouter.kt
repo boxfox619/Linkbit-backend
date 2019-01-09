@@ -22,8 +22,9 @@ class CoinRouter() : AbstractRouter() {
 
     @RouteRegistration(uri = "/coins", method = [HttpMethod.GET])
     fun getSimpleCoinList(ctx: RoutingContext) {
+        val locale = ctx.data()["locale"].toString()
         getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.getCoins().subscribe({
+        this.coinService.getCoins(locale).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
@@ -32,8 +33,9 @@ class CoinRouter() : AbstractRouter() {
 
     @RouteRegistration(uri = "/coins/price", method = [HttpMethod.GET])
     fun getCoinPriceList(ctx: RoutingContext) {
+        val locale = ctx.data()["locale"].toString()
         getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.getPrices().subscribe({
+        this.coinService.getPrices(locale).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)
@@ -42,8 +44,9 @@ class CoinRouter() : AbstractRouter() {
 
     @RouteRegistration(uri = "/coins/price", method = [HttpMethod.POST])
     fun getCoinPriceList(ctx: RoutingContext, @Param(name = "symbols") symbols: JsonArray) {
+        val locale = ctx.data()["locale"].toString()
         getLogger().debug(String.format("Coin Load : %s", ctx.request().remoteAddress().host()))
-        this.coinService.getPrices(symbols.map { it -> it.toString() }).subscribe({
+        this.coinService.getPrices(symbols.map { it -> it.toString() }, locale).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)

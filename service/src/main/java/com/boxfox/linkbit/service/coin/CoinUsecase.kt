@@ -6,15 +6,15 @@ import org.jooq.DSLContext
 
 interface CoinUsecase {
 
-    fun getCoins(ctx: DSLContext): List<CoinModel>
+    fun getCoins(ctx: DSLContext, locale: String): List<CoinModel>
 
-    fun getAllPrices(ctx: DSLContext, moneySymbol: String): List<CoinPriceModel>
+    fun getAllPrices(ctx: DSLContext, locale: String): List<CoinPriceModel>
 
-    fun getPrices(ctx: DSLContext, symbols: List<String>, moneySymbol: String): List<CoinPriceModel>
+    fun getPrices(ctx: DSLContext, symbols: List<String>, locale: String): List<CoinPriceModel>
 
-    fun getPrice(symbol: String, moneySymbol: String, balance: Double): Double
+    fun getPrice(symbol: String, balance: Double): Double
 
-    fun getPrice(symbol: String, moneySymbol: String): Double
+    fun getPrice(symbol: String): Double
 
-    fun getPrice(symbols: List<String>, moneySymbol: String): Map<String, Double>
+    fun getPrice(symbols: List<String>): Map<String, Double>
 }

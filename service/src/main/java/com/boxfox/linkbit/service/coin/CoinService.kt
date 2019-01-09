@@ -13,24 +13,24 @@ class CoinService(private val impl: CoinUsecase = CoinServiceImpl()) : JooqReact
     @Service
     internal lateinit var localeService: LocaleService
 
-    fun getCoins(locale: String = Locale.KOREA.toString()): Single<List<CoinModel>> {
-        return single { impl.getCoins(it) }
+    fun getCoins(locale: String = Locale.KOREA.language): Single<List<CoinModel>> {
+        return single { impl.getCoins(it, locale) }
     }
 
-    fun getPrices(locale: String = Locale.KOREA.toString()): Single<List<CoinPriceModel>> {
-        return single { impl.getAllPrices(it, localeService.getMoneySymbol(locale)) }
+    fun getPrices(locale: String = Locale.KOREA.language): Single<List<CoinPriceModel>> {
+        return single { impl.getAllPrices(it, locale) }
     }
 
-    fun getPrices(symbols: List<String>, locale: String = Locale.KOREA.toString()): Single<List<CoinPriceModel>> {
-        return single { impl.getPrices(it, symbols, localeService.getMoneySymbol(locale)) }
+    fun getPrices(symbols: List<String>, locale: String = Locale.KOREA.language): Single<List<CoinPriceModel>> {
+        return single { impl.getPrices(it, symbols, locale) }
     }
 
-    fun getPrice(symbol: String, balance: Double, locale: String = Locale.KOREA.toString()): Single<Double> {
-        return single { impl.getPrice(symbol, localeService.getMoneySymbol(locale), balance) }
+    fun getPrice(symbol: String, balance: Double): Single<Double> {
+        return single { impl.getPrice(symbol, balance) }
     }
 
     @JvmOverloads
-    fun getPrice(symbol: String, locale: String = Locale.KOREA.toString()): Single<Double> {
-        return single { impl.getPrice(symbol, locale) }
+    fun getPrice(symbol: String): Single<Double> {
+        return single { impl.getPrice(symbol) }
     }
 }
