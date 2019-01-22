@@ -4,11 +4,13 @@ import com.boxfox.linkbit.common.RoutingException;
 import com.boxfox.linkbit.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.wallet.WalletServiceException;
 import com.boxfox.linkbit.wallet.model.TransactionResult;
+import io.vertx.core.json.JsonObject;
+
 import java.util.List;
 
 public interface TransactionPart {
 
-    TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount);
+    TransactionResult send(JsonObject data, String targetAddress, String amount);
 
     List<TransactionModel> getTransactionList(String address) throws WalletServiceException, RoutingException;
 

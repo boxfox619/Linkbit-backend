@@ -10,6 +10,8 @@ import com.boxfox.linkbit.wallet.part.CreateWalletPart;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
 import com.boxfox.vertx.service.AbstractService;
 import com.google.gson.Gson;
+import io.vertx.core.json.JsonObject;
+
 import java.util.List;
 
 import static com.boxfox.linkbit.wallet.indexing.IndexingMessage.EVENT_SUBJECT;
@@ -32,8 +34,13 @@ public class WalletService extends AbstractService implements BalancePart, Creat
     }
 
     @Override
-    public TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount) {
-        return context.getTransactionPart().send(walletFileName, walletJsonFile, password, targetAddress, amount);
+    public WalletCreateResult importWallet(String type, JsonObject data) {
+        return context.getCreateWalletPart().importWallet(type, data);
+    }
+
+    @Override
+    public TransactionResult send(JsonObject walletData, String targetAddress, String amount) {
+        return context.getTransactionPart().send(walletData, targetAddress, amount);
     }
 
     @Override

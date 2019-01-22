@@ -54,20 +54,18 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
     }
 
     @Override
-    public TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount) {
-        File tmpWallet = new File(cachePath.getPath() + File.separator + walletFileName);
+    public TransactionResult send(String type, JsonObject data, String targetAddress, String amount) {
         TransactionResult result = new TransactionResult();
         try {
-            Files.write(walletJsonFile, tmpWallet, Charset.forName("UTF-8"));
-            Credentials credentials1 = WalletUtils.loadCredentials(password, tmpWallet.getPath());
-            EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(credentials1.getAddress(), DefaultBlockParameterName.LATEST).sendAsync().get();
+            Credentials credentials = this.getCredentials(type, data);
+            EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(credentials.getAddress(), DefaultBlockParameterName.LATEST).sendAsync().get();
 
             BigInteger nonce = ethGetTransactionCount.getTransactionCount();
 
             BigInteger amountEth = Convert.toWei(amount, Convert.Unit.ETHER).toBigInteger();
             RawTransaction rawTransaction = RawTransaction.createEtherTransaction(nonce, GAS_PRICE, GAS_LIMIT, targetAddress, amountEth);
 
-            byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials1);
+            byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
             String hexValue = Numeric.toHexString(signedMessage);
 
             EthSendTransaction ethSendTransaction = web3.ethSendRawTransaction(hexValue).sendAsync().get();
@@ -82,8 +80,24 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
             e.printStackTrace();
         } catch (CipherException e) {
             e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
         }
         return result;
+    }
+
+    private Credentials getCredentials(String type, JsonObject data) throws IOException, CipherException {
+        switch (type) {
+            case "mnemonic":
+                return WalletUtils.loadBip39Credentials(data.getString("password"), data.getString("mnemonic"));
+            case "privateKey":
+                return Credentials.create(data.getString("privateKey"));
+            case "keystore":
+                File tmpWallet = new File(cachePath.getPath() + File.separator + System.currentTimeMillis());
+                Files.write(data.getJsonObject("keystore").toString(), tmpWallet, Charset.forName("UTF-8"));
+                return WalletUtils.loadCredentials(data.getString("password"), tmpWallet.getPath());
+        }
+        throw new IllegalArgumentException("type not match");
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 
 class WalletRouter : AbstractRouter() {
@@ -21,6 +22,20 @@ class WalletRouter : AbstractRouter() {
         val uid = ctx.data()["uid"] as String
         getLogger().debug("Wallet create test$uid")
         walletService.createWallet(uid, symbol, password).subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, {
+            ctx.fail(it)
+        })
+    }
+
+    @RouteRegistration(uri = "/wallet/import", method = [HttpMethod.POST], auth = true)
+    fun import(ctx: RoutingContext,
+               @Param(name = "data") data: JsonObject,
+               @Param(name = "type") type: String,
+               @Param(name = "symbol") symbol: String) {
+        val uid = ctx.data()["uid"] as String
+        getLogger().debug("Wallet create test$uid")
+        walletService.importWallet(uid, symbol, type, data).subscribe({
             ctx.response().end(gson.toJson(it))
         }, {
             ctx.fail(it)

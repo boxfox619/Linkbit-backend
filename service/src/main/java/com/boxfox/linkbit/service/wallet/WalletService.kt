@@ -5,6 +5,7 @@ import com.boxfox.linkbit.common.entity.wallet.WalletCreateModel
 import com.boxfox.linkbit.service.JooqReactiveService
 import com.boxfox.linkbit.service.address.AddressServiceImpl
 import com.boxfox.linkbit.service.address.AddressUsecase
+import io.vertx.core.json.JsonObject
 import io.reactivex.Single
 
 class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl(),
@@ -14,6 +15,12 @@ class WalletService(private val impl: WalletServiceImpl = WalletServiceImpl(),
                      symbol: String,
                      password: String): Single<WalletCreateModel> = single {
         val wallet = impl.createWallet(it, symbol, password)
+        addressImpl.registerRandomAddress(it, uid, symbol, wallet.address)
+        wallet
+    }
+
+    fun importWallet(uid: String, symbol: String, type: String, data: JsonObject): Single<WalletCreateModel> = single {
+        val wallet = impl.importWallet(it, symbol, type, data)
         addressImpl.registerRandomAddress(it, uid, symbol, wallet.address)
         wallet
     }

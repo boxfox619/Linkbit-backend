@@ -4,6 +4,7 @@ import com.boxfox.linkbit.common.RoutingException
 import com.boxfox.linkbit.common.entity.wallet.WalletCreateModel
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
+import io.vertx.core.json.JsonObject
 import org.jooq.DSLContext
 
 class WalletServiceImpl : WalletUsecase {
@@ -18,6 +19,19 @@ class WalletServiceImpl : WalletUsecase {
             }
         } else {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Wallet create fail")
+        }
+    }
+
+    override fun importWallet(ctx: DSLContext, symbol: String, type: String, data: JsonObject): WalletCreateModel {
+        val result = WalletServiceRegistry.getService(symbol).importWallet(type, data)
+        if (result.isSuccess) {
+            return WalletCreateModel().apply {
+                this.address = result.address
+                this.walletFileName = result.walletName
+                this.walletData = result.walletData.toString()
+            }
+        } else {
+            throw RoutingException(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, "Wallet import fail")
         }
     }
 
