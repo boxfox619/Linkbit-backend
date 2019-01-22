@@ -54,10 +54,10 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
     }
 
     @Override
-    public TransactionResult send(String type, JsonObject data, String targetAddress, String amount) {
+    public TransactionResult send(JsonObject data, String targetAddress, String amount) {
         TransactionResult result = new TransactionResult();
         try {
-            Credentials credentials = this.getCredentials(type, data);
+            Credentials credentials = this.getCredentials(data);
             EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(credentials.getAddress(), DefaultBlockParameterName.LATEST).sendAsync().get();
 
             BigInteger nonce = ethGetTransactionCount.getTransactionCount();
@@ -86,8 +86,8 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
         return result;
     }
 
-    private Credentials getCredentials(String type, JsonObject data) throws IOException, CipherException {
-        switch (type) {
+    private Credentials getCredentials(JsonObject data) throws IOException, CipherException {
+        switch (data.getString("type")) {
             case "mnemonic":
                 return WalletUtils.loadBip39Credentials(data.getString("password"), data.getString("mnemonic"));
             case "privateKey":

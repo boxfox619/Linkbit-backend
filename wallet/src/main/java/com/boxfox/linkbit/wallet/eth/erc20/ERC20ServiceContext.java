@@ -21,6 +21,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.List;
+
+import io.vertx.core.json.JsonObject;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
@@ -65,13 +67,19 @@ public class ERC20ServiceContext extends WalletServiceContext implements Transac
     }
 
     @Override
-    public TransactionResult send(String walletFileName, String walletJsonFile, String password, String targetAddress, String amount) {
+    public WalletCreateResult importWallet(String type, JsonObject data) {
+        //@TODO implement import wallet ERC20
+        return null;
+    }
+
+    @Override
+    public TransactionResult send(JsonObject data, String targetAddress, String amount) {
         String cachePath = Config.getDefaultInstance().getString("cachePath", "cache");
-        File tmpWallet = new File(cachePath+ File.separator + walletFileName);
+        File tmpWallet = new File(cachePath+ File.separator + System.currentTimeMillis());
         TransactionResult result = new TransactionResult();
         try {
-            Files.write(walletJsonFile, tmpWallet, Charset.forName("UTF-8"));
-            Credentials credentials = WalletUtils.loadCredentials(password, tmpWallet.getPath());
+            Files.write(data.getJsonObject("keystore").toString(), tmpWallet, Charset.forName("UTF-8"));
+            Credentials credentials = WalletUtils.loadCredentials(data.getString("password"), tmpWallet.getPath());
             String contractAddr = ERC20Tokens.getTokenAddress(symbol);
             String contractData = inputData("0xa9059cbb", targetAddress, amount);
             RawTransaction transaction = RawTransaction.createTransaction(new BigInteger("0x0"), GAS_PRICE, GAS_LIMIT, contractAddr, BigInteger.ZERO, contractData);
