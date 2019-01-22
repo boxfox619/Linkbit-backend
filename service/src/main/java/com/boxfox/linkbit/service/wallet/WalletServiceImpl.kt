@@ -14,7 +14,6 @@ class WalletServiceImpl : WalletUsecase {
         if (result.isSuccess) {
             return WalletCreateModel().apply {
                 this.address = result.address
-                this.walletFileName = result.walletName
                 this.walletData = result.walletData.toString()
             }
         } else {
@@ -27,7 +26,6 @@ class WalletServiceImpl : WalletUsecase {
         if (result.isSuccess) {
             return WalletCreateModel().apply {
                 this.address = result.address
-                this.walletFileName = result.walletName
                 this.walletData = result.walletData.toString()
             }
         } else {
