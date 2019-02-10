@@ -64,6 +64,10 @@ public class WalletService extends AbstractService implements BalancePart, Creat
         context.getTransactionPart().indexingTransaction(address);
     }
 
+    public boolean validAddress(String address){
+        return context.validAddress(address);
+    }
+
     public void requestTransactionIndexing(String address) {
         IndexingMessage msg = new IndexingMessage();
         msg.setSymbol(context.symbol);

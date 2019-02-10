@@ -5,6 +5,7 @@ import com.boxfox.linkbit.common.data.PostgresConfig
 import com.boxfox.linkbit.common.entity.Address.AddressEntityMapper
 import com.boxfox.linkbit.common.entity.Address.AddressModel
 import com.boxfox.linkbit.util.AddressUtil
+import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import io.one.sys.db.Tables.ADDRESS
 import io.one.sys.db.Tables.LINKADDRESS
 import io.one.sys.db.tables.daos.AddressDao
@@ -14,6 +15,7 @@ import io.one.sys.db.tables.pojos.Linkaddress
 import org.jooq.DSLContext
 
 class AddressServiceImpl : AddressUsecase {
+
     private val addressDao = AddressDao(PostgresConfig.create())
     private val linkAddressDao = LinkaddressDao(PostgresConfig.create())
 
@@ -73,6 +75,14 @@ class AddressServiceImpl : AddressUsecase {
     override fun checkAddressExist(ctx: DSLContext, address: String): Boolean {
         val count = ctx.selectFrom(ADDRESS).where(ADDRESS.LINKADDRESS.eq(address)).count()
         return (count > 0)
+    }
+
+    override fun checkAddressValid(ctx: DSLContext, symbol: String, address: String): Boolean {
+        return if (AddressUtil.isCrossAddress(address)) {
+            checkAddressExist(ctx, address)
+        } else {
+            WalletServiceRegistry.getService(symbol).validAddress(address)
+        }
     }
 
 }

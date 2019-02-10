@@ -23,4 +23,8 @@ class AddressService(private val impl: AddressUsecase = AddressServiceImpl()) : 
     fun checkAddressExist(address: String): Single<Boolean> {
         return single{impl.checkAddressExist(it, address)}
     }
+
+    fun checkAddressValid(symbol: String, address: String): Single<Boolean> {
+        return single{impl.checkAddressValid(it, symbol, address)}
+    }
 }

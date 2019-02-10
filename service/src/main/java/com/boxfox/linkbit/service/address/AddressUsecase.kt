@@ -11,5 +11,6 @@ interface AddressUsecase {
     fun unregisterAddress(ctx: DSLContext, uid: String, linkAddress: String, symbol: String): Boolean
     fun checkAddressOwn(ctx: DSLContext, uid: String, linkAddress: String): Boolean
     fun checkAddressExist(ctx: DSLContext, address: String): Boolean
+    fun checkAddressValid(ctx: DSLContext, symbol: String, address: String): Boolean
     fun registerRandomAddress(ctx: DSLContext, uid: String, symbol: String, originalAddress: String): Boolean
 }

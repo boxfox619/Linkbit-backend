@@ -24,6 +24,20 @@ class AddressRouter : AbstractAuthRouter() {
         })
     }
 
+    @RouteRegistration(uri = "/address/valid", method = [HttpMethod.GET], auth = true)
+    fun checkAddressValid(ctx: RoutingContext, @Param(name = "symbol") symbol: String, @Param(name = "address") address: String) {
+        addressService.checkAddressValid(symbol, address).subscribe({
+            if(it){
+                ctx.response().end()
+            }else{
+                ctx.response().setStatusCode(400).end()
+            }
+        }, {
+            ctx.fail(it)
+        })
+    }
+
+
     @RouteRegistration(uri = "/address/accounts", method = [HttpMethod.GET], auth = true)
     fun getLinkedAddress(ctx: RoutingContext, @Param(name = "address") address: String) {
         addressService.getAddress(address).subscribe({

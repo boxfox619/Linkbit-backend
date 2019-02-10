@@ -7,7 +7,7 @@ import com.boxfox.linkbit.wallet.part.CreateWalletPart;
 import com.boxfox.linkbit.wallet.part.TransactionPart;
 import io.vertx.core.json.JsonObject;
 
-public class WalletServiceContext {
+public abstract class WalletServiceContext {
     private IndexingService indexingService;
     protected final String symbol;
 
@@ -40,6 +40,8 @@ public class WalletServiceContext {
     protected IndexingService getIndexingService() {
         return this.indexingService;
     }
+
+    protected abstract boolean validAddress(String address);
 
     public void setIndexingService(IndexingService indexingService) {
         this.indexingService = indexingService;

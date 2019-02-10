@@ -9,6 +9,7 @@ import com.boxfox.vertx.data.Config;
 import java.io.File;
 
 import io.vertx.core.Vertx;
+import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
@@ -46,6 +47,11 @@ public class EthereumServiceContext extends WalletServiceContext {
     @Override
     public TransactionPart getTransactionPart() {
         return this.transactionPart;
+    }
+
+    @Override
+    protected boolean validAddress(String address) {
+        return WalletUtils.isValidAddress(address);
     }
 
 }
