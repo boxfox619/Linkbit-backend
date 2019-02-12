@@ -6,6 +6,7 @@ import com.boxfox.vertx.router.Param
 import com.boxfox.vertx.router.RouteRegistration
 import com.boxfox.vertx.service.Service
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonArray
 import io.vertx.ext.web.RoutingContext
 
 class TransactionRouter : AbstractRouter() {
@@ -30,7 +31,28 @@ class TransactionRouter : AbstractRouter() {
     fun lookupTransaction(ctx: RoutingContext,
                           @Param(name = "symbol") symbol: String,
                           @Param(name = "txHash") txHash: String) {
-        val transaction = transactionService.getTransaction(symbol, txHash)
-        ctx.response().setChunked(true).write(gson.toJson(transaction)).end()
+        transactionService.getTransaction(symbol, txHash).subscribe({
+            ctx.response().end(gson.toJson(it))
+        },{ ctx.fail(it)})
+    }
+
+    @RouteRegistration(uri = "/transaction/:symbol", method = [HttpMethod.POST])
+    fun lookupTransactions(ctx: RoutingContext,
+                          @Param(name = "symbol") symbol: String,
+                          @Param(name = "transactions") transactions: JsonArray) {
+        val hashList = transactions.map{it -> it.toString()}.toList()
+        transactionService.getTransactions(symbol, hashList).subscribe({
+            ctx.response().end(gson.toJson(it))
+        },{ ctx.fail(it)})
+    }
+
+    @RouteRegistration(uri = "/transaction/:symbol", method = [HttpMethod.GET])
+    fun lookupTransactions(ctx: RoutingContext,
+                           @Param(name = "symbol") symbol: String,
+                           @Param(name = "address") address: String,
+                           @Param(name = "lastBlock") lastBlock: Int) {
+        transactionService.getTransactions(symbol, address, lastBlock).subscribe({
+            ctx.response().end(gson.toJson(it))
+        }, { ctx.fail(it) })
     }
 }

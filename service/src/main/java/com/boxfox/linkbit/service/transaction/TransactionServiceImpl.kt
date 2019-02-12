@@ -39,4 +39,7 @@ class TransactionServiceImpl : TransactionUsecase {
         return count
     }
 
+    override fun getTransactionList(symbol: String, address: String, lastBlock: Int): List<TransactionModel> {
+        return WalletServiceRegistry.getService(symbol).indexingTransactions(address, lastBlock)
+    }
 }

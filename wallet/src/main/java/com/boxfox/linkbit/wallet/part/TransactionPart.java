@@ -19,4 +19,6 @@ public interface TransactionPart {
     int getTransactionCount(String address) throws WalletServiceException;
 
     void indexingTransaction(String address);
+
+    List<TransactionModel> indexingTransactions(String address, int fromBlockNumber) throws WalletServiceException, RoutingException;
 }

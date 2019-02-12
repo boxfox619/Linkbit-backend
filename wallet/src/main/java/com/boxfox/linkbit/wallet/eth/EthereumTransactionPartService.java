@@ -47,7 +47,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
 
     static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
     static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
-    private static final String HTTP_API_ETHERSCAN_IO_API_TXLIST = "http://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM";
+    private static final String HTTP_API_ETHERSCAN_IO_API_TXLIST = "http://api.etherscan.io/api?module=account&action=txlist&startblock=%s&endblock=99999999&sort=asc&apikey=WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM&address=%s";
 
     public EthereumTransactionPartService(Vertx vertx, Web3j web3, File cachePath) {
         super(vertx, web3, cachePath);
@@ -80,7 +80,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
             e.printStackTrace();
         } catch (CipherException e) {
             e.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
@@ -176,7 +176,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
     @Override
     public void indexingTransaction(String address) {
         try {
-            String result = Unirest.get(HTTP_API_ETHERSCAN_IO_API_TXLIST + "&address=" + address).asString().getBody();
+            String result = Unirest.get(String.format(HTTP_API_ETHERSCAN_IO_API_TXLIST, 0, address)).asString().getBody();
             JsonObject obj = new JsonObject(result);
             JsonArray transactions = obj.getJsonArray("result");
             for (int i = 0; i < transactions.size(); i++) {
@@ -202,6 +202,44 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
         } catch (UnirestException e) {
             Logger.getRootLogger().error(e);
         }
+    }
+
+    @Override
+    public List<TransactionModel> indexingTransactions(String address, int fromBlockNumber) throws WalletServiceException, RoutingException {
+        List<TransactionModel> list = new ArrayList<>();
+        try {
+            String result = Unirest.get(String.format(HTTP_API_ETHERSCAN_IO_API_TXLIST, fromBlockNumber, address)).asString().getBody();
+            JsonObject obj = new JsonObject(result);
+            JsonArray transactions = obj.getJsonArray("result");
+            for (int i = 0; i < transactions.size(); i++) {
+                JsonObject tx = transactions.getJsonObject(i);
+                String hash = tx.getString("hash");
+                String from = tx.getString("from");
+                String blockNumber = tx.getString("blockNumber");
+                String to = tx.getString("to");
+                String receipt = tx.getString("txreceipt_status");
+                String confirmations = tx.getString("confirmations");
+                String value = tx.getString("value");
+                String timeStamp = tx.getString("timeStamp");
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis() - Integer.valueOf(timeStamp));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd/ HH:mm:ss");
+                String dateTime = simpleDateFormat.format(timestamp);
+                BigDecimal amount = Convert.fromWei(value, Convert.Unit.ETHER);
+                TransactionModel status = new TransactionModel();
+                status.setTransactionHash(hash);
+                status.setSourceAddress(from);
+                status.setTargetAddress(to);
+                status.setAmount(amount.doubleValue());
+                status.setDate(dateTime);
+                status.setConfirmation(Integer.valueOf(confirmations));
+                status.setStatus(receipt.equals("1"));
+                status.setBlockNumber(Integer.valueOf(blockNumber));
+                list.add(status);
+            }
+        } catch (UnirestException e) {
+            Logger.getRootLogger().error(e);
+        }
+        return list;
     }
 
 }
