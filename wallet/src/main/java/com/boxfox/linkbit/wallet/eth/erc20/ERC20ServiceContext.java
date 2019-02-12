@@ -2,6 +2,7 @@ package com.boxfox.linkbit.wallet.eth.erc20;
 
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
+import com.boxfox.linkbit.common.RoutingException;
 import com.boxfox.linkbit.common.entity.transaction.TransactionModel;
 import com.boxfox.linkbit.util.DigitsUtils;
 import com.boxfox.linkbit.util.ERC20Tokens;
@@ -153,6 +154,11 @@ public class ERC20ServiceContext extends WalletServiceContext implements Transac
     }
 
     @Override
+    public List<TransactionModel> indexingTransactions(String address, int fromBlockNumber) throws WalletServiceException, RoutingException {
+        return null;
+    }
+
+    @Override
     public BalancePart getBalancePart() {
         return this;
     }
@@ -165,5 +171,10 @@ public class ERC20ServiceContext extends WalletServiceContext implements Transac
     @Override
     public TransactionPart getTransactionPart() {
         return this;
+    }
+
+    @Override
+    protected boolean validAddress(String address) {
+        return false;
     }
 }

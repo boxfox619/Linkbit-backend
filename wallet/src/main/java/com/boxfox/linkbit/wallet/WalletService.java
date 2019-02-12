@@ -64,6 +64,11 @@ public class WalletService extends AbstractService implements BalancePart, Creat
         context.getTransactionPart().indexingTransaction(address);
     }
 
+    @Override
+    public List<TransactionModel> indexingTransactions(String address, int fromBlockNumber) throws WalletServiceException, RoutingException {
+        return context.getTransactionPart().indexingTransactions(address, fromBlockNumber);
+    }
+
     public boolean validAddress(String address){
         return context.validAddress(address);
     }
