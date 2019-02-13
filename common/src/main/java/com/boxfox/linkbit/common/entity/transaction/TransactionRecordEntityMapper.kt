@@ -10,7 +10,7 @@ object TransactionRecordEntityMapper {
             this.date = record.get(TRANSACTION.DATETIME)
             this.sourceAddress = record.get(TRANSACTION.SOURCEADDRESS)
             this.targetAddress = record.get(TRANSACTION.TARGETADDRESS)
-            this.transactionHash = record.get(TRANSACTION.HASH)
+            this.hash = record.get(TRANSACTION.HASH)
             //this.targetProfile = record.targetProfile
             //this.confirmation = record.comparmation
             //this.blockNumber = record.blockNumber

@@ -112,11 +112,10 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
             transactions.addAll(transactionDao.fetchBySourceaddress());
             for (io.one.sys.db.tables.pojos.Transaction tx : transactions) {
                 TransactionModel txStatus = new TransactionModel();
-                txStatus.setTransactionHash(tx.getHash());
+                txStatus.setHash(tx.getHash());
                 txStatus.setAmount(tx.getAmount());
                 txStatus.setSourceAddress(tx.getSourceaddress());
                 txStatus.setTargetAddress(tx.getTargetaddress());
-                txStatus.setTransactionHash(tx.getHash());
                 txStatus.setDate(tx.getDatetime());
                 Wallet wallet = walletDao.findById(tx.getTargetaddress());
                 if (wallet != null) {
@@ -127,8 +126,8 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
                 //@TODO blocknumber, status save to db
                 TransactionReceipt receipt = web3.ethGetTransactionReceipt(tx.getHash()).send().getTransactionReceipt().get();
                 txStatus.setStatus(receipt.getStatus().equals("0x1"));
-                txStatus.setBlockNumber(receipt.getBlockNumber().intValue());
-                txStatus.setConfirmation(totalBlockNumber - txStatus.getBlockNumber());
+                txStatus.setBlock(receipt.getBlockNumber().intValue());
+                txStatus.setConfirm(totalBlockNumber - txStatus.getBlock());
                 txStatusList.add(txStatus);
             }
             return txStatusList;
@@ -146,13 +145,13 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
             BigInteger lastBlockNumber = web3.ethBlockNumber().send().getBlockNumber();
             TransactionModel status = new TransactionModel();
             BigInteger confirmation = lastBlockNumber.subtract(receipt.getBlockNumber());
-            status.setConfirmation(confirmation.intValue());
+            status.setConfirm(confirmation.intValue());
             status.setSourceAddress(receipt.getFrom());
             status.setTargetAddress(receipt.getTo());
-            status.setTransactionHash(receipt.getBlockHash());
+            status.setHash(receipt.getBlockHash());
             status.setAmount(Double.valueOf(Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER).toPlainString()));
             status.setStatus(receipt.getStatus().equals("0x1"));
-            status.setBlockNumber(receipt.getBlockNumber().intValue());
+            status.setBlock(receipt.getBlockNumber().intValue());
             //txStatus.setDate(tx.getDatetime());
             //txStatus.setTargetProfile();
             //txStatus.setBlockNumber();
@@ -226,14 +225,14 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
                 String dateTime = simpleDateFormat.format(timestamp);
                 BigDecimal amount = Convert.fromWei(value, Convert.Unit.ETHER);
                 TransactionModel status = new TransactionModel();
-                status.setTransactionHash(hash);
+                status.setHash(hash);
                 status.setSourceAddress(from);
                 status.setTargetAddress(to);
                 status.setAmount(amount.doubleValue());
                 status.setDate(dateTime);
-                status.setConfirmation(Integer.valueOf(confirmations));
+                status.setConfirm(Integer.valueOf(confirmations));
                 status.setStatus(receipt.equals("1"));
-                status.setBlockNumber(Integer.valueOf(blockNumber));
+                status.setBlock(Integer.valueOf(blockNumber));
                 list.add(status);
             }
         } catch (UnirestException e) {
