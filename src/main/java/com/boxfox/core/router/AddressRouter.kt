@@ -47,7 +47,7 @@ class AddressRouter : AbstractAuthRouter() {
         })
     }
 
-    @RouteRegistration(uri = "/address/valid", method = [HttpMethod.GET])
+    @RouteRegistration(uri = "/address/exist", method = [HttpMethod.GET])
     fun checkAddressValid(ctx: RoutingContext, @Param(name = "address") address: String) {
         addressService.checkAddressExist(address).subscribe({
             ctx.response().end(JSONObject().put("result", !it).toString())
