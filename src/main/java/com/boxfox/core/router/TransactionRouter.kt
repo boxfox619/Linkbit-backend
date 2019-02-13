@@ -46,7 +46,7 @@ class TransactionRouter : AbstractRouter() {
         },{ ctx.fail(it)})
     }
 
-    @RouteRegistration(uri = "/transaction/:symbol", method = [HttpMethod.GET])
+    @RouteRegistration(uri = "/transactions/:symbol", method = [HttpMethod.GET])
     fun lookupTransactions(ctx: RoutingContext,
                            @Param(name = "symbol") symbol: String,
                            @Param(name = "address") address: String,
