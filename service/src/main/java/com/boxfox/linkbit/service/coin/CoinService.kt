@@ -3,34 +3,50 @@ package com.boxfox.linkbit.service.coin
 import com.boxfox.linkbit.common.entity.coin.CoinModel
 import com.boxfox.linkbit.common.entity.coin.CoinPriceModel
 import com.boxfox.linkbit.service.JooqReactiveService
-import com.boxfox.linkbit.service.LocaleService
-import com.boxfox.vertx.service.Service
+import com.boxfox.linkbit.service.currency.CurrencyServiceImpl
+import com.boxfox.linkbit.service.currency.CurrencyUsecase
 import io.reactivex.Single
 import java.util.*
 
-class CoinService(private val impl: CoinUsecase = CoinServiceImpl()) : JooqReactiveService() {
-
-    @Service
-    internal lateinit var localeService: LocaleService
+class CoinService(private val impl: CoinUsecase = CoinServiceImpl(),
+                  private val currencyImpl: CurrencyUsecase = CurrencyServiceImpl()) : JooqReactiveService() {
 
     fun getCoins(locale: String = Locale.KOREA.language): Single<List<CoinModel>> {
         return single { impl.getCoins(it, locale) }
     }
 
-    fun getPrices(locale: String = Locale.KOREA.language): Single<List<CoinPriceModel>> {
-        return single { impl.getAllPrices(it, locale) }
+    fun getPrices(currency: String = "USD", locale: String = Locale.KOREA.language): Single<List<CoinPriceModel>> {
+        return single {
+            val value = currencyImpl.getCurrency(currency)
+            impl.getAllPrices(it, locale).map { c ->
+                c.price = c.price * value
+                c
+            }
+        }
     }
 
-    fun getPrices(symbols: List<String>, locale: String = Locale.KOREA.language): Single<List<CoinPriceModel>> {
-        return single { impl.getPrices(it, symbols, locale) }
+    fun getPrices(symbols: List<String>, currency: String = "USD", locale: String = Locale.KOREA.language): Single<List<CoinPriceModel>> {
+        return single {
+            val value = currencyImpl.getCurrency(currency)
+            impl.getPrices(it, symbols, locale).map { c ->
+                c.price = c.price * value
+                c
+            }
+        }
     }
 
-    fun getPrice(symbol: String, balance: Double): Single<Double> {
-        return single { impl.getPrice(symbol, balance) }
+    fun getPrice(symbol: String, balance: Double, currency: String = "USD"): Single<Double> {
+        return single {
+            val value = currencyImpl.getCurrency(currency)
+            impl.getPrice(symbol, balance) * value
+        }
     }
 
     @JvmOverloads
-    fun getPrice(symbol: String): Single<Double> {
-        return single { impl.getPrice(symbol) }
+    fun getPrice(symbol: String, currency: String = "USD"): Single<Double> {
+        return single {
+            val value = currencyImpl.getCurrency(currency)
+            impl.getPrice(symbol) * value
+        }
     }
 }

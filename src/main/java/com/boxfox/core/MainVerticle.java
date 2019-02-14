@@ -6,6 +6,7 @@ import com.boxfox.linkbit.common.vertx.middleware.LocaleHandler;
 import com.boxfox.linkbit.common.vertx.middleware.LoggerHandler;
 import com.boxfox.linkbit.common.vertx.middleware.SecureHeaderHandler;
 import com.boxfox.linkbit.service.coin.PriceIndexingVerticle;
+import com.boxfox.linkbit.service.currency.CurrencyIndexingVerticle;
 import com.boxfox.linkbit.wallet.WalletServiceRegistry;
 import com.boxfox.linkbit.wallet.indexing.TransactionIndexingVerticle;
 import com.boxfox.vertx.data.Config;
@@ -69,6 +70,7 @@ public class MainVerticle extends AbstractVerticle {
       Logger.getRootLogger().info("Server started : " + server.actualPort());
       vertx.deployVerticle(TransactionIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
       vertx.deployVerticle(PriceIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
+      vertx.deployVerticle(CurrencyIndexingVerticle.class.getName(), new DeploymentOptions().setWorker(true));
       WalletServiceRegistry.init(vertx);
     });
     future.complete();
