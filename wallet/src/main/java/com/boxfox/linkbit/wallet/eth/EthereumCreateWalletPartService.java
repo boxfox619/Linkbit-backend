@@ -65,6 +65,7 @@ public class EthereumCreateWalletPartService extends EthereumPart implements Cre
         result.setAddress(credentials.getAddress());
         result.getWalletData().addProperty("type", "mnemonic");
         result.getWalletData().addProperty("mnemonic", mnemonic);
+        result.getWalletData().addProperty("password", false);
         result.setResult(true);
         return result;
     }

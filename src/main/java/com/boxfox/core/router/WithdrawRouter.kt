@@ -14,7 +14,7 @@ class WithdrawRouter : AbstractRouter() {
     @Service
     private lateinit var withdrawService: WithdrawService
 
-    @RouteRegistration(uri = "/withdraw", method = arrayOf(HttpMethod.POST))
+    @RouteRegistration(uri = "/withdraw", method = [HttpMethod.POST])
     fun send(ctx: RoutingContext,
              @Param(name = "symbol") symbol: String,
              @Param(name = "walletData") walletData: JsonObject,
