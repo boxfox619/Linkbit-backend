@@ -22,8 +22,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.apache.log4j.Logger;
@@ -34,6 +36,7 @@ import org.web3j.crypto.TransactionEncoder;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.Transaction;
@@ -45,7 +48,8 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
 
   static final BigInteger GAS_PRICE = BigInteger.valueOf(20_000_000_000L);
   static final BigInteger GAS_LIMIT = BigInteger.valueOf(4_300_000);
-  private static final String HTTP_API_ETHERSCAN_IO_API_TXLIST = "http://api.etherscan.io/api?module=account&action=txlist&startblock=%s&endblock=99999999&sort=asc&apikey=WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM&address=%s";
+  private static final String API_KEY = "WN69XKERKW2UYW3QM3YPKFD4VUJCPE1NVM";
+  private static final String HTTP_API_ETHERSCAN_IO_API_TXLIST = "http://api.etherscan.io/api?module=account&action=txlist&startblock=%s&endblock=99999999&sort=asc&address=%s&apikey=%s";
 
   public EthereumTransactionPartService(Vertx vertx, Web3j web3, File cachePath) {
     super(vertx, web3, cachePath);
@@ -152,18 +156,23 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
       if (tx == null || receipt == null) {
         throw new WalletServiceException("Can not lookup transaction status");
       }
+      EthBlock block = web3.ethGetBlockByHash(tx.getBlockHash(), false).send();
+      BigDecimal balance = Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER);
+      double amount = Double.valueOf(balance.toPlainString());
       BigInteger lastBlockNumber = web3.ethBlockNumber().send().getBlockNumber();
       TransactionModel status = new TransactionModel();
       BigInteger confirmation = lastBlockNumber.subtract(receipt.getBlockNumber());
       status.setConfirm(confirmation.intValue());
       status.setSourceAddress(receipt.getFrom());
       status.setTargetAddress(receipt.getTo());
-      status.setHash(receipt.getBlockHash());
-      status.setAmount(Double
-          .valueOf(Convert.fromWei(tx.getValue().toString(), Convert.Unit.ETHER).toPlainString()));
+      status.setHash(tx.getHash());
+      status.setAmount(amount);
       status.setStatus(receipt.getStatus().equals("0x1"));
       status.setBlock(receipt.getBlockNumber().intValue());
-      //txStatus.setDate(tx.getDatetime());
+      long timestamp = block.getBlock().getTimestamp().longValue();
+      Date date = new Date(timestamp*1000);
+      DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+      status.setDate(format.format(date));
       //txStatus.setTargetProfile();
       //txStatus.setBlockNumber();
       //@TODO more add tx status
@@ -187,7 +196,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
   @Override
   public void indexingTransaction(String address) {
     try {
-      String result = Unirest.get(String.format(HTTP_API_ETHERSCAN_IO_API_TXLIST, 0, address))
+      String result = Unirest.get(String.format(HTTP_API_ETHERSCAN_IO_API_TXLIST, 0, address, API_KEY))
           .asString().getBody();
       JsonObject obj = new JsonObject(result);
       JsonArray transactions = obj.getJsonArray("result");
@@ -223,7 +232,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
     List<TransactionModel> list = new ArrayList<>();
     try {
       String result = Unirest
-          .get(String.format(HTTP_API_ETHERSCAN_IO_API_TXLIST, fromBlockNumber, address)).asString()
+          .get(String.format(HTTP_API_ETHERSCAN_IO_API_TXLIST, fromBlockNumber, address, API_KEY)).asString()
           .getBody();
       JsonObject obj = new JsonObject(result);
       JsonArray transactions = obj.getJsonArray("result");
