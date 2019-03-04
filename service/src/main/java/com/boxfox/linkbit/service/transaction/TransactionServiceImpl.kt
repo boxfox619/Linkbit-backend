@@ -3,25 +3,26 @@ package com.boxfox.linkbit.service.transaction
 import com.boxfox.linkbit.common.RoutingException
 import com.boxfox.linkbit.common.entity.transaction.TransactionModel
 import com.boxfox.linkbit.common.entity.transaction.TransactionRecordEntityMapper
+import com.boxfox.linkbit.wallet.WalletServiceException
 import com.boxfox.linkbit.wallet.WalletServiceRegistry
 import com.google.api.client.http.HttpStatusCodes
 import io.one.sys.db.Tables.TRANSACTION
 import io.one.sys.db.Tables.WALLET
 import io.one.sys.db.tables.records.TransactionRecord
 import org.jooq.DSLContext
-import java.util.*
 
 class TransactionServiceImpl : TransactionUsecase {
 
     override fun getTransaction(ctx: DSLContext, symbol: String, txHash: String): TransactionModel {
         val record: TransactionRecord? = ctx.selectFrom(TRANSACTION).where(TRANSACTION.HASH.eq(txHash)).fetch().firstOrNull()
         val transaction: TransactionModel
-        if (record == null) {
-            transaction = WalletServiceRegistry.getService(symbol).getTransaction(txHash)
-        } else {
-            transaction = TransactionRecordEntityMapper.fromRecord(record)
-        }
-        if (transaction == null) {
+        transaction = try {
+            if (record == null) {
+                WalletServiceRegistry.getService(symbol).getTransaction(txHash)
+            } else {
+                TransactionRecordEntityMapper.fromRecord(record)
+            }
+        } catch (e: WalletServiceException) {
             throw RoutingException(HttpStatusCodes.STATUS_CODE_NOT_FOUND, "transaction not found")
         }
         return transaction

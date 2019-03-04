@@ -38,12 +38,12 @@ class TransactionRouter : AbstractRouter() {
 
     @RouteRegistration(uri = "/transaction/:symbol", method = [HttpMethod.POST])
     fun lookupTransactions(ctx: RoutingContext,
-                          @Param(name = "symbol") symbol: String,
-                          @Param(name = "transactions") transactions: JsonArray) {
-        val hashList = transactions.map{it -> it.toString()}.toList()
+                           @Param(name = "symbol") symbol: String,
+                           @Param(name = "transactions") transactions: JsonArray) {
+        val hashList = transactions.map { it -> it.toString() }.toList()
         transactionService.getTransactions(symbol, hashList).subscribe({
             ctx.response().end(gson.toJson(it))
-        },{ ctx.fail(it)})
+        }, { ctx.fail(it) })
     }
 
     @RouteRegistration(uri = "/transactions/:symbol", method = [HttpMethod.GET])
