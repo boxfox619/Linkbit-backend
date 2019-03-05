@@ -39,7 +39,7 @@ public class WalletService extends AbstractService implements BalancePart, Creat
     }
 
     @Override
-    public TransactionResult send(JsonObject walletData, String targetAddress, String amount) {
+    public TransactionResult send(JsonObject walletData, String targetAddress, String amount) throws RoutingException {
         return context.getTransactionPart().send(walletData, targetAddress, amount);
     }
 

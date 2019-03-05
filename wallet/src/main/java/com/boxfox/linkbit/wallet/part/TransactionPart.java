@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TransactionPart {
 
-    TransactionResult send(JsonObject data, String targetAddress, String amount);
+    TransactionResult send(JsonObject data, String targetAddress, String amount) throws RoutingException;
 
     List<TransactionModel> getTransactionList(String address) throws WalletServiceException, RoutingException;
 

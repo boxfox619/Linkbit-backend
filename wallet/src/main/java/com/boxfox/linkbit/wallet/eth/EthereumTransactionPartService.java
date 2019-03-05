@@ -56,7 +56,7 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
   }
 
   @Override
-  public TransactionResult send(JsonObject data, String targetAddress, String amount) {
+  public TransactionResult send(JsonObject data, String targetAddress, String amount) throws RoutingException {
     TransactionResult result = new TransactionResult();
     try {
       Credentials credentials = this.getCredentials(data);
@@ -78,16 +78,10 @@ public class EthereumTransactionPartService extends EthereumPart implements Tran
       String transactionHash = ethSendTransaction.getTransactionHash();
       result.setStatus(true);
       result.setTransactionHash(transactionHash);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    } catch (CipherException e) {
-      e.printStackTrace();
+    }catch(CipherException e){
+      throw new RoutingException( HttpStatusCodes.STATUS_CODE_BAD_REQUEST, "Invalid password");
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new RoutingException( HttpStatusCodes.STATUS_CODE_BAD_REQUEST, "Withdraw fail");
     }
     return result;
   }
