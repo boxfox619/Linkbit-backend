@@ -21,8 +21,8 @@ import org.web3j.protocol.Web3j;
 
 public class EthereumCreateWalletPartService extends EthereumPart implements CreateWalletPart {
 
-    public EthereumCreateWalletPartService(Vertx vertx, Web3j web3, File cachePath) {
-        super(vertx, web3, cachePath);
+    public EthereumCreateWalletPartService(Web3j web3, File cachePath) {
+        super(web3, cachePath);
     }
 
     @Override

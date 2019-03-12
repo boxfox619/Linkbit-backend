@@ -14,7 +14,7 @@ public class WalletServiceRegistry {
 
   public static void init(Vertx vertx) {
     Logger.getRootLogger().info("Start wallet services initializing");
-    register(EthereumServiceContext.create(vertx));
+    register(EthereumServiceContext.create());
     ERC20Tokens.init();
     Logger.getRootLogger().info("Finish wallet services initialization");
   }

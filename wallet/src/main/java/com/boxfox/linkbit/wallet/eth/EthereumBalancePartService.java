@@ -12,8 +12,8 @@ import org.web3j.utils.Convert;
 
 public class EthereumBalancePartService extends EthereumPart implements BalancePart {
 
-  public EthereumBalancePartService(Vertx vertx, Web3j web3, File cachePath) {
-    super(vertx, web3, cachePath);
+  public EthereumBalancePartService(Web3j web3, File cachePath) {
+    super(web3, cachePath);
   }
 
   @Override

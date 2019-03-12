@@ -22,15 +22,15 @@ public class EthereumServiceContext extends WalletServiceContext {
         super("ETH");
     }
 
-    public static EthereumServiceContext create(Vertx vertx) {
+    public static EthereumServiceContext create() {
         EthereumServiceContext service = new EthereumServiceContext();
         Web3j web3 = Web3j.build(new HttpService("https://mainnet.infura.io/v3/326b0d7561824e0b8c4ee1f30e257019"));
         File cachePath = new File(Config.getDefaultInstance().getString("cachePath", "wallets"));
         if (!cachePath.exists())
             cachePath.mkdirs();
-        service.balancePart = new EthereumBalancePartService(vertx, web3, cachePath);
-        service.createWalletPart = new EthereumCreateWalletPartService(vertx, web3, cachePath);
-        service.transactionPart = new EthereumTransactionPartService(vertx, web3, cachePath);
+        service.balancePart = new EthereumBalancePartService(web3, cachePath);
+        service.createWalletPart = new EthereumCreateWalletPartService(web3, cachePath);
+        service.transactionPart = new EthereumTransactionPartService(web3, cachePath);
         return service;
     }
 
